@@ -1,6 +1,9 @@
-import { Template } from "../types/schema";
+import { Template } from "../types/template";
 
-export const mockPizzaTemplate: Template = {
+/**
+ * A mock template for testing the video editor.
+ */
+export const mockBunnyTemplate: Template = {
   id: "bunny-intro-2026",
   title: "Kaninen och Fjärilen",
   sourceVideoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
@@ -13,7 +16,6 @@ export const mockPizzaTemplate: Template = {
       durationSeconds: 3.0,
       instruction: "Fjäril flyger ovanför en gigantisk kanin",
       textOverlays: [],
-      effects: [],
     },
     {
       id: "scene-2",
@@ -23,7 +25,6 @@ export const mockPizzaTemplate: Template = {
       instruction:
         "Kaninen följer fjärilen med ögonen tills den landar på blomma, i sista ögonblick mosas fjärilen av ett fallande äpple",
       textOverlays: [],
-      effects: [],
     },
   ],
 };

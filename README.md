@@ -1,4 +1,4 @@
-# Studentspec för Abbas Faeq Hadi — Automatisk videoredigering (CapCut-stil) - Utarbetad i samarbete med LeTrend
+# Studentspec för Abbas Faeq Hadi — Automatisk videoredigering (CapCut-stil) — Utarbetad i samarbete med LeTrend
 
 > **För:** Mjukvaruutvecklingsstudent, 8 veckors projekt
 > **Kurs:** Mjukvaruutvecklingsprojekt, Linnéuniversitetet
