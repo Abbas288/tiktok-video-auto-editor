@@ -10,7 +10,7 @@ export default function PreviewScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Preview för projekt: {id}</Text>
+      <Text style={styles.text}>Preview for project: {id}</Text>
     </View>
   );
 }

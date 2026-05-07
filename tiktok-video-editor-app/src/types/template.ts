@@ -1,40 +1,65 @@
-/**
- * Represents a video editing project template.
- */
-export interface Template {
-  id: string;
-  title: string;
-  sourceVideoUrl: string;
-  orientation: "portrait" | "landscape";
-  music?: {
-    url: string;
-    volume: number;
-  };
-  scenes: Scene[];
+/** Allowed video orientations. */
+export type Orientation = "portrait" | "landscape" | "square";
+
+/** Configuration for background music. */
+export interface Music {
+  url: string;
+  volume: number;
+  beatSync: boolean;
+}
+
+/** Defines how a scene transitions into the next. */
+export interface Transition {
+  type: "cut" | "fade" | "slide";
+  durationSeconds: number;
+  direction?: "left" | "right" | "up" | "down";
 }
 
 /**
- * Represents a specific scene within a template.
+ * Represents a text element rendered over the video.
+ * positionX and positionY are normalized (0-1) coordinates.
  */
+export interface TextOverlay {
+  id: string;
+  text: string;
+  positionX: number;
+  positionY: number;
+  fontSizePt: number;
+  color: string;
+  style: "normal" | "bold" | "italic";
+  animationIn: "none" | "fadeUp" | "fadeIn";
+  startSeconds: number;
+  durationSeconds: number;
+}
+
+/** Visual effects applied to a specific scene. */
+export interface Effect {
+  type: "zoom" | "brightness" | "contrast" | "blur";
+  intensity?: number;
+  value?: number;
+}
+
+/** Represents a discrete video segment with its own rules and overlays. */
 export interface Scene {
   id: string;
   orderIndex: number;
   startSeconds: number;
   durationSeconds: number;
   instruction: string;
+  transition?: Transition;
   textOverlays: TextOverlay[];
+  effects: Effect[];
 }
 
 /**
- * Represents a text overlay element on a scene.
+ * The root template object containing the full editing blueprint.
+ * This drives the entire EditorSession.
  */
-export interface TextOverlay {
+export interface Template {
   id: string;
-  text: string;
-  positionX: number; // 0-1
-  positionY: number; // 0-1
-  fontSize: number;
-  color: string;
-  startSeconds: number;
-  durationSeconds: number;
+  title: string;
+  sourceVideoUrl: string;
+  orientation: Orientation;
+  music?: Music;
+  scenes: Scene[];
 }
