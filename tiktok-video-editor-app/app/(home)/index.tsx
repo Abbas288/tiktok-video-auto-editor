@@ -45,7 +45,7 @@ export default function HomeScreen() {
    * @param {string} id - The unique identifier of the selected template.
    */
   const handleOpenProject = (id: string) => {
-    router.push(`/(editor)/${id}`);
+    router.push(`/editor/${id}`);
   };
 
   if (isLoading) {

@@ -13,10 +13,10 @@ export default function RootLayout() {
     >
       <Stack.Screen name="(home)/index" options={{ title: "My Projects" }} />
       <Stack.Screen
-        name="(editor)/[id]"
+        name="editor/[id]"
         options={{ title: "Editor", headerShown: false }}
       />
-      <Stack.Screen name="(preview)/[id]" options={{ title: "Preview" }} />
+      <Stack.Screen name="preview/[id]" options={{ title: "Preview" }} />
     </Stack>
   );
 }
