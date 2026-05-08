@@ -28,7 +28,11 @@ export default function EditorScreen(): React.JSX.Element {
 
   const handleGoBack = useCallback((): void => {
     clearSession();
-    router.back();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
   }, [clearSession, router]);
 
   if (isLoading) {
