@@ -1,4 +1,3 @@
-// tiktok-video-editor-app/src/components/EditorHeader.tsx
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { colors } from "../styles/theme";
@@ -18,7 +17,7 @@ export function EditorHeader({
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={onGoBack}>
-        <Text style={styles.link}>← Tillbaka</Text>
+        <Text style={styles.link}>← Go Back</Text>
       </TouchableOpacity>
       <Text style={styles.title}>{title}</Text>
     </View>

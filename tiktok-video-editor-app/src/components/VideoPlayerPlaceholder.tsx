@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from "react-native";
 export function VideoPlayerPlaceholder(): React.JSX.Element {
   return (
     <View style={styles.videoPlaceholder}>
-      <Text style={{ color: "#fff" }}>Videospelare kommer här</Text>
+      <Text style={{ color: "#fff" }}>Video player will be here</Text>
     </View>
   );
 }

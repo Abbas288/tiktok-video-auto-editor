@@ -37,7 +37,7 @@ export function SceneList({
         </TouchableOpacity>
       )}
       ListEmptyComponent={
-        <Text style={styles.emptyText}>Inga scener tillgängliga.</Text>
+        <Text style={styles.emptyText}>No scenes available.</Text>
       }
     />
   );
