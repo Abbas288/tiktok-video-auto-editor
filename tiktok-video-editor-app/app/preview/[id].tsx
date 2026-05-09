@@ -3,14 +3,14 @@ import { useLocalSearchParams } from "expo-router";
 import { colors } from "../../src/styles/theme";
 
 /**
- * Screen component for video editing.
+ * Screen component for video previewing.
  */
-export default function EditorScreen() {
+export default function PreviewScreen() {
   const { id } = useLocalSearchParams();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Editor för projekt: {id}</Text>
+      <Text style={styles.text}>Preview for project: {id}</Text>
     </View>
   );
 }

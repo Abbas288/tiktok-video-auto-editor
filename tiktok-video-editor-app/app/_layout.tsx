@@ -11,15 +11,12 @@ export default function RootLayout() {
         headerTintColor: "#fff",
       }}
     >
-      <Stack.Screen name="(home)/index" options={{ title: "Mina Projekt" }} />
+      <Stack.Screen name="(home)/index" options={{ title: "My Projects" }} />
       <Stack.Screen
-        name="(editor)/[id]"
-        options={{ title: "Redigerare", headerShown: false }}
+        name="editor/[id]"
+        options={{ title: "Editor", headerShown: false }}
       />
-      <Stack.Screen
-        name="(preview)/[id]"
-        options={{ title: "Förhandsgranskning" }}
-      />
+      <Stack.Screen name="preview/[id]" options={{ title: "Preview" }} />
     </Stack>
   );
 }

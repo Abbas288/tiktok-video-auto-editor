@@ -5,7 +5,7 @@ import { Template } from "../types/template";
  */
 export const mockBunnyTemplate: Template = {
   id: "bunny-intro-2026",
-  title: "Kaninen och Fjärilen",
+  title: "The Bunny and the Butterfly",
   sourceVideoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
   orientation: "landscape",
   scenes: [
@@ -14,8 +14,9 @@ export const mockBunnyTemplate: Template = {
       orderIndex: 0,
       startSeconds: 0.0,
       durationSeconds: 3.0,
-      instruction: "Fjäril flyger ovanför en gigantisk kanin",
+      instruction: "Butterfly flies above a giant bunny",
       textOverlays: [],
+      effects: [],
     },
     {
       id: "scene-2",
@@ -23,8 +24,9 @@ export const mockBunnyTemplate: Template = {
       startSeconds: 3.0,
       durationSeconds: 7.0,
       instruction:
-        "Kaninen följer fjärilen med ögonen tills den landar på blomma, i sista ögonblick mosas fjärilen av ett fallande äpple",
+        "The bunny follows the butterfly with its eyes until it lands on a flower; at the last moment, the butterfly is crushed by a falling apple",
       textOverlays: [],
+      effects: [],
     },
   ],
 };
