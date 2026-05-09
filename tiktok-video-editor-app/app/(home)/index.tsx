@@ -19,6 +19,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     /**
@@ -27,10 +28,12 @@ export default function HomeScreen() {
     const fetchTemplates = async () => {
       try {
         setIsLoading(true);
+        setError(null);
         const data = await templateRepository.getAvailableTemplates();
         setTemplates(data);
       } catch (error) {
         console.error("Error fetching templates:", error);
+        setError("Could not load templates.");
       } finally {
         setIsLoading(false);
       }
@@ -52,6 +55,14 @@ export default function HomeScreen() {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={colors.text} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
@@ -111,5 +122,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
     marginTop: 5,
+  },
+  errorText: {
+    fontSize: 16,
+    color: colors.text,
+    textAlign: "center",
   },
 });
