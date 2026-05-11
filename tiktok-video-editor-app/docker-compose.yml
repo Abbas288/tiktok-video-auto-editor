@@ -4,6 +4,25 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    ports:
-      - "${WEB_PORT:-8080}:80"
+    expose:
+      - "80"
     restart: unless-stopped
+
+  caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - /etc/ssl/certs/LNU_FTK_Campus_Root_CA_2025.pem:/etc/ssl/certs/LNU_FTK_Campus_Root_CA_2025.pem:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:
