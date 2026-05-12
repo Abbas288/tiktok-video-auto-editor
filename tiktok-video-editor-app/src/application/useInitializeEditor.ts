@@ -13,11 +13,12 @@ interface EditorInitializationResult {
 }
 
 /**
- * Custom hook to orchestrate the initialization of the editor session.
- * Handles data fetching, error states, and syncing with the global store.
+ * Custom hook that initializes the editor session from a template id.
+ * It loads a validated template, syncs it with the global edit session,
+ * and clears stale session state when the id is missing or invalid.
  *
- * @param {string | undefined} id - The template ID from the route parameters.
- * @returns An object containing loading state, error state, and session actions.
+ * @param id Template id from the editor route.
+ * @returns Loading state, error state, current session data and session actions.
  */
 export function useInitializeEditor(
   id: string | undefined,
@@ -34,32 +35,59 @@ export function useInitializeEditor(
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAndLoadTemplate = async () => {
-      if (!id) return;
+    let isActive = true;
+
+    const fetchAndLoadTemplate = async (): Promise<void> => {
+      setIsLoading(true);
+      setError(null);
+
+      if (!id) {
+        clearSession();
+
+        if (isActive) {
+          setError("No template id was provided.");
+          setIsLoading(false);
+        }
+
+        return;
+      }
 
       try {
-        setIsLoading(true);
-        setError(null);
-
         const template = await templateRepository.getTemplateById(id);
 
-        if (template) {
-          loadTemplate(template);
-        } else {
-          setError("Could not find the template. It may have been removed.");
+        if (!isActive) {
+          return;
         }
-      } catch (err) {
-        console.error("Failed to load template:", err);
+
+        if (!template) {
+          clearSession();
+          setError("Could not find the template. It may have been removed.");
+          return;
+        }
+
+        loadTemplate(template);
+      } catch {
+        if (!isActive) {
+          return;
+        }
+
+        clearSession();
         setError(
-          "An error occurred while loading the template. The data format might be invalid.",
+          "An error occurred while loading the template. The data format might be invalid",
         );
       } finally {
-        setIsLoading(false);
+        if (isActive) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchAndLoadTemplate();
-  }, [id, loadTemplate]);
+
+    return () => {
+      isActive = false;
+    };
+  }, [id, loadTemplate, clearSession]);
 
   return {
     isLoading,
