@@ -37,6 +37,14 @@ TikTok URL -> AI/API video analysis -> Template-JSON -> EditSession -> Editor UI
 - Backend/compile-server utför faktisk rendering via FFmpeg.
 - Syftet är att härma redigeringsformat, struktur och stil, inte att kopiera originalvideons innehåll rakt av.
 
+## Deployment-scope
+
+Docker, Docker Compose, Nginx, Caddy, Expo Web-export och Cumulus gäller bara när aktuell issue uttryckligen handlar om deployment eller release, till exempel `#35` eller `#40`.
+
+Vid vanlig apputveckling ska Gemini inte föreslå Docker-kommandon, Expo Web-export eller deployment-testning om issue inte kräver det.
+
+Deployment i Abbas projekt betyder webbdeployment eller framtida backend/compile-server. Det betyder inte native mobilrelease och det får inte ändra mobilappens kärnansvar.
+
 ## Kärnmandat
 
 1. Bygg strikt en feature i taget.
@@ -106,10 +114,48 @@ Krav ska vara:
 2. Identifiera aktuell issue eller feature.
 3. Kontrollera krav och acceptanskriterier.
 4. Implementera minsta möjliga ändring.
-5. Testa manuellt och automatiskt där det är rimligt.
-6. Uppdatera `08_current_feature_context.md` vid behov.
-7. Kör `git status` och `git diff`.
-8. Föreslå commit först när verifiering är gjord.
+5. Testa enligt issue och testfall.
+6. Vid vanlig Expo-verifiering används `npm start`.
+7. Uppdatera `08_current_feature_context.md` vid behov.
+8. Kör `git status` och `git diff`.
+9. Föreslå commit först när verifiering är gjord.
+
+## Verifiering
+
+Standardkontroller före commit:
+
+```bash
+npm run lint
+npx tsc --noEmit
+git status
+git diff
+```
+
+Om UI eller appstruktur påverkas:
+
+```bash
+npm start
+```
+
+Om aktuell issue eller testfall kräver automatiska tester, eller om testkod ändras:
+
+```bash
+npm test
+```
+
+Om aktuell issue uttryckligen gäller Expo Web eller deployment, till exempel `#35` eller `#40`:
+
+```bash
+npx expo export --platform web
+docker compose build
+docker compose up --build -d
+```
+
+Om filer redan är staged:
+
+```bash
+git diff --staged
+```
 
 ## Commit-standard
 
@@ -149,3 +195,4 @@ Gemini får inte:
 - föreslå commit utan att först kontrollera test och diff
 - skriva att appen kopierar TikTok-videos i juridisk mening
 - lägga secrets, tokens, Supabase-nycklar, API-nycklar, `.env` eller privata signerade länkar i repo
+- blanda deploymentarbete med editorlogik om de inte hör till samma issue

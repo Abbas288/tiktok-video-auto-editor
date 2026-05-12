@@ -11,6 +11,7 @@ Gemini ska använda denna fil när den:
 - granskar diff
 - hjälper Abbas inför commit
 - bedömer om en feature är redo
+- hjälper till med GitLab-spårbarhet
 
 ## Grundregel
 
@@ -40,6 +41,7 @@ Gemini får inte hoppa över testning eller dokumentation för att koden ser rim
 - Undvik stora omskrivningar om det inte är nödvändigt.
 - Bygg inte flera features samtidigt.
 - Anpassa lösningen till Abbas app, inte till Ida, Wasim eller hagen-auto-edit.
+- Separera appfeature, dokumentation, test och deployment om de inte hör till samma issue.
 
 ### 3. Dokumentation
 
@@ -47,6 +49,7 @@ Gemini får inte hoppa över testning eller dokumentation för att koden ser rim
 - Dokumentera beslut om arkitektur eller scope ändras.
 - Uppdatera `08_current_feature_context.md` när aktuell feature ändras.
 - Uppdatera Wiki eller ai-context om teststrategi, krav eller arkitektur påverkas.
+- Uppdatera deploymentdokumentation endast när aktuell issue gäller Docker, Cumulus, Nginx, Caddy eller Expo Web-export.
 
 ### 4. Testfall
 
@@ -54,6 +57,8 @@ Gemini får inte hoppa över testning eller dokumentation för att koden ser rim
 - Testa normalfall och edge cases.
 - Koppla testfall till krav.
 - Dokumentera faktiskt resultat, inte bara förväntat resultat.
+- När aktuell issue gäller routing eller template-id-stabilisering ska relevant edge case testas, till exempel TC-E1.
+- När aktuell issue gäller Docker eller deployment ska relevanta TC-Dx-testfall testas.
 
 ### 5. Verifiering
 
@@ -62,7 +67,28 @@ Minimikontroller före commit:
 ```bash
 npm run lint
 npx tsc --noEmit
-npx expo start
+```
+
+Om UI eller appstruktur påverkas:
+
+```bash
+npm start
+```
+
+När aktuell issue eller testfall kräver automatiska tester, eller när testkod ändras:
+
+```bash
+npm test
+```
+
+När aktuell issue uttryckligen gäller Expo Web eller deployment, till exempel `#35` eller `#40`:
+
+```bash
+npx expo export --platform web
+docker compose build
+docker compose up --build -d
+docker compose ps
+docker compose logs
 ```
 
 Före commit ska även detta kontrolleras:
@@ -86,6 +112,8 @@ Om kommandon saknas eller inte kan köras ska Gemini dokumentera varför.
 - Commit ska ha ett tydligt syfte.
 - Commit ska inte blanda orelaterade ändringar.
 - Untracked files måste granskas innan `git add .`.
+- Deploymentfiler ska helst committas separat från editorlogik.
+- Dokumentationsändringar ska helst committas separat om de inte direkt hör till samma feature.
 
 ## Arkitekturlager
 
@@ -158,6 +186,24 @@ Exempel:
 
 Infrastructure ska kunna mockas så att tester inte kräver riktiga API-anrop.
 
+### Deployment
+
+Deployment är leveransform och driftkonfiguration, inte ett nytt lager i editorlogiken.
+
+Ansvar vid deployment-issues:
+- Expo Web-export
+- statisk webbserver, exempelvis Nginx
+- reverse proxy, exempelvis Caddy
+- Dockerfile och Docker Compose
+- Cumulus som kursens deploymentmiljö
+
+Regler:
+- Deployment får inte ändra appens kärnansvar.
+- Expo Web-deployment är inte samma sak som native mobilrelease.
+- FFmpeg ska inte flyttas till mobilappen.
+- Secrets, `.env`, privata nycklar och certifikat får inte versionshanteras eller byggas in i imagen.
+- Deploymentkommandon ska bara föreslås när aktuell issue faktiskt gäller deployment.
+
 ## Kodstil
 
 - Använd strikt TypeScript.
@@ -171,6 +217,7 @@ Infrastructure ska kunna mockas så att tester inte kräver riktiga API-anrop.
 - Lägg aldrig secrets, tokens, Supabase-nycklar eller privata signerade länkar i repo.
 - Ta bort debug-loggar före commit.
 - Undvik scope creep.
+- Använd helper för route-parametrar när Expo Router kan returnera `string`, `string[]` eller `undefined`.
 
 ## JSDoc-princip
 
@@ -201,6 +248,9 @@ Gemini ska:
 - fråga eller markera osäkerhet när krav är oklara
 - föreslå mockning när externa services används
 - hålla implementationer små och verifierbara
+- föreslå `npm test` endast när aktuell issue eller testfall kräver automatiska tester, eller när testkod ändras
+- föreslå `npx expo export --platform web` endast när aktuell issue gäller Expo Web eller deployment
+- föreslå Docker Compose-testning endast när Dockerfiler eller deploymentkonfiguration påverkas
 
 ## Referensregler
 
@@ -220,10 +270,24 @@ npm run lint
 npx tsc --noEmit
 ```
 
+Om aktuell issue eller testfall kräver automatiska tester, eller testkod ändras:
+
+```bash
+npm test
+```
+
 Om UI eller appstruktur påverkas:
 
 ```bash
-npx expo start
+npm start
+```
+
+Om aktuell issue uttryckligen gäller Expo Web eller deployment:
+
+```bash
+npx expo export --platform web
+docker compose build
+docker compose up --build -d
 ```
 
 Om filer redan är staged:
@@ -231,6 +295,15 @@ Om filer redan är staged:
 ```bash
 git diff --staged
 ```
+
+## Branching och GitLab
+
+- `main` ska hållas stabil.
+- Använd kortlivade feature branches som standard.
+- Branch ska vara kopplad till issue eller tydlig fix när det är möjligt.
+- Git Flow är för tungt för Abbas projekt om det inte finns flera parallella releaser.
+- Partnerövningar ska vara små, tidsboxade och fokusera på programförståelse, branching, MR och test.
+- GitLab automation kan senare användas för lint, test, TypeScript, build och MR-kontroller.
 
 ## Klarhetsregel
 
@@ -240,9 +313,10 @@ En feature är inte klar bara för att:
 - AI säger att det ser bra ut
 - TypeScript inte klagar
 - UI ser rimligt ut
+- Docker startar en container
+- appen går att öppna lokalt en gång
 
 En feature är klar först när den är testad mot krav, förstådd av Abbas och dokumenterad.
-
 
 ## När Gemini ska stanna
 
@@ -253,3 +327,5 @@ Gemini ska stanna och fråga Abbas när:
 - kod kräver credentials eller externa API-nycklar
 - en lösning riskerar att hamna utanför MVP
 - testresultat saknas men commit efterfrågas
+- Docker eller deployment riskerar att dra projektet bort från editor-MVP
+- Git visar många orelaterade ändringar som inte kan förklaras

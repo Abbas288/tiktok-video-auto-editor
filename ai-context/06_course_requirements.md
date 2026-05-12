@@ -14,6 +14,7 @@ Gemini ska använda denna fil vid:
 - kodarbete
 - reflektion
 - slutrapport
+- deployment eller GitLab-arbete
 
 ## Kursens karaktär
 
@@ -133,6 +134,9 @@ GitLab används för:
 - tidsrapportering
 - commits
 - spårbarhet
+- partnerövning
+- branching strategy
+- eventuell automation
 
 Gemini ska behandla GitLab som en del av examinationen, inte bara som backup för kod.
 
@@ -151,6 +155,7 @@ Den bör innehålla:
 - iterationsrapporter
 - tekniska beslut
 - reflektioner
+- deploymentbeskrivning när Docker eller Cumulus används
 
 Dokumentationen ska vara levande och spegla verklig kod.
 
@@ -202,6 +207,7 @@ Gemini ska hjälpa Abbas skapa:
 - kravspårbarhet
 - edge case-testning
 - regressionstestning
+- deploymenttest när Docker eller Cumulus påverkas
 
 Testfall ska följa:
 
@@ -215,6 +221,8 @@ Exempel:
 TC1.1 Home route renders project list
 TC1.2 Invalid template id is handled
 TC2.1 Template can be parsed into EditSession
+TC-D1 Lokal Docker-build
+TC-E1 Editor och preview hanterar saknat eller ogiltigt template-id
 ```
 
 Alla testfall behöver inte vara lyckade, men misslyckade test ska leda till analys, issue eller ny plan.
@@ -231,6 +239,7 @@ För Abbas projekt ska Gemini prioritera:
 - tydlig separation mellan UI, state, domain och infrastructure
 - testbar kod
 - inga antaganden om att frontend analyserar TikTok-videos
+- stabil route-hantering för template-id och editorstate
 
 ## Versionshantering
 
@@ -254,6 +263,7 @@ Gemini ska stödja:
 - inga hemligheter i Git
 - `.env.example` när miljövariabler behövs
 - `.gitignore` som skyddar `node_modules`, Expo-cache, env-filer och skräpfiler
+- `.dockerignore` när Docker används
 - package-lock eller annan lockfil som hanteras medvetet
 
 ## Veckoteman
@@ -262,8 +272,8 @@ Kursen följer ungefär dessa teman:
 - Vecka 1 till 2: Vision och planering
 - Vecka 3: Krav och test
 - Vecka 4: Implementation 1 och arkitektur
-- Vecka 5: Versionshantering
-- Vecka 6: Drift och Docker
+- Vecka 5: Versionshantering, GitLab, branching och software evolution
+- Vecka 6: Drift, Docker Compose, produktion, återanvändning, komponenter och services
 - Vecka 7: CI/CD
 - Vecka 8: Automatiserade tester
 - Vecka 9: Leverans och etik
@@ -279,6 +289,19 @@ Kapitelkoppling:
 
 Gemini ska använda `ai-context/theory/` före originalkapitlen när sådana filer finns.
 
+## Vecka 5: Git, branching och partnerövning
+
+Vecka 5 kräver att Abbas kan visa:
+- versionshantering som mer än backup
+- `git status`, `git diff`, staging, commit och push
+- skillnaden mellan tracked och untracked files
+- att `git commit -a` inte tar med nya filer
+- koppling mellan krav, issue, branch, commit/MR och test
+- reflektion över branching strategies
+- partnerövning där en liten ändring görs i någon annans repo
+
+För Abbas projekt är short-lived feature branches rimlig standard. Git Flow är normalt för tungt eftersom projektet inte har flera parallella releaser.
+
 ## Arkitektur och design
 
 Kursen förväntar sig minst en enkel schematisk bild eller beskrivning av applikationens arkitektur.
@@ -288,6 +311,7 @@ För Abbas projekt ska arkitekturen beskrivas som:
 - Application: Zustand store, orchestration, use cases
 - Domain: Template, Scene, EditSession, Overlay, Transition, CompilePayload
 - Infrastructure: API-klienter, TemplateRepository, GCS, Supabase, RenderApiClient, compile-server
+- Deployment: Expo Web-export, Docker Compose, Nginx/Caddy, Cumulus när detta används som leveransform
 
 Viktigt flöde:
 
@@ -295,15 +319,28 @@ TikTok URL -> AI/API video analysis -> Template-JSON -> EditSession -> Editor UI
 
 ## Driftsättning och Docker
 
-Docker och containers är kursmaterial som blir viktigare senare. För Abbas projekt är Docker främst relevant för backend/compile-server, inte för att mobilappen själv ska köra FFmpeg.
+Docker och containers är kursmaterial som blir viktigt under vecka 6. För Abbas projekt är Docker främst relevant för Expo Web-deployment och framtida backend/compile-server, inte för att mobilappen själv ska köra FFmpeg.
 
 Gemini ska komma ihåg:
 - mobilappen kör inte FFmpeg lokalt
-- compile-servern kan containeriseras
+- compile-servern kan containeriseras separat i framtiden
+- Expo Web kan exporteras och serveras som statiska filer
+- Docker Compose kan användas för webbserver och reverse proxy
 - Docker löser miljöproblem och "works on my machine"
-- appar bör inte köras som root i containers
+- appar bör inte köras som root i containers om det går att undvika
 - images ska vara små och rena
 - environment variables ska hanteras säkert
+- `.env`, privata nycklar, certifikat och tokens får inte checkas in eller byggas in i imagen
+- `latest` bör undvikas i produktion där stabilitet är viktig
+- production ska skiljas från development
+
+För Abbas kan en kursrimlig deployment vara:
+
+```text
+Expo Web export -> Nginx container -> Caddy reverse proxy -> Cumulus demo
+```
+
+Detta ska beskrivas som webbdeployment för kursen, inte som färdig native mobilrelease.
 
 ## Extern uppdragsgivare
 
@@ -349,6 +386,7 @@ Kursmässigt räcker det inte att detta finns i kod. Abbas måste kunna visa:
 - hur det testats
 - vilka begränsningar som finns
 - hur det kan vidareutvecklas
+- hur GitLab, testfall och eventuell deployment gör arbetet spårbart
 
 ## Etik och juridik
 
@@ -408,6 +446,12 @@ Slutpresentationen bör kunna visa:
 10. Begränsningar
 11. Nästa steg
 
+Om deployment ingår bör presentationen även kunna visa:
+- hur appen byggdes eller levererades
+- hur Docker eller Cumulus användes
+- vilka deploymenttester som kördes
+- varför detta är en kursrimlig leveransform
+
 ## Regel för Gemini
 
 När Gemini hjälper Abbas ska den alltid fråga:
@@ -428,3 +472,5 @@ Om svaret är nej är lösningen eller dokumentationen inte färdig.
 - Compile-payload skickas till backend/compile-server.
 - Renderad video skapas via FFmpeg utanför mobilappen.
 - Testning och dokumentation är en del av kursens kärna.
+- GitLab visar spårbarheten i arbetet.
+- Docker och Expo Web-deployment är leveransform, inte ny produktlogik.

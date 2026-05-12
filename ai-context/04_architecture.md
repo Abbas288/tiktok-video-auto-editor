@@ -11,6 +11,7 @@ Gemini ska använda denna fil när den:
 - separerar frontend, backend och externa services
 - granskar om kod hamnar i rätt lager
 - planerar tester för Domain, Application eller Infrastructure
+- beskriver Docker, deployment eller runtime-miljö
 
 ## Övergripande dataflöde
 
@@ -121,6 +122,7 @@ Mappar:
 
 Exempel:
 - `src/store/useEditSession.ts`
+- `src/application/useInitializeEditor.ts`
 
 Regel:
 
@@ -147,7 +149,7 @@ Mappar:
 
 Exempel:
 - `src/types/template.ts`
-- framtida `parseTemplate`
+- `src/domain/parseTemplate.ts`
 - framtida `buildEditSession`
 - framtida `buildCompilePayload`
 
@@ -173,10 +175,11 @@ Ansvar:
 - kapsla externa beroenden
 
 Mappar:
-- framtida `src/infrastructure/`
+- `src/infrastructure/`
 - framtida `src/services/`
 
 Exempel:
+- `src/infrastructure/templateRepository.ts`
 - framtida `TemplateApiClient`
 - framtida `RenderApiClient`
 - framtida `GcsMediaResolver`
@@ -184,6 +187,44 @@ Exempel:
 Regel:
 
 Infrastructure ska kunna mockas så att tester inte kräver riktiga API-anrop.
+
+## 5. Deployment Layer
+
+Deployment är inte ett nytt produktlager i editorlogiken, men det är en del av systemets leveransform.
+
+Teknik:
+- Expo Web-export
+- Docker
+- Docker Compose
+- Nginx som statisk webbserver
+- Caddy eller Nginx som reverse proxy
+- Cumulus som kursens deploymentmiljö
+
+Ansvar:
+- bygga appen till statisk Expo Web-output
+- paketera webbappen reproducerbart
+- servera statiska filer
+- hantera portpublicering och intern containerkommunikation
+- möjliggöra demo och leverans i kursmiljö
+
+Regler:
+- Expo Web-deployment är inte samma sak som färdig native mobilrelease.
+- Docker ska inte användas som argument för att köra FFmpeg i mobilappen.
+- Backend/compile-server kan senare containeriseras separat.
+- Production ska inte bygga på lokala dev-volymer eller hot reload.
+- Secrets, `.env`, privata nycklar och certifikat får inte versionshanteras eller byggas in i image.
+
+Exempel på deploymentflöde:
+
+```text
+Expo source -> expo export --platform web -> static dist -> Nginx container -> Caddy/reverse proxy -> Cumulus demo
+```
+
+För framtida backend:
+
+```text
+Compile-payload -> backend/compile-server container -> FFmpeg -> rendered video
+```
 
 ## Viktiga arkitekturkomponenter
 
@@ -211,6 +252,10 @@ Framtida domain/application-komponent som översätter EditSession till backende
 
 Framtida infrastructure-komponent som skickar payload till backend/compile-server.
 
+### Deploymentkonfiguration
+
+Dockerfile, Docker Compose, `.dockerignore`, Nginx-konfiguration och Caddyfile är configuration items. De ska granskas och testas som en del av systemet, men de ska inte blandas ihop med editorlogiken.
+
 ## Viktiga runtime-flöden
 
 ### Template-laddning
@@ -235,6 +280,21 @@ Risker:
 - UI visar scen men store saknar aktiv session
 - preview och timeline hamnar ur synk
 
+### Route-baserad sessionstart
+
+`Expo Router param -> normalizeRouteParam -> useInitializeEditor -> templateRepository -> useEditSession`
+
+Risker:
+- `id` saknas
+- `id` är `string[]`
+- ogiltigt template-id
+- tidigare session ligger kvar efter ogiltig route
+- loading state fastnar
+
+Regel:
+
+Route-parametrar ska normaliseras innan de används för template-laddning. Ogiltigt eller saknat id ska ge error state och rensa gammal editorstate.
+
 ### Text overlay
 
 `Scene.textOverlays -> render overlays by timing -> edit overlay -> update EditSession -> preview updated`
@@ -256,6 +316,19 @@ Risker:
 - lång kompilering saknar progress
 - fel videoformat vid export
 
+### Deployment
+
+`Expo Web build -> Docker image -> Docker Compose service -> Nginx/Caddy -> Cumulus`
+
+Risker:
+- lokal build fungerar men container saknar filer
+- `dist` hanteras fel
+- `.env` eller secrets hamnar i image
+- portar exponeras fel
+- Caddy/Nginx proxyar fel service
+- HTTPS fungerar inte på Cumulus
+- deployment dokumenteras inte
+
 ## Route-struktur
 
 Aktuell eller planerad Expo Router-struktur:
@@ -276,6 +349,7 @@ Route-regler:
 - Editor ska läsa route-param `id` och försöka ladda motsvarande template/session.
 - Preview ska visa aktuell session eller färdig renderad video beroende på feature-steg.
 - Felaktigt `id` ska ge tydligt error state, inte krasch.
+- Home ska visa empty state om inga templates finns.
 
 ## State-principer
 
@@ -290,12 +364,13 @@ Bör innehålla eller senare kunna innehålla:
 - `selectScene(sceneId)`
 - `updateTextOverlay(sceneId, overlayId, patch)`
 - `updateSceneEffect(sceneId, effectPatch)`
-- `resetSession()`
+- `resetSession()` eller `clearSession()`
 
 Regler:
 - Store ska inte själv hämta all extern data om det gör testning svår.
 - Store-actions ska vara små och begripliga.
 - Kritiska stateövergångar ska kunna testas.
+- Ogiltig template-laddning ska kunna rensa state.
 
 ## Beslutsregel för framtida implementation
 
@@ -306,7 +381,6 @@ När en ny feature ska byggas, välj lösningen som:
 4. går att förklara i kursens Wiki eller presentation
 5. minskar risken för dolda AI-fel
 
-
 ## Arkitekturella principer
 
 - Separation of Concerns: varje lager har eget ansvar.
@@ -316,6 +390,7 @@ När en ny feature ska byggas, välj lösningen som:
 - Verifiering före volym: bygg hellre liten testbar arkitektur än stor osäker demo.
 - Ingen lokal FFmpeg i mobilappen.
 - Ingen TikTok-analys i frontend.
+- Deployment är leveransform, inte ett argument för att flytta backendansvar till mobilen.
 
 ## Risker
 
@@ -324,3 +399,5 @@ När en ny feature ska byggas, välj lösningen som:
 - Om backendformat antas utan test kan rendering fallera sent.
 - Om mockTemplate skiljer sig från riktig API-data kan appen ge falsk trygghet.
 - Om AI skapar för mycket kod utan arkitekturlager blir vidareutveckling dyr.
+- Om deployment blandas med editorfeatures blir commits svåra att granska.
+- Om Expo Web-deployment misstolkas som native mobilrelease blir dokumentationen missvisande.

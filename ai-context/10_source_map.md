@@ -224,8 +224,27 @@ Använd när:
 ### `v5-allt-på-kurssajtsen.txt`
 
 Använd när:
-- versionshantering, Docker eller senare kursmoment ska beskrivas
-- aktuell kursstatus behöver kontrolleras
+- versionshantering och Git behöver kontrolleras
+- GitLab från krav till implementation ska beskrivas
+- branching strategies ska diskuteras
+- partnerövning ska planeras eller dokumenteras
+- software evolution och configuration management ska kopplas till projektet
+- vecka 5-status behöver kontrolleras
+
+### `v6-allt-på-kurssajtsen.txt`
+
+Använd när:
+- Docker Compose, production och deployment behöver kontrolleras
+- Just Task It Docker Compose eller production-övningarna ska sammanfattas
+- Cumulus, containers, reverse proxy eller Expo Web-deployment ska dokumenteras
+- vecka 6-status behöver kontrolleras
+
+### `transcription_demo5_docker_compose.txt`
+
+Använd när:
+- exakta detaljer från Docker Compose-demonstrationen behövs
+- skillnaden mellan services, networks, volumes, ports, expose och depends_on ska förklaras
+- Compose-arbetsflödet ska kopplas till Abbas deployment
 
 ### `v1-2_allt_på_kurssajten.txt`
 
@@ -242,7 +261,7 @@ Använd när:
 ### `v4-allt-på-kurssajtsen.txt`
 
 Använd när:
-- implementation, arkitektur, Docker, Definition of Done eller testplan från vecka 4 behöver kontrolleras
+- implementation, arkitektur, Docker-grund, Definition of Done eller testplan från vecka 4 behöver kontrolleras
 - Gemini behöver mer detaljer än `weekly/week_4_context.md`
 
 ## Presentationer
@@ -363,6 +382,18 @@ Använd när:
 - implementation, arkitektur eller hagen AI-pipeline behöver djupdykning
 - lärarens instruktioner för vecka 4 behöver extraheras
 
+### Vecka 5-transkriptioner
+
+Använd när:
+- Git, GitLab, partnerövning, branching strategy eller configuration management behöver kompletteras
+- lärarens muntliga instruktioner för versionshantering behövs
+
+### Vecka 6-transkriptioner
+
+Använd när:
+- Docker Compose, production, Cumulus, deployment eller demonstrationen behöver kompletteras
+- lärarens muntliga instruktioner om drift behövs
+
 Regel för transkriptioner:
 - ta bort småprat och upprepningar
 - behåll kurskrav, examination, GitLab, testning, krav, Wiki och presentation
@@ -381,6 +412,8 @@ Dessa filer ska användas före råtranskriptionerna när de finns:
 - `ai-context/transcripts/v1_2_transcript_compact.md`
 - `ai-context/transcripts/v3_transcript_compact.md`
 - `ai-context/transcripts/v4_transcript_compact.md`
+- `ai-context/transcripts/v5_transcript_compact.md`
+- `ai-context/transcripts/v6_transcript_compact.md`
 
 Använd när Gemini behöver:
 - exakt kursbetoning från muntliga genomgångar
@@ -396,6 +429,7 @@ AI-vänliga arbetsfiler:
 - `ai-context/weekly/week_3_context.md`
 - `ai-context/weekly/week_4_context.md`
 - `ai-context/weekly/week_5_context.md`
+- `ai-context/weekly/week_6_context.md`
 
 Använd när Gemini behöver:
 - förstå veckans kursfokus
@@ -411,6 +445,7 @@ Använd när Gemini behöver:
 - GitLab: börja med `05_gitlab_workflow.md`, `gitlab_issues.txt`, `commits plan.txt`.
 - Arkitektur: börja med `04_architecture.md`, `ch06_architectural_design.md`, `ch07_design_implementation.md`, `PROJECT_README.txt`.
 - Compile/export: börja med `04_architecture.md`, `SPEC_STUDENT.txt`, `PROJECT_README.txt`, `codebase hagen-auto-edit.txt`.
+- Deployment: börja med `04_architecture.md`, `06_course_requirements.md`, `weekly/week_6_context.md`, `transcripts/v6_transcript_compact.md`, `v6-allt-på-kurssajtsen.txt`, `transcription_demo5_docker_compose.txt`.
 - Presentation: börja med `alla_presentationer.txt`, veckokontext och relevanta teorifiler.
 - Wiki: börja med `backup-wikisidor.txt`, veckokontext, GitLab workflow och relevant teori.
 
@@ -422,6 +457,8 @@ Använd när Gemini behöver:
 - Anta inte att Ida och Wasim är kravkällor.
 - Anta inte att mobilappen ansvarar för AI-analys eller FFmpeg-rendering.
 - Anta inte att en feature är klar utan testfall och verifiering.
+- Anta inte att Docker-deployment betyder native mobilrelease.
+- Anta inte att Cumulus, Caddy eller Nginx ska påverka editorlogiken.
 
 ## Minsta rekommenderade läsordning för ny session
 
