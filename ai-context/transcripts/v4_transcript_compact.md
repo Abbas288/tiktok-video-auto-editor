@@ -43,5 +43,5 @@
 - Håll implementationen liten och testbar.
 - Skriv inte om hela appen när en route eller store-funktion räcker.
 - Koppla ny kod till ett konkret krav och testfall.
-- Uppdatera `08_current_feature_context.md` när feature-konteksten ändras.
+- Uppdatera relevant ai-context när feature-konteksten ändras.
 - För Docker: föreslå detta senare för backend/compile-server, inte som första lösning i mobilappen.

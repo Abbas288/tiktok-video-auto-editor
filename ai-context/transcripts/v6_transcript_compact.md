@@ -62,6 +62,6 @@
 * Föreslå testfall som TC-D1, TC-D2, TC-D3, TC-D4 och TC-D5 när deployment påverkas.
 * Vid Cumulus: skilj på lokal Docker-testning, HTTP-deployment och HTTPS via reverse proxy.
 * Lägg aldrig secrets, `.env`, privata nycklar eller signerade privata länkar i repo.
-* Om deployment ändras, uppdatera `08_current_feature_context.md`, testdokumentation och MVP-krav vid behov.
+* Om deployment ändras, uppdatera relevant ai-context, testdokumentation och MVP-krav vid behov.
 * Påminn om `docker compose build`, `docker compose up --build -d`, `docker compose ps`, `docker compose logs` och säkerhetskontroll med `git status`.
 * Håll deployment som egen feature eller fix, inte blandad med editorfunktioner.

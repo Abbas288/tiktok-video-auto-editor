@@ -147,7 +147,7 @@ Förväntat resultat: HTTP omdirigerar till HTTPS och appen visas via HTTPS.
 
 ## Dokumentation som ska uppdateras
 Vid deployment bör Abbas uppdatera:
-* `08_current_feature_context.md`
+* relevant ai-context eller Wiki vid behov
 * testspecifikation
 * testrapport
 * MVP-krav om deployment räknas som feature

@@ -439,7 +439,7 @@ Använd när Gemini behöver:
 
 ## När Gemini ska använda vilken källa
 
-- Kodändring: börja med `GEMINI.md`, `00_project_rules.md`, `04_architecture.md`, `08_current_feature_context.md`.
+- Kodändring: börja med `GEMINI.md`, `00_project_rules.md` och `04_architecture.md`.
 - Kravarbete: börja med `01_abbas_project_context.md`, `06_course_requirements.md`, `ch04_requirements_engineering.md`, `gitlab_issues.txt`.
 - Testning: börja med `02_testing_rules.md`, `03_definition_of_done.md`, `ch08_software_testing.md`, `exempel på testfall.txt`.
 - GitLab: börja med `05_gitlab_workflow.md`, `gitlab_issues.txt`, `commits plan.txt`.
@@ -466,9 +466,8 @@ Använd när Gemini behöver:
 2. `ai-context/00_project_rules.md`
 3. `ai-context/01_abbas_project_context.md`
 4. `ai-context/04_architecture.md`
-5. `ai-context/08_current_feature_context.md`
-6. relevant teori eller veckofil
-7. originalkälla endast vid behov
+5. relevant teori eller veckofil
+6. originalkälla endast vid behov
 
 ## Regel för Gemini
 

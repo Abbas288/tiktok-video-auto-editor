@@ -80,7 +80,7 @@ När Gemini kodar eller planerar ska kapitel 2 leda till:
 - tydlig feature-scope
 - testning före nästa steg
 - inga stora omskrivningar utan anledning
-- uppdaterad `08_current_feature_context.md`
+- uppdaterad relevant ai-context
 - dokumenterade risker när processen upptäcker osäkerhet
 
 Processregeln för Abbas projekt är:

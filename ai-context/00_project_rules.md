@@ -47,7 +47,7 @@ Gemini får inte hoppa över testning eller dokumentation för att koden ser rim
 
 - Använd enkel JSDoc för exporterade funktioner, viktiga typer, stores och komplex logik.
 - Dokumentera beslut om arkitektur eller scope ändras.
-- Uppdatera `08_current_feature_context.md` när aktuell feature ändras.
+- Uppdatera relevant ai-context eller Wiki när aktuell feature ändras.
 - Uppdatera Wiki eller ai-context om teststrategi, krav eller arkitektur påverkas.
 - Uppdatera deploymentdokumentation endast när aktuell issue gäller Docker, Cumulus, Nginx, Caddy eller Expo Web-export.
 

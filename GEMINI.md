@@ -116,7 +116,7 @@ Krav ska vara:
 4. Implementera minsta möjliga ändring.
 5. Testa enligt issue och testfall.
 6. Vid vanlig Expo-verifiering används `npm start`.
-7. Uppdatera `08_current_feature_context.md` vid behov.
+7. Uppdatera relevant ai-context eller Wiki vid behov.
 8. Kör `git status` och `git diff`.
 9. Föreslå commit först när verifiering är gjord.
 
