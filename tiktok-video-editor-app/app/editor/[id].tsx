@@ -12,10 +12,12 @@ import { EditorHeader } from "../../src/components/EditorHeader";
 import { SceneList } from "../../src/components/SceneList";
 import { VideoPlayerPlaceholder } from "../../src/components/VideoPlayerPlaceholder";
 import { colors } from "../../src/styles/theme";
+import { normalizeRouteParam } from "../../src/utils/normalizeRouteParam";
 
 export default function EditorScreen(): React.JSX.Element {
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams<{ id?: string | string[] }>();
+  const templateId = normalizeRouteParam(id);
 
   const {
     isLoading,
@@ -24,21 +26,23 @@ export default function EditorScreen(): React.JSX.Element {
     activeSceneId,
     selectScene,
     clearSession,
-  } = useInitializeEditor(id);
+  } = useInitializeEditor(templateId);
 
   const handleGoBack = useCallback((): void => {
     clearSession();
+
     if (router.canGoBack()) {
       router.back();
-    } else {
-      router.replace("/");
+      return;
     }
+
+    router.replace("/");
   }, [clearSession, router]);
 
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={colors.text || "#000"} />
+        <ActivityIndicator size="large" color={colors.text} />
       </View>
     );
   }
@@ -71,28 +75,30 @@ export default function EditorScreen(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.surface || "#fff",
+    backgroundColor: colors.surface,
   },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.background || "#f5f5f5",
+    backgroundColor: colors.background,
+    padding: 20,
   },
   subtitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginHorizontal: 20,
     marginBottom: 10,
-    color: colors.text || "#000",
+    color: colors.text,
   },
   errorText: {
     fontSize: 16,
     marginBottom: 20,
-    color: colors.text || "#000",
+    color: colors.text,
+    textAlign: "center",
   },
   link: {
-    color: "#007AFF",
+    color: colors.primary,
     fontSize: 16,
   },
 });

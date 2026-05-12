@@ -71,16 +71,20 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <Text style={styles.header}>Available Templates</Text>
 
-      {templates.map((template) => (
-        <TouchableOpacity
-          key={template.id}
-          style={styles.card}
-          onPress={() => handleOpenProject(template.id)}
-        >
-          <Text style={styles.cardTitle}>{template.title}</Text>
-          <Text style={styles.cardSub}>{template.scenes.length} scenes</Text>
-        </TouchableOpacity>
-      ))}
+      {templates.length === 0 ? (
+        <Text style={styles.emptyText}>No templates available.</Text>
+      ) : (
+        templates.map((template) => (
+          <TouchableOpacity
+            key={template.id}
+            style={styles.card}
+            onPress={() => handleOpenProject(template.id)}
+          >
+            <Text style={styles.cardTitle}>{template.title}</Text>
+            <Text style={styles.cardSub}>{template.scenes.length} scenes</Text>
+          </TouchableOpacity>
+        ))
+      )}
     </View>
   );
 }
@@ -125,7 +129,13 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: colors.text,
+    color: colors.error,
     textAlign: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    textAlign: "center",
+    marginTop: 20,
   },
 });
