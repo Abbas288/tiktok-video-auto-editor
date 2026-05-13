@@ -9,10 +9,10 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useInitializeEditor } from "../../src/application/useInitializeEditor";
 import { EditorHeader } from "../../src/components/EditorHeader";
-import { SceneList } from "../../src/components/SceneList";
 import { colors } from "../../src/styles/theme";
 import { normalizeRouteParam } from "../../src/utils/normalizeRouteParam";
 import { VideoPlayer } from "../../src/components/VideoPlayer";
+import { Timeline } from "../../src/components/Timeline";
 
 export default function EditorScreen(): React.JSX.Element {
   const router = useRouter();
@@ -64,8 +64,10 @@ export default function EditorScreen(): React.JSX.Element {
 
       <VideoPlayer videoUrl={currentTemplate.sourceVideoUrl} />
 
-      <Text style={styles.subtitle}>Scenes</Text>
-      <SceneList
+      <Timeline
+        // TC-T2: Tidslinjen hanterar tom scenlista säkert
+        // scenes={[]}
+
         scenes={currentTemplate.scenes}
         activeSceneId={activeSceneId}
         onSelectScene={selectScene}
