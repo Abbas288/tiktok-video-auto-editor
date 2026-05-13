@@ -80,9 +80,7 @@ describe("parseTemplate", () => {
       title: "Test",
       sourceVideoUrl: "https://example.com/video.mp4",
       orientation: "square",
-      scenes: [
-        { id: "s1", startSeconds: 0, durationSeconds: 0 }, // Invalid duration
-      ],
+      scenes: [{ id: "s1", startSeconds: 0, durationSeconds: 0 }],
     };
     expect(() => parseTemplate(zeroDuration)).toThrow(
       "Scene 0 has invalid timing",
