@@ -10,9 +10,9 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useInitializeEditor } from "../../src/application/useInitializeEditor";
 import { EditorHeader } from "../../src/components/EditorHeader";
 import { SceneList } from "../../src/components/SceneList";
-import { VideoPlayerPlaceholder } from "../../src/components/VideoPlayerPlaceholder";
 import { colors } from "../../src/styles/theme";
 import { normalizeRouteParam } from "../../src/utils/normalizeRouteParam";
+import { VideoPlayer } from "../../src/components/VideoPlayer";
 
 export default function EditorScreen(): React.JSX.Element {
   const router = useRouter();
@@ -61,7 +61,9 @@ export default function EditorScreen(): React.JSX.Element {
   return (
     <View style={styles.container}>
       <EditorHeader title={currentTemplate.title} onGoBack={handleGoBack} />
-      <VideoPlayerPlaceholder />
+
+      <VideoPlayer videoUrl={currentTemplate.sourceVideoUrl} />
+
       <Text style={styles.subtitle}>Scenes</Text>
       <SceneList
         scenes={currentTemplate.scenes}
