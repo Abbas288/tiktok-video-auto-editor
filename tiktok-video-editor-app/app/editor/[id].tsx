@@ -1,19 +1,21 @@
 import React, { useCallback, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { SeekRequest } from "../../src/application/useVideoSync";
 import { useInitializeEditor } from "../../src/application/useInitializeEditor";
 import { EditorHeader } from "../../src/components/EditorHeader";
 import { Timeline } from "../../src/components/Timeline";
+import { VideoStage } from "../../src/components/video-stage/VideoStage";
 import { colors } from "../../src/styles/theme";
 import { normalizeRouteParam } from "../../src/utils/normalizeRouteParam";
-import { VideoPlayer } from "../../src/components/VideoPlayer";
-import { SeekRequest } from "../../src/application/useVideoSync";
+import { getActiveSceneIdAtTime } from "../../src/domain/video/getActiveSceneIdAtTime";
 
 export default function EditorScreen(): React.JSX.Element {
   const router = useRouter();
@@ -21,6 +23,7 @@ export default function EditorScreen(): React.JSX.Element {
   const templateId = normalizeRouteParam(id);
 
   const [seekRequest, setSeekRequest] = useState<SeekRequest>();
+  const [currentTime, setCurrentTime] = useState<number>(0);
 
   const {
     isLoading,
@@ -43,34 +46,40 @@ export default function EditorScreen(): React.JSX.Element {
   }, [clearSession, router]);
 
   const handleSceneClick = useCallback(
-    (sceneId: string) => {
-      const scene = currentTemplate?.scenes.find((s) => s.id === sceneId);
-      if (scene) {
-        selectScene(sceneId);
-        setSeekRequest({
-          time: scene.startSeconds,
-          timestamp: Date.now(),
-        });
+    (sceneId: string): void => {
+      const scene = currentTemplate?.scenes.find((item) => item.id === sceneId);
+
+      if (!scene) {
+        return;
       }
+
+      selectScene(sceneId);
+      setSeekRequest({
+        time: scene.startSeconds,
+        timestamp: Date.now(),
+      });
     },
     [currentTemplate, selectScene],
   );
 
   const handleTimeUpdate = useCallback(
-    (currentTime: number) => {
-      if (!currentTemplate) return;
+    (time: number): void => {
+      setCurrentTime(time);
 
-      const matchedScene = currentTemplate.scenes.find(
-        (scene) =>
-          currentTime >= scene.startSeconds &&
-          currentTime < scene.startSeconds + scene.durationSeconds,
+      if (!currentTemplate) {
+        return;
+      }
+
+      const matchedSceneId = getActiveSceneIdAtTime(
+        currentTemplate.scenes,
+        time,
       );
 
-      if (matchedScene && matchedScene.id !== activeSceneId) {
-        selectScene(matchedScene.id);
+      if (matchedSceneId && matchedSceneId !== activeSceneId) {
+        selectScene(matchedSceneId);
       }
     },
-    [currentTemplate, activeSceneId, selectScene],
+    [activeSceneId, currentTemplate, selectScene],
   );
 
   if (isLoading) {
@@ -96,17 +105,25 @@ export default function EditorScreen(): React.JSX.Element {
     <View style={styles.container}>
       <EditorHeader title={currentTemplate.title} onGoBack={handleGoBack} />
 
-      <VideoPlayer
-        videoUrl={currentTemplate.sourceVideoUrl}
-        seekRequest={seekRequest}
-        onTimeUpdate={handleTimeUpdate}
-      />
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.stageShell}>
+          <VideoStage
+            template={currentTemplate}
+            currentTime={currentTime}
+            seekRequest={seekRequest}
+            onTimeUpdate={handleTimeUpdate}
+          />
+        </View>
 
-      <Timeline
-        scenes={currentTemplate.scenes}
-        activeSceneId={activeSceneId}
-        onSelectScene={handleSceneClick}
-      />
+        <Timeline
+          scenes={currentTemplate.scenes}
+          activeSceneId={activeSceneId}
+          onSelectScene={handleSceneClick}
+        />
+      </ScrollView>
     </View>
   );
 }
@@ -114,30 +131,33 @@ export default function EditorScreen(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 24,
+    gap: 24,
+  },
+  stageShell: {
+    width: "100%",
+    maxWidth: 960,
+    alignSelf: "center",
   },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: colors.background,
-    padding: 20,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginHorizontal: 20,
-    marginBottom: 10,
-    color: colors.text,
   },
   errorText: {
     fontSize: 16,
     marginBottom: 20,
     color: colors.text,
-    textAlign: "center",
   },
   link: {
-    color: colors.primary,
+    color: "#007AFF",
     fontSize: 16,
   },
 });
