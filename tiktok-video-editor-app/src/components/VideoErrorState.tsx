@@ -6,9 +6,6 @@ interface VideoErrorStateProps {
   message?: string;
 }
 
-/**
- * A UI-only component that renders an error boundary for the video player.
- */
 export function VideoErrorState({
   message = "Unable to load video (broken link)",
 }: VideoErrorStateProps): React.JSX.Element {
@@ -21,12 +18,10 @@ export function VideoErrorState({
 
 const styles = StyleSheet.create({
   errorContainer: {
-    height: 250,
-    margin: 20,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: colors.surface || "#1a1a1a",
-    borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.error || "#FF5D73",
   },

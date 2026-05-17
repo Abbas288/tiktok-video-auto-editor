@@ -13,36 +13,41 @@ interface UseVideoSyncProps {
 }
 
 /**
- * Custom hook that encapsulates all expo-video logic and timeline synchronization.
- * Handles auto-play, seeking, and interval-based time reporting.
+ * Encapsulates expo-video player setup, timeline seeking and time reporting.
  */
 export function useVideoSync({
   videoUrl,
   seekRequest,
   onTimeUpdate,
 }: UseVideoSyncProps) {
-  const player = useVideoPlayer(videoUrl || "", (p) => {
-    p.loop = false;
+  const player = useVideoPlayer(videoUrl ?? null, (createdPlayer) => {
+    createdPlayer.loop = false;
+    createdPlayer.timeUpdateEventInterval = 0.1;
+
     if (videoUrl) {
-      p.play();
+      createdPlayer.play();
     }
   });
 
   useEffect(() => {
-    if (player && seekRequest) {
-      player.currentTime = seekRequest.time;
+    if (!seekRequest) {
+      return;
     }
-  }, [seekRequest, player]);
+
+    player.currentTime = seekRequest.time;
+  }, [player, seekRequest]);
 
   useEffect(() => {
-    if (!player || !onTimeUpdate) return;
+    if (!onTimeUpdate) {
+      return undefined;
+    }
 
     const interval = setInterval(() => {
       onTimeUpdate(player.currentTime);
-    }, 250);
+    }, 100);
 
     return () => clearInterval(interval);
-  }, [player, onTimeUpdate]);
+  }, [onTimeUpdate, player]);
 
   return player;
 }

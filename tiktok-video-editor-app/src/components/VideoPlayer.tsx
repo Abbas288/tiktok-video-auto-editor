@@ -1,9 +1,8 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { VideoView } from "expo-video";
-import { colors } from "../styles/theme";
+import { SeekRequest, useVideoSync } from "../application/useVideoSync";
 import { VideoErrorState } from "./VideoErrorState";
-import { useVideoSync, SeekRequest } from "../application/useVideoSync";
 
 interface VideoPlayerProps {
   videoUrl?: string;
@@ -12,8 +11,10 @@ interface VideoPlayerProps {
 }
 
 /**
- * Main video player component.
- * Uses useVideoSync for logic and delegates error rendering to VideoErrorState.
+ * Legacy standalone video player.
+ *
+ * Editor preview should use VideoStage instead. This component is kept as a
+ * simple video-only fallback for places where overlays are not required.
  */
 export function VideoPlayer({
   videoUrl,
@@ -31,8 +32,9 @@ export function VideoPlayer({
       <VideoView
         style={styles.video}
         player={player}
-        allowsFullscreen
-        allowsPictureInPicture
+        nativeControls={false}
+        contentFit="fill"
+        allowsPictureInPicture={false}
       />
     </View>
   );
@@ -40,11 +42,8 @@ export function VideoPlayer({
 
 const styles = StyleSheet.create({
   container: {
-    height: 250,
-    margin: 20,
-    borderRadius: 10,
-    overflow: "hidden",
-    backgroundColor: colors.surface || "#1a1a1a",
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#000000",
   },
   video: {
     width: "100%",
