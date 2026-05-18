@@ -3,7 +3,18 @@ const prettier = require("eslint-plugin-prettier/recommended");
 
 module.exports = [
   {
-    ignores: ["expo-env.d.ts", ".expo/**", "node_modules/**"],
+    ignores: [
+      "expo-env.d.ts",
+      ".expo/**",
+      "node_modules/**",
+      "dist/**",
+      "web-build/**",
+      "coverage/**",
+      ".git/**",
+      "ios/**",
+      "android/**",
+      "*.tsbuildinfo",
+    ],
   },
   ...expo,
   prettier,

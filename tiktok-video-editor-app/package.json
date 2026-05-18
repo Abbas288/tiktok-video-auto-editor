@@ -2,17 +2,18 @@
   "name": "tiktok-video-editor-app",
   "version": "1.0.0",
   "main": "expo-router/entry",
-"scripts": {
-  "start": "expo start",
-  "android": "expo run:android",
-  "ios": "expo run:ios",
-  "web": "expo start --web",
-  "lint": "eslint .",
-  "lint:fix": "eslint . --fix",
-  "typecheck": "tsc --noEmit",
-  "test": "jest",
-  "verify": "npm run lint:fix && npm run typecheck && npm test"
-},
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "build:web": "expo export --platform web",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "verify": "npm run lint && npm run typecheck && npm test"
+  },
   "dependencies": {
     "expo": "~54.0.34",
     "expo-constants": "~18.0.13",

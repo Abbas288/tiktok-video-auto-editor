@@ -1,14 +1,18 @@
 services:
   web:
+    image: ${APP_IMAGE:-tiktok-video-editor-app:local}
     build:
       context: .
       dockerfile: Dockerfile
       target: production
-    expose:
-      - "80"
+    ports:
+      - "${WEB_PORT:-8080}:80"
     restart: unless-stopped
 
   caddy:
+    profiles:
+      - production
+    image: ${CADDY_IMAGE:-tiktok-video-editor-caddy:local}
     build:
       context: .
       dockerfile: Dockerfile.caddy
@@ -19,6 +23,8 @@ services:
       - /etc/ssl/certs/LNU_FTK_Campus_Root_CA_2025.pem:/etc/ssl/certs/LNU_FTK_Campus_Root_CA_2025.pem:ro
       - caddy_data:/data
       - caddy_config:/config
+    environment:
+      - SITE_ADDRESS=${SITE_ADDRESS:-cu1223.camp.lnu.se}
     depends_on:
       - web
     restart: unless-stopped
