@@ -2,12 +2,11 @@ FROM node:22-bookworm-slim AS build
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-
-RUN npx expo export --platform web
+RUN npm run build:web
 
 FROM nginx:1.27-alpine AS production
 

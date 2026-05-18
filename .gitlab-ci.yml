@@ -1,0 +1,93 @@
+default:
+  artifacts:
+    expire_in: 1 day
+
+stages:
+  - verify
+  - build
+  - deploy
+
+variables:
+  APP_DIR: "tiktok-video-editor-app"
+  NODE_IMAGE: "node:22-alpine"
+  DOCKER_TLS_CERTDIR: ""
+
+verify_app:
+  stage: verify
+  image: $NODE_IMAGE
+  cache:
+    key:
+      files:
+        - $APP_DIR/package-lock.json
+    paths:
+      - $APP_DIR/.npm/
+  before_script:
+    - cd "$APP_DIR"
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - npm run lint
+    - npm run typecheck
+    - npm test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+build_container:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  needs:
+    - verify_app
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - script_failure
+  script:
+    - mkdir -p /kaniko/.docker
+    - |
+      echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(printf "%s:%s" "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "$CI_PROJECT_DIR/$APP_DIR"
+      --dockerfile "$CI_PROJECT_DIR/$APP_DIR/Dockerfile"
+      --target production
+      --cache=true
+      --destination "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+      --destination "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG
+
+deploy_production:
+  stage: deploy
+  image: docker:27-cli
+  needs:
+    - build_container
+  before_script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY_B64" | base64 -d > ~/.ssh_key
+    - chmod 600 ~/.ssh_key
+    - ssh-add ~/.ssh_key
+    - rm ~/.ssh_key
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+  script:
+    - unset DOCKER_HOST
+    - docker context rm production --force || true
+    - docker context create production --docker "host=ssh://$SERVER_USER@$SERVER_HOST"
+    - docker context use production
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - export APP_IMAGE="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    - export WEB_PORT="${WEB_PORT:-8080}"
+    - docker compose -f "$APP_DIR/docker-compose.yml" pull web
+    - docker compose -f "$APP_DIR/docker-compose.yml" up -d --no-build --remove-orphans web
+    - docker system prune -f
+  environment:
+    name: production
+    url: https://cu3133.camp.lnu.se
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
