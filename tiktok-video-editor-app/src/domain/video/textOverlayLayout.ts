@@ -13,16 +13,17 @@ const MAX_TEXT_LINES = 4;
 const DEFAULT_FONT_SIZE = 32;
 const MIN_FONT_RATIO = 0.028;
 const MAX_FONT_RATIO = 0.12;
-const TEXT_BOX_WIDTH_RATIO = 0.86;
-const HORIZONTAL_SAFE_RATIO = 0.055;
-const TOP_SAFE_RATIO = 0.055;
-const BOTTOM_SAFE_RATIO = 0.18;
+const MAX_TEXT_BOX_WIDTH_RATIO = 0.86;
 const LINE_HEIGHT_RATIO = 1.15;
 const PADDING_X_RATIO = 0.012;
 const PADDING_Y_RATIO = 0.007;
 
 /**
- * Filters overlays by current playback time.
+ * Filters text overlays that should be visible at the current playback time.
+ *
+ * @param overlays Text overlays from the active template scenes.
+ * @param currentTime Current playback time in seconds.
+ * @returns Text overlays visible at the current playback time.
  */
 export function getVisibleTextOverlays(
   overlays: TextOverlay[],
@@ -43,7 +44,17 @@ export function getVisibleTextOverlays(
 }
 
 /**
- * Converts template overlay data into a render model inside the real media rect.
+ * Converts template overlay data into a render model for appearance.
+ *
+ * Position is intentionally kept outside this model during editing. The
+ * draggable overlay component owns live transform state and commits the final
+ * normalized coordinates only when the gesture finishes.
+ *
+ * @param overlay Source text overlay.
+ * @param index Overlay index used for stable fallback ids and stacking.
+ * @param canvas Logical video canvas.
+ * @param mediaSize Rendered media size.
+ * @returns Render model used by the overlay component.
  */
 export function createTextOverlayRenderModel(
   overlay: TextOverlay,
@@ -63,37 +74,13 @@ export function createTextOverlayRenderModel(
   const paddingX = mediaSize.width * PADDING_X_RATIO;
   const paddingY = mediaSize.height * PADDING_Y_RATIO;
   const maxTextHeight = lineHeight * MAX_TEXT_LINES + paddingY * 2;
-  const boxWidth = mediaSize.width * TEXT_BOX_WIDTH_RATIO;
-
-  const safeLeft = mediaSize.width * HORIZONTAL_SAFE_RATIO;
-  const safeTop = mediaSize.height * TOP_SAFE_RATIO;
-  const safeBottom = mediaSize.height * BOTTOM_SAFE_RATIO;
-
-  const wantedCenterX =
-    clamp(toFiniteNumber(overlay.positionX, 0.5), 0, 1) * mediaSize.width;
-  const wantedCenterY =
-    clamp(toFiniteNumber(overlay.positionY, 0.5), 0, 1) * mediaSize.height;
-
-  const centerX = clamp(
-    wantedCenterX,
-    safeLeft + boxWidth / 2,
-    mediaSize.width - safeLeft - boxWidth / 2,
-  );
-
-  const centerY = clamp(
-    wantedCenterY,
-    safeTop + maxTextHeight / 2,
-    mediaSize.height - safeBottom - maxTextHeight / 2,
-  );
 
   return {
     id: getSafeId(overlay.id, index),
     text: typeof overlay.text === "string" ? overlay.text : "",
     wrapperStyle: {
       position: "absolute",
-      left: centerX - boxWidth / 2,
-      top: centerY - maxTextHeight / 2,
-      width: boxWidth,
+      maxWidth: mediaSize.width * MAX_TEXT_BOX_WIDTH_RATIO,
       maxHeight: maxTextHeight,
       paddingHorizontal: paddingX,
       paddingVertical: paddingY,
@@ -104,7 +91,6 @@ export function createTextOverlayRenderModel(
       elevation: 30 + index,
     },
     textStyle: {
-      width: "100%",
       color: getSafeColor(overlay.color),
       fontSize,
       lineHeight,
@@ -120,7 +106,9 @@ export function createTextOverlayRenderModel(
 }
 
 /**
- * Returns the number of lines used by text overlays.
+ * Returns the maximum number of lines used by text overlays.
+ *
+ * @returns Maximum number of rendered text lines.
  */
 export function getMaxTextLines(): number {
   return MAX_TEXT_LINES;

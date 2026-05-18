@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useEditSession } from "../store/useEditSession";
+import { TextOverlayUpdate, useEditSession } from "../store/useEditSession";
 import { templateRepository } from "../infrastructure/templateRepository";
 import { Template } from "../types/template";
 
@@ -8,14 +8,19 @@ interface EditorInitializationResult {
   error: string | null;
   currentTemplate: Template | null;
   activeSceneId: string | null;
+  selectedOverlayId: string | null;
   selectScene: (sceneId: string) => void;
+  selectOverlay: (overlayId: string | null) => void;
+  updateTextOverlay: (
+    sceneId: string,
+    overlayId: string,
+    patch: TextOverlayUpdate,
+  ) => void;
   clearSession: () => void;
 }
 
 /**
- * Custom hook that initializes the editor session from a template id.
- * It loads a validated template, syncs it with the global edit session,
- * and clears stale session state when the id is missing or invalid.
+ * Initializes the editor session from a template id.
  *
  * @param id Template id from the editor route.
  * @returns Loading state, error state, current session data and session actions.
@@ -26,9 +31,12 @@ export function useInitializeEditor(
   const {
     currentTemplate,
     activeSceneId,
+    selectedOverlayId,
     loadTemplate,
     clearSession,
     selectScene,
+    selectOverlay,
+    updateTextOverlay,
   } = useEditSession();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -94,7 +102,10 @@ export function useInitializeEditor(
     error,
     currentTemplate,
     activeSceneId,
+    selectedOverlayId,
     selectScene,
+    selectOverlay,
+    updateTextOverlay,
     clearSession,
   };
 }
