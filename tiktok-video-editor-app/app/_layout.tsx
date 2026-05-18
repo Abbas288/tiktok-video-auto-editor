@@ -1,14 +1,14 @@
 import { Stack } from "expo-router";
 
 /**
- * Root layout component defining the global navigation stack.
+ * Defines the global app layout.
  */
-export default function RootLayout() {
+export default function RootLayout(): React.JSX.Element {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: "#000" },
-        headerTintColor: "#fff",
+        headerStyle: { backgroundColor: "#000000" },
+        headerTintColor: "#FFFFFF",
       }}
     >
       <Stack.Screen name="(home)/index" options={{ title: "My Projects" }} />

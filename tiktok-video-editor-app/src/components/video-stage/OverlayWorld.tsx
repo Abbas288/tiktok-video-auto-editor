@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
+import { NormalizedOverlayPosition } from "../../domain/video/overlayPosition";
 import { MediaRect, VideoCanvas } from "../../domain/video/videoCanvas";
 import { TextOverlay } from "../../types/template";
 import { TextOverlayLayer } from "../TextOverlayLayer";
@@ -9,22 +10,34 @@ interface OverlayWorldProps {
   currentTime: number;
   canvas: VideoCanvas;
   mediaRect: MediaRect;
+  selectedOverlayId: string | null;
+  isEditingEnabled: boolean;
+  onSelectOverlay: (overlayId: string | null) => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
+  onCommitOverlayPosition: (
+    overlayId: string,
+    position: NormalizedOverlayPosition,
+  ) => void;
 }
 
 /**
  * Mounts overlay layers on top of the exact rendered media rectangle.
- *
- * This prevents overlays from leaking into letterbox areas or the surrounding
- * editor layout.
  */
 export function OverlayWorld({
   overlays,
   currentTime,
   canvas,
   mediaRect,
+  selectedOverlayId,
+  isEditingEnabled,
+  onSelectOverlay,
+  onDragStart,
+  onDragEnd,
+  onCommitOverlayPosition,
 }: OverlayWorldProps): React.JSX.Element {
   return (
-    <View style={[styles.world, mediaRect]} pointerEvents="none">
+    <View style={[styles.world, mediaRect]} pointerEvents="box-none">
       <TextOverlayLayer
         overlays={overlays}
         currentTime={currentTime}
@@ -33,6 +46,12 @@ export function OverlayWorld({
           width: mediaRect.width,
           height: mediaRect.height,
         }}
+        selectedOverlayId={selectedOverlayId}
+        isEditingEnabled={isEditingEnabled}
+        onSelectOverlay={onSelectOverlay}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onCommitOverlayPosition={onCommitOverlayPosition}
       />
     </View>
   );

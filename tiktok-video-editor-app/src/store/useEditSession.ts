@@ -1,59 +1,225 @@
 import { create } from "zustand";
-import { Template } from "../types/template";
+import { Template, TextOverlay } from "../types/template";
+import {
+  clearEditedTemplateDraftsStorage,
+  EditedTemplatesById,
+  loadEditedTemplateDrafts,
+  saveEditedTemplateDrafts,
+} from "./editSessionDrafts";
 
 /**
- * Interface representing the state and actions for an active video editing session.
- *
- * @interface EditSessionState
+ * Defines editable text overlay fields.
  */
-interface EditSessionState {
+export type TextOverlayUpdate = Partial<
+  Pick<TextOverlay, "text" | "positionX" | "positionY" | "fontSizePt" | "color">
+>;
+
+/**
+ * Represents the state and actions for an active video editing session.
+ */
+export interface EditSessionState {
   /** The currently loaded template project. */
   currentTemplate: Template | null;
 
-  /** The ID of the currently active/selected scene in the timeline. */
+  /** Cached edited templates by template id. */
+  editedTemplatesById: EditedTemplatesById;
+
+  /** The ID of the currently active or selected scene in the timeline. */
   activeSceneId: string | null;
+
+  /** The ID of the currently selected text overlay. */
+  selectedOverlayId: string | null;
 
   /**
    * Loads a validated template into the active session.
-   * Automatically sets the first scene as active if available.
    *
-   * @param {Template} template - The validated template data.
+   * If an edited draft already exists for the same template id, the draft is
+   * loaded instead of the original template.
+   *
+   * @param template The validated template data.
    */
   loadTemplate: (template: Template) => void;
 
   /**
-   * Clears the current session, removing the active template and scene.
+   * Clears the currently opened editing session without deleting saved drafts.
    */
   clearSession: () => void;
 
   /**
-   * Updates the active scene ID based on user selection.
+   * Clears all cached edited template drafts.
+   */
+  clearDrafts: () => void;
+
+  /**
+   * Selects the active scene.
    *
-   * @param {string} sceneId - The ID of the scene to select.
+   * @param sceneId The scene ID to select.
    */
   selectScene: (sceneId: string) => void;
+
+  /**
+   * Selects a text overlay for editing.
+   *
+   * @param overlayId The selected overlay ID, or null to clear selection.
+   */
+  selectOverlay: (overlayId: string | null) => void;
+
+  /**
+   * Updates a specific text overlay immutably inside the current template and
+   * saves the updated template as a browser draft.
+   *
+   * @param sceneId The scene that owns the overlay.
+   * @param overlayId The overlay to update.
+   * @param patch Editable overlay fields to update.
+   */
+  updateTextOverlay: (
+    sceneId: string,
+    overlayId: string,
+    patch: TextOverlayUpdate,
+  ) => void;
 }
 
 /**
  * Zustand store managing the global state for the video editing session.
- * This acts as the central hub for the UI to read and manipulate the active project.
  */
 export const useEditSession = create<EditSessionState>((set) => ({
   currentTemplate: null,
+  editedTemplatesById: loadEditedTemplateDrafts(),
   activeSceneId: null,
+  selectedOverlayId: null,
 
   loadTemplate: (template: Template) => {
-    set({
-      currentTemplate: template,
-      activeSceneId: template.scenes.length > 0 ? template.scenes[0].id : null,
+    set((state) => {
+      const templateToLoad = state.editedTemplatesById[template.id] ?? template;
+
+      return {
+        currentTemplate: templateToLoad,
+        activeSceneId:
+          templateToLoad.scenes.length > 0 ? templateToLoad.scenes[0].id : null,
+        selectedOverlayId: null,
+      };
     });
   },
 
   clearSession: () => {
-    set({ currentTemplate: null, activeSceneId: null });
+    set({
+      currentTemplate: null,
+      activeSceneId: null,
+      selectedOverlayId: null,
+    });
+  },
+
+  clearDrafts: () => {
+    clearEditedTemplateDraftsStorage();
+
+    set({
+      editedTemplatesById: {},
+    });
   },
 
   selectScene: (sceneId: string) => {
-    set({ activeSceneId: sceneId });
+    set({
+      activeSceneId: sceneId,
+      selectedOverlayId: null,
+    });
+  },
+
+  selectOverlay: (overlayId: string | null) => {
+    set({
+      selectedOverlayId: overlayId,
+    });
+  },
+
+  updateTextOverlay: (
+    sceneId: string,
+    overlayId: string,
+    patch: TextOverlayUpdate,
+  ) => {
+    set((state) => {
+      if (!state.currentTemplate) {
+        return state;
+      }
+
+      const updatedTemplate = updateTemplateTextOverlay(
+        state.currentTemplate,
+        sceneId,
+        overlayId,
+        patch,
+      );
+
+      if (updatedTemplate === state.currentTemplate) {
+        return state;
+      }
+
+      const editedTemplatesById = {
+        ...state.editedTemplatesById,
+        [updatedTemplate.id]: updatedTemplate,
+      };
+
+      saveEditedTemplateDrafts(editedTemplatesById);
+
+      return {
+        currentTemplate: updatedTemplate,
+        editedTemplatesById,
+      };
+    });
   },
 }));
+
+/**
+ * Updates a text overlay inside a template without mutating the original object.
+ *
+ * @param template Source template.
+ * @param sceneId Scene that owns the target overlay.
+ * @param overlayId Target overlay id.
+ * @param patch Editable overlay fields to update.
+ * @returns Updated template, or the original template if no matching overlay exists.
+ */
+export function updateTemplateTextOverlay(
+  template: Template,
+  sceneId: string,
+  overlayId: string,
+  patch: TextOverlayUpdate,
+): Template {
+  let didUpdateOverlay = false;
+
+  const scenes = template.scenes.map((scene) => {
+    if (scene.id !== sceneId) {
+      return scene;
+    }
+
+    let didUpdateScene = false;
+
+    const textOverlays = scene.textOverlays.map((overlay) => {
+      if (overlay.id !== overlayId) {
+        return overlay;
+      }
+
+      didUpdateOverlay = true;
+      didUpdateScene = true;
+
+      return {
+        ...overlay,
+        ...patch,
+      };
+    });
+
+    if (!didUpdateScene) {
+      return scene;
+    }
+
+    return {
+      ...scene,
+      textOverlays,
+    };
+  });
+
+  if (!didUpdateOverlay) {
+    return template;
+  }
+
+  return {
+    ...template,
+    scenes,
+  };
+}

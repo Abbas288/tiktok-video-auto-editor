@@ -1,25 +1,29 @@
 import React, { useMemo } from "react";
-import {
-  Platform,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextStyle,
-  View,
-} from "react-native";
-import { TextOverlay } from "../types/template";
-import { Size, VideoCanvas, getVideoCanvas } from "../domain/video/videoCanvas";
+import { Platform, StyleProp, StyleSheet, TextStyle, View } from "react-native";
+import { NormalizedOverlayPosition } from "../domain/video/overlayPosition";
 import {
   createTextOverlayRenderModel,
   getMaxTextLines,
   getVisibleTextOverlays,
 } from "../domain/video/textOverlayLayout";
+import { Size, VideoCanvas, getVideoCanvas } from "../domain/video/videoCanvas";
+import { TextOverlay } from "../types/template";
+import { EditableTextOverlay } from "./video-stage/EditableTextOverlay";
 
 interface TextOverlayLayerProps {
   overlays: TextOverlay[];
   currentTime: number;
   canvas?: VideoCanvas;
   mediaSize?: Size;
+  selectedOverlayId?: string | null;
+  isEditingEnabled?: boolean;
+  onSelectOverlay?: (overlayId: string | null) => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
+  onCommitOverlayPosition?: (
+    overlayId: string,
+    position: NormalizedOverlayPosition,
+  ) => void;
 }
 
 const webTextWrapStyle = Platform.select<StyleProp<TextStyle>>({
@@ -32,39 +36,58 @@ const webTextWrapStyle = Platform.select<StyleProp<TextStyle>>({
 });
 
 /**
- * Renders synchronized text overlays inside a video-owned coordinate system.
+ * Renders synchronized text overlays inside video space.
  *
- * The layer does not measure browser size and does not position text against
- * the page. It receives the logical video canvas and actual media size from
- * VideoStage, then renders text inside that video space only.
+ * When editing is disabled, overlays remain visible but cannot be selected or
+ * dragged. This is used for fullscreen preview mode.
  */
 export function TextOverlayLayer({
   overlays,
   currentTime,
   canvas = getVideoCanvas("landscape"),
   mediaSize = canvas,
+  selectedOverlayId = null,
+  isEditingEnabled = true,
+  onSelectOverlay,
+  onDragStart,
+  onDragEnd,
+  onCommitOverlayPosition,
 }: TextOverlayLayerProps): React.JSX.Element {
   const renderModels = useMemo(
     () =>
-      getVisibleTextOverlays(overlays, currentTime).map((overlay, index) =>
-        createTextOverlayRenderModel(overlay, index, canvas, mediaSize),
-      ),
+      getVisibleTextOverlays(overlays, currentTime).map((overlay, index) => ({
+        overlay,
+        model: createTextOverlayRenderModel(overlay, index, canvas, mediaSize),
+      })),
     [canvas, currentTime, mediaSize, overlays],
   );
 
   return (
-    <View style={styles.layer} pointerEvents="none" testID="text-overlay-layer">
-      {renderModels.map((model) => (
-        <View key={model.id} style={model.wrapperStyle} pointerEvents="none">
-          <Text
-            numberOfLines={getMaxTextLines()}
-            ellipsizeMode="tail"
-            maxFontSizeMultiplier={1}
-            style={[model.textStyle, webTextWrapStyle]}
-          >
-            {model.text}
-          </Text>
-        </View>
+    <View
+      style={styles.layer}
+      pointerEvents={isEditingEnabled ? "box-none" : "none"}
+      testID="text-overlay-layer"
+    >
+      {renderModels.map(({ overlay, model }) => (
+        <EditableTextOverlay
+          key={model.id}
+          model={model}
+          position={{
+            positionX: overlay.positionX,
+            positionY: overlay.positionY,
+          }}
+          mediaSize={mediaSize}
+          isSelected={isEditingEnabled && selectedOverlayId === overlay.id}
+          isEditingEnabled={isEditingEnabled}
+          maxLines={getMaxTextLines()}
+          webTextWrapStyle={webTextWrapStyle}
+          onSelect={() => onSelectOverlay?.(overlay.id)}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          onCommitPosition={(position) =>
+            onCommitOverlayPosition?.(overlay.id, position)
+          }
+        />
       ))}
     </View>
   );

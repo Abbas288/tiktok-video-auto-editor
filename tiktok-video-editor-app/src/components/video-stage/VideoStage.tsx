@@ -1,7 +1,8 @@
 import { useEvent } from "expo";
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { SeekRequest, useVideoSync } from "../../application/useVideoSync";
+import { NormalizedOverlayPosition } from "../../domain/video/overlayPosition";
 import {
   getContainedMediaRect,
   getVideoCanvas,
@@ -17,21 +18,35 @@ import { VideoSurface } from "./VideoSurface";
 interface VideoStageProps {
   template: Template;
   currentTime: number;
+  selectedOverlayId: string | null;
   seekRequest?: SeekRequest;
   onTimeUpdate: (time: number) => void;
+  onSelectOverlay: (overlayId: string | null) => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
+  onCommitOverlayPosition: (
+    overlayId: string,
+    position: NormalizedOverlayPosition,
+  ) => void;
 }
 
 /**
  * Owns the complete video preview stage: video, overlays and custom controls.
  *
- * Fullscreen is applied to this stage, not to VideoView. This keeps text
- * overlays attached to the video preview during fullscreen.
+ * Fullscreen is treated as preview mode. Text overlays remain visible, but
+ * editing interactions are disabled to keep coordinates stable and avoid
+ * fullscreen-specific drag bugs.
  */
 export function VideoStage({
   template,
   currentTime,
+  selectedOverlayId,
   seekRequest,
   onTimeUpdate,
+  onSelectOverlay,
+  onDragStart,
+  onDragEnd,
+  onCommitOverlayPosition,
 }: VideoStageProps): React.JSX.Element {
   const stageRef = useRef<View | null>(null);
   const { size: stageSize, hasMeasuredSize, onLayout } = useMeasuredSize();
@@ -56,6 +71,13 @@ export function VideoStage({
   });
 
   const { isFullscreen, toggleFullscreen } = useStageFullscreen(stageRef);
+  const isOverlayEditingEnabled = !isFullscreen;
+
+  useEffect(() => {
+    if (isFullscreen && selectedOverlayId) {
+      onSelectOverlay(null);
+    }
+  }, [isFullscreen, onSelectOverlay, selectedOverlayId]);
 
   const overlays = useMemo(
     () => template.scenes.flatMap((scene) => scene.textOverlays ?? []),
@@ -103,6 +125,12 @@ export function VideoStage({
             currentTime={currentTime}
             canvas={canvas}
             mediaRect={mediaRect}
+            selectedOverlayId={selectedOverlayId}
+            isEditingEnabled={isOverlayEditingEnabled}
+            onSelectOverlay={onSelectOverlay}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+            onCommitOverlayPosition={onCommitOverlayPosition}
           />
 
           {status === "error" ? (
