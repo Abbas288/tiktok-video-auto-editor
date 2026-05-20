@@ -37,6 +37,8 @@ export interface Effect {
   type: "zoom" | "brightness" | "contrast" | "blur";
   intensity?: number;
   value?: number;
+  positionX?: number;
+  positionY?: number;
 }
 
 /** Represents a discrete video segment with its own rules and overlays. */

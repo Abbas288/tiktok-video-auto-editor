@@ -1,4 +1,11 @@
 import { create } from "zustand";
+import {
+  EditableSceneEffectType,
+  resetEditableSceneEffects,
+  upsertSceneEffect,
+  upsertSceneZoomFocus,
+  ZoomFocusPosition,
+} from "../domain/video/sceneEffects";
 import { Template, TextOverlay } from "../types/template";
 import {
   clearEditedTemplateDraftsStorage,
@@ -77,6 +84,34 @@ export interface EditSessionState {
     overlayId: string,
     patch: TextOverlayUpdate,
   ) => void;
+
+  /**
+   * Adds or updates one visual filter effect for a scene.
+   *
+   * @param sceneId The scene to update.
+   * @param effectType Editable effect type.
+   * @param value New effect value.
+   */
+  updateSceneEffect: (
+    sceneId: string,
+    effectType: EditableSceneEffectType,
+    value: number,
+  ) => void;
+
+  /**
+   * Updates the zoom focus for a scene.
+   *
+   * @param sceneId The scene to update.
+   * @param position New normalized zoom focus position.
+   */
+  updateSceneZoomFocus: (sceneId: string, position: ZoomFocusPosition) => void;
+
+  /**
+   * Resets editable visual filters for one scene.
+   *
+   * @param sceneId The scene to reset.
+   */
+  resetSceneEffects: (sceneId: string) => void;
 }
 
 /**
@@ -147,21 +182,59 @@ export const useEditSession = create<EditSessionState>((set) => ({
         patch,
       );
 
-      if (updatedTemplate === state.currentTemplate) {
+      return persistTemplateUpdate(state, updatedTemplate);
+    });
+  },
+
+  updateSceneEffect: (
+    sceneId: string,
+    effectType: EditableSceneEffectType,
+    value: number,
+  ) => {
+    set((state) => {
+      if (!state.currentTemplate) {
         return state;
       }
 
-      const editedTemplatesById = {
-        ...state.editedTemplatesById,
-        [updatedTemplate.id]: updatedTemplate,
-      };
+      const updatedTemplate = updateTemplateSceneEffect(
+        state.currentTemplate,
+        sceneId,
+        effectType,
+        value,
+      );
 
-      saveEditedTemplateDrafts(editedTemplatesById);
+      return persistTemplateUpdate(state, updatedTemplate);
+    });
+  },
 
-      return {
-        currentTemplate: updatedTemplate,
-        editedTemplatesById,
-      };
+  updateSceneZoomFocus: (sceneId: string, position: ZoomFocusPosition) => {
+    set((state) => {
+      if (!state.currentTemplate) {
+        return state;
+      }
+
+      const updatedTemplate = updateTemplateSceneZoomFocus(
+        state.currentTemplate,
+        sceneId,
+        position,
+      );
+
+      return persistTemplateUpdate(state, updatedTemplate);
+    });
+  },
+
+  resetSceneEffects: (sceneId: string) => {
+    set((state) => {
+      if (!state.currentTemplate) {
+        return state;
+      }
+
+      const updatedTemplate = resetTemplateSceneEffects(
+        state.currentTemplate,
+        sceneId,
+      );
+
+      return persistTemplateUpdate(state, updatedTemplate);
     });
   },
 }));
@@ -221,5 +294,140 @@ export function updateTemplateTextOverlay(
   return {
     ...template,
     scenes,
+  };
+}
+
+/**
+ * Updates one scene visual effect without mutating the original template.
+ *
+ * @param template Source template.
+ * @param sceneId Target scene id.
+ * @param effectType Editable effect type.
+ * @param value New effect value.
+ * @returns Updated template, or original template if no scene matches.
+ */
+export function updateTemplateSceneEffect(
+  template: Template,
+  sceneId: string,
+  effectType: EditableSceneEffectType,
+  value: number,
+): Template {
+  let didUpdateScene = false;
+
+  const scenes = template.scenes.map((scene) => {
+    if (scene.id !== sceneId) {
+      return scene;
+    }
+
+    didUpdateScene = true;
+
+    return {
+      ...scene,
+      effects: upsertSceneEffect(scene.effects ?? [], effectType, value),
+    };
+  });
+
+  if (!didUpdateScene) {
+    return template;
+  }
+
+  return {
+    ...template,
+    scenes,
+  };
+}
+
+/**
+ * Updates one scene zoom focus without mutating the original template.
+ *
+ * @param template Source template.
+ * @param sceneId Target scene id.
+ * @param position New normalized zoom focus position.
+ * @returns Updated template, or original template if no scene matches.
+ */
+export function updateTemplateSceneZoomFocus(
+  template: Template,
+  sceneId: string,
+  position: ZoomFocusPosition,
+): Template {
+  let didUpdateScene = false;
+
+  const scenes = template.scenes.map((scene) => {
+    if (scene.id !== sceneId) {
+      return scene;
+    }
+
+    didUpdateScene = true;
+
+    return {
+      ...scene,
+      effects: upsertSceneZoomFocus(scene.effects ?? [], position),
+    };
+  });
+
+  if (!didUpdateScene) {
+    return template;
+  }
+
+  return {
+    ...template,
+    scenes,
+  };
+}
+
+/**
+ * Resets editable scene effects without mutating the original template.
+ *
+ * @param template Source template.
+ * @param sceneId Target scene id.
+ * @returns Updated template, or original template if no scene matches.
+ */
+export function resetTemplateSceneEffects(
+  template: Template,
+  sceneId: string,
+): Template {
+  let didUpdateScene = false;
+
+  const scenes = template.scenes.map((scene) => {
+    if (scene.id !== sceneId) {
+      return scene;
+    }
+
+    didUpdateScene = true;
+
+    return {
+      ...scene,
+      effects: resetEditableSceneEffects(scene.effects ?? []),
+    };
+  });
+
+  if (!didUpdateScene) {
+    return template;
+  }
+
+  return {
+    ...template,
+    scenes,
+  };
+}
+
+function persistTemplateUpdate(
+  state: EditSessionState,
+  updatedTemplate: Template,
+): Partial<EditSessionState> | EditSessionState {
+  if (updatedTemplate === state.currentTemplate) {
+    return state;
+  }
+
+  const editedTemplatesById = {
+    ...state.editedTemplatesById,
+    [updatedTemplate.id]: updatedTemplate,
+  };
+
+  saveEditedTemplateDrafts(editedTemplatesById);
+
+  return {
+    currentTemplate: updatedTemplate,
+    editedTemplatesById,
   };
 }
