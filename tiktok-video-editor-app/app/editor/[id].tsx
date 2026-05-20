@@ -12,11 +12,17 @@ import { useInitializeEditor } from "../../src/application/useInitializeEditor";
 import { SeekRequest } from "../../src/application/useVideoSync";
 import { EditorHeader } from "../../src/components/EditorHeader";
 import { OverlayEditPanel } from "../../src/components/OverlayEditPanel";
+import { SceneEffectsPanel } from "../../src/components/SceneEffectsPanel";
 import { Timeline } from "../../src/components/Timeline";
 import { VideoStage } from "../../src/components/video-stage/VideoStage";
 import { findTextOverlayById } from "../../src/domain/video/findTextOverlay";
 import { getActiveSceneIdAtTime } from "../../src/domain/video/getActiveSceneIdAtTime";
 import { NormalizedOverlayPosition } from "../../src/domain/video/overlayPosition";
+import {
+  EditableSceneEffectType,
+  getSceneFilterValues,
+  ZoomFocusPosition,
+} from "../../src/domain/video/sceneEffects";
 import { TextOverlayUpdate } from "../../src/store/useEditSession";
 import { colors } from "../../src/styles/theme";
 import { normalizeRouteParam } from "../../src/utils/normalizeRouteParam";
@@ -42,6 +48,9 @@ export default function EditorScreen(): React.JSX.Element {
     selectScene,
     selectOverlay,
     updateTextOverlay,
+    updateSceneEffect,
+    updateSceneZoomFocus,
+    resetSceneEffects,
     clearSession,
   } = useInitializeEditor(templateId);
 
@@ -51,6 +60,18 @@ export default function EditorScreen(): React.JSX.Element {
         ? findTextOverlayById(currentTemplate.scenes, selectedOverlayId)
         : null,
     [currentTemplate, selectedOverlayId],
+  );
+
+  const activeScene = useMemo(
+    () =>
+      currentTemplate?.scenes.find((scene) => scene.id === activeSceneId) ??
+      null,
+    [activeSceneId, currentTemplate],
+  );
+
+  const activeSceneFilterValues = useMemo(
+    () => (activeScene ? getSceneFilterValues(activeScene.effects) : null),
+    [activeScene],
   );
 
   const handleGoBack = useCallback((): void => {
@@ -133,6 +154,32 @@ export default function EditorScreen(): React.JSX.Element {
     [selectedOverlayResult, updateTextOverlay],
   );
 
+  const handleChangeSceneEffect = useCallback(
+    (effectType: EditableSceneEffectType, value: number): void => {
+      if (!activeScene) {
+        return;
+      }
+
+      updateSceneEffect(activeScene.id, effectType, value);
+    },
+    [activeScene, updateSceneEffect],
+  );
+
+  const handleResetSceneEffects = useCallback((): void => {
+    if (!activeScene) {
+      return;
+    }
+
+    resetSceneEffects(activeScene.id);
+  }, [activeScene, resetSceneEffects]);
+
+  const handleCommitZoomFocus = useCallback(
+    (sceneId: string, position: ZoomFocusPosition): void => {
+      updateSceneZoomFocus(sceneId, position);
+    },
+    [updateSceneZoomFocus],
+  );
+
   if (isLoading) {
     return (
       <View style={styles.center}>
@@ -172,6 +219,7 @@ export default function EditorScreen(): React.JSX.Element {
             onDragStart={() => setIsDraggingOverlay(true)}
             onDragEnd={() => setIsDraggingOverlay(false)}
             onCommitOverlayPosition={handleCommitOverlayPosition}
+            onCommitZoomFocus={handleCommitZoomFocus}
           />
         </View>
 
@@ -179,6 +227,13 @@ export default function EditorScreen(): React.JSX.Element {
           overlay={selectedOverlayResult?.overlay ?? null}
           onChange={handleChangeSelectedOverlay}
           onClose={() => selectOverlay(null)}
+        />
+
+        <SceneEffectsPanel
+          sceneTitle={activeScene?.instruction ?? null}
+          values={activeSceneFilterValues}
+          onChange={handleChangeSceneEffect}
+          onReset={handleResetSceneEffects}
         />
 
         <Timeline

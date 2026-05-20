@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
-import { TextOverlayUpdate, useEditSession } from "../store/useEditSession";
+import {
+  EditableSceneEffectType,
+  ZoomFocusPosition,
+} from "../domain/video/sceneEffects";
 import { templateRepository } from "../infrastructure/templateRepository";
+import { TextOverlayUpdate, useEditSession } from "../store/useEditSession";
 import { Template } from "../types/template";
 
 interface EditorInitializationResult {
@@ -16,6 +20,13 @@ interface EditorInitializationResult {
     overlayId: string,
     patch: TextOverlayUpdate,
   ) => void;
+  updateSceneEffect: (
+    sceneId: string,
+    effectType: EditableSceneEffectType,
+    value: number,
+  ) => void;
+  updateSceneZoomFocus: (sceneId: string, position: ZoomFocusPosition) => void;
+  resetSceneEffects: (sceneId: string) => void;
   clearSession: () => void;
 }
 
@@ -37,6 +48,9 @@ export function useInitializeEditor(
     selectScene,
     selectOverlay,
     updateTextOverlay,
+    updateSceneEffect,
+    updateSceneZoomFocus,
+    resetSceneEffects,
   } = useEditSession();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -106,6 +120,9 @@ export function useInitializeEditor(
     selectScene,
     selectOverlay,
     updateTextOverlay,
+    updateSceneEffect,
+    updateSceneZoomFocus,
+    resetSceneEffects,
     clearSession,
   };
 }

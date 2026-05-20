@@ -4,6 +4,11 @@ import { StyleSheet, View } from "react-native";
 import { SeekRequest, useVideoSync } from "../../application/useVideoSync";
 import { NormalizedOverlayPosition } from "../../domain/video/overlayPosition";
 import {
+  getSceneEffectsAtTime,
+  getSceneFilterValues,
+  ZoomFocusPosition,
+} from "../../domain/video/sceneEffects";
+import {
   getContainedMediaRect,
   getVideoCanvas,
 } from "../../domain/video/videoCanvas";
@@ -28,14 +33,14 @@ interface VideoStageProps {
     overlayId: string,
     position: NormalizedOverlayPosition,
   ) => void;
+  onCommitZoomFocus: (sceneId: string, position: ZoomFocusPosition) => void;
 }
 
 /**
  * Owns the complete video preview stage: video, overlays and custom controls.
  *
- * Fullscreen is treated as preview mode. Text overlays remain visible, but
- * editing interactions are disabled to keep coordinates stable and avoid
- * fullscreen-specific drag bugs.
+ * Scene filters are resolved from playback time so each scene controls only
+ * its own visual appearance.
  */
 export function VideoStage({
   template,
@@ -47,6 +52,7 @@ export function VideoStage({
   onDragStart,
   onDragEnd,
   onCommitOverlayPosition,
+  onCommitZoomFocus,
 }: VideoStageProps): React.JSX.Element {
   const stageRef = useRef<View | null>(null);
   const { size: stageSize, hasMeasuredSize, onLayout } = useMeasuredSize();
@@ -79,9 +85,25 @@ export function VideoStage({
     }
   }, [isFullscreen, onSelectOverlay, selectedOverlayId]);
 
+  const activeScene = useMemo(
+    () =>
+      template.scenes.find(
+        (scene) =>
+          currentTime >= scene.startSeconds &&
+          currentTime < scene.startSeconds + scene.durationSeconds,
+      ) ?? null,
+    [currentTime, template.scenes],
+  );
+
   const overlays = useMemo(
     () => template.scenes.flatMap((scene) => scene.textOverlays ?? []),
     [template.scenes],
+  );
+
+  const activeSceneFilters = useMemo(
+    () =>
+      getSceneFilterValues(getSceneEffectsAtTime(template.scenes, currentTime)),
+    [currentTime, template.scenes],
   );
 
   const mediaRect = useMemo(
@@ -102,6 +124,17 @@ export function VideoStage({
     void toggleFullscreen();
   }, [toggleFullscreen]);
 
+  const handleCommitZoomFocus = useCallback(
+    (position: ZoomFocusPosition): void => {
+      if (!activeScene) {
+        return;
+      }
+
+      onCommitZoomFocus(activeScene.id, position);
+    },
+    [activeScene, onCommitZoomFocus],
+  );
+
   return (
     <View
       ref={stageRef}
@@ -118,7 +151,15 @@ export function VideoStage({
     >
       {hasMeasuredSize ? (
         <>
-          <VideoSurface player={player} mediaRect={mediaRect} />
+          <VideoSurface
+            player={player}
+            mediaRect={mediaRect}
+            filters={activeSceneFilters}
+            isZoomPanEnabled={!selectedOverlayId}
+            onZoomPanStart={onDragStart}
+            onZoomPanEnd={onDragEnd}
+            onCommitZoomFocus={handleCommitZoomFocus}
+          />
 
           <OverlayWorld
             overlays={overlays}
