@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useVideoPlayer } from "expo-video";
 
 export interface SeekRequest {
@@ -13,20 +13,21 @@ interface UseVideoSyncProps {
 }
 
 /**
- * Encapsulates expo-video player setup, timeline seeking and time reporting.
+ * Encapsulates main video player setup, seeking and time reporting.
+ *
+ * @param props Main video synchronization properties.
+ * @returns Main video player instance.
  */
 export function useVideoSync({
   videoUrl,
   seekRequest,
   onTimeUpdate,
 }: UseVideoSyncProps) {
-  const player = useVideoPlayer(videoUrl ?? null, (createdPlayer) => {
+  const sourceUrl = useMemo(() => normalizeMediaUrl(videoUrl), [videoUrl]);
+
+  const player = useVideoPlayer(sourceUrl, (createdPlayer) => {
     createdPlayer.loop = false;
     createdPlayer.timeUpdateEventInterval = 0.1;
-
-    if (videoUrl) {
-      createdPlayer.play();
-    }
   });
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export function useVideoSync({
       return;
     }
 
-    player.currentTime = seekRequest.time;
+    player.currentTime = Math.max(seekRequest.time, 0);
   }, [player, seekRequest]);
 
   useEffect(() => {
@@ -50,4 +51,14 @@ export function useVideoSync({
   }, [onTimeUpdate, player]);
 
   return player;
+}
+
+function normalizeMediaUrl(url: string | undefined): string | null {
+  if (typeof url !== "string") {
+    return null;
+  }
+
+  const trimmedUrl = url.trim();
+
+  return trimmedUrl.length > 0 ? trimmedUrl : null;
 }

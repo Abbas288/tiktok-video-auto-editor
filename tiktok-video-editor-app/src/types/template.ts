@@ -62,6 +62,7 @@ export interface Template {
   title: string;
   sourceVideoUrl: string;
   orientation: Orientation;
+  originalVolume?: number;
   music?: Music;
   scenes: Scene[];
 }

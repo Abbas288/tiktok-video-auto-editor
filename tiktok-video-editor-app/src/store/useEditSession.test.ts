@@ -265,3 +265,23 @@ describe("useEditSession overlay editing", () => {
     expect(useEditSession.getState().editedTemplatesById).toEqual({});
   });
 });
+
+describe("useEditSession volume editing", () => {
+  beforeEach(() => {
+    resetStore();
+  });
+
+  it("updates original and music volumes immutably", () => {
+    const template = createTemplateFixture();
+    template.music = { url: "test.mp3", volume: 1, beatSync: false };
+
+    useEditSession.getState().loadTemplate(template);
+    useEditSession.getState().updateVolumes(0.5, 0.25);
+
+    const updatedTemplate = getCurrentTemplate();
+
+    expect(updatedTemplate.originalVolume).toBe(0.5);
+    expect(updatedTemplate.music?.volume).toBe(0.25);
+    expect(updatedTemplate).not.toBe(template);
+  });
+});

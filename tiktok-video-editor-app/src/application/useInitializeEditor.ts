@@ -7,6 +7,9 @@ import { templateRepository } from "../infrastructure/templateRepository";
 import { TextOverlayUpdate, useEditSession } from "../store/useEditSession";
 import { Template } from "../types/template";
 
+/**
+ * The unified interface returned by the editor initialization hook.
+ */
 interface EditorInitializationResult {
   isLoading: boolean;
   error: string | null;
@@ -27,6 +30,7 @@ interface EditorInitializationResult {
   ) => void;
   updateSceneZoomFocus: (sceneId: string, position: ZoomFocusPosition) => void;
   resetSceneEffects: (sceneId: string) => void;
+  updateVolumes: (originalVolume: number, musicVolume?: number) => void;
   clearSession: () => void;
 }
 
@@ -51,6 +55,7 @@ export function useInitializeEditor(
     updateSceneEffect,
     updateSceneZoomFocus,
     resetSceneEffects,
+    updateVolumes,
   } = useEditSession();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -123,6 +128,7 @@ export function useInitializeEditor(
     updateSceneEffect,
     updateSceneZoomFocus,
     resetSceneEffects,
+    updateVolumes,
     clearSession,
   };
 }

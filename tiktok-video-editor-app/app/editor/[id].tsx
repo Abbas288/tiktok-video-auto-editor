@@ -10,6 +10,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useInitializeEditor } from "../../src/application/useInitializeEditor";
 import { SeekRequest } from "../../src/application/useVideoSync";
+import { AudioPanel } from "../../src/components/AudioPanel";
 import { EditorHeader } from "../../src/components/EditorHeader";
 import { OverlayEditPanel } from "../../src/components/OverlayEditPanel";
 import { SceneEffectsPanel } from "../../src/components/SceneEffectsPanel";
@@ -29,6 +30,9 @@ import { normalizeRouteParam } from "../../src/utils/normalizeRouteParam";
 
 /**
  * Renders the editor screen for a selected template.
+ * Coordinates all editing panels, video playback, and timeline interactions.
+ *
+ * @returns Editor screen element.
  */
 export default function EditorScreen(): React.JSX.Element {
   const router = useRouter();
@@ -51,6 +55,7 @@ export default function EditorScreen(): React.JSX.Element {
     updateSceneEffect,
     updateSceneZoomFocus,
     resetSceneEffects,
+    updateVolumes,
     clearSession,
   } = useInitializeEditor(templateId);
 
@@ -229,12 +234,24 @@ export default function EditorScreen(): React.JSX.Element {
           onClose={() => selectOverlay(null)}
         />
 
-        <SceneEffectsPanel
-          sceneTitle={activeScene?.instruction ?? null}
-          values={activeSceneFilterValues}
-          onChange={handleChangeSceneEffect}
-          onReset={handleResetSceneEffects}
-        />
+        {!selectedOverlayId && (
+          <>
+            <SceneEffectsPanel
+              sceneTitle={activeScene?.instruction ?? null}
+              values={activeSceneFilterValues}
+              onChange={handleChangeSceneEffect}
+              onReset={handleResetSceneEffects}
+            />
+
+            <AudioPanel
+              originalVolume={currentTemplate.originalVolume ?? 1}
+              musicVolume={
+                currentTemplate.music ? currentTemplate.music.volume : null
+              }
+              onChangeVolumes={updateVolumes}
+            />
+          </>
+        )}
 
         <Timeline
           scenes={currentTemplate.scenes}
