@@ -1,6 +1,8 @@
 import { useEvent } from "expo";
+import { type VideoPlayer as ExpoVideoPlayer } from "expo-video";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
+import { useBackgroundMusic } from "../../application/useBackgroundMusic";
 import { SeekRequest, useVideoSync } from "../../application/useVideoSync";
 import { NormalizedOverlayPosition } from "../../domain/video/overlayPosition";
 import {
@@ -20,7 +22,7 @@ import { useMeasuredSize } from "./useMeasuredSize";
 import { useStageFullscreen } from "./useStageFullscreen";
 import { VideoSurface } from "./VideoSurface";
 
-interface VideoStageProps {
+export interface VideoStageProps {
   template: Template;
   currentTime: number;
   selectedOverlayId: string | null;
@@ -37,10 +39,10 @@ interface VideoStageProps {
 }
 
 /**
- * Owns the complete video preview stage: video, overlays and custom controls.
+ * Owns the complete video preview stage: video, overlays, audio and custom controls.
  *
- * Scene filters are resolved from playback time so each scene controls only
- * its own visual appearance.
+ * @param props Component properties containing playback state and template.
+ * @returns Video stage element.
  */
 export function VideoStage({
   template,
@@ -74,6 +76,20 @@ export function VideoStage({
 
   const { status } = useEvent(player, "statusChange", {
     status: player.status,
+  });
+
+  const originalVolume = template.originalVolume ?? 1;
+
+  useEffect(() => {
+    player.volume = clampVolume(originalVolume);
+    player.muted = originalVolume === 0;
+  }, [player, originalVolume]);
+
+  const backgroundMusic = useBackgroundMusic({
+    url: template.music?.url,
+    volume: template.music?.volume ?? 1,
+    isPlaying,
+    seekRequest,
   });
 
   const { isFullscreen, toggleFullscreen } = useStageFullscreen(stageRef);
@@ -112,13 +128,15 @@ export function VideoStage({
   );
 
   const handleTogglePlay = useCallback((): void => {
-    if (player.playing) {
+    if (isPlaying) {
+      backgroundMusic.pause();
       player.pause();
       return;
     }
 
-    player.play();
-  }, [player]);
+    backgroundMusic.playFromUserGesture();
+    playVideo(player, backgroundMusic.pause);
+  }, [backgroundMusic, isPlaying, player]);
 
   const handleToggleFullscreen = useCallback((): void => {
     void toggleFullscreen();
@@ -192,6 +210,32 @@ export function VideoStage({
       ) : null}
     </View>
   );
+}
+
+function playVideo(player: ExpoVideoPlayer, onRejected: () => void): void {
+  try {
+    const result = player.play();
+
+    void Promise.resolve(result).catch((error) => {
+      onRejected();
+      handleVideoPlaybackError(error);
+    });
+  } catch (error) {
+    onRejected();
+    handleVideoPlaybackError(error);
+  }
+}
+
+function handleVideoPlaybackError(error: unknown): void {
+  console.warn("Unable to play video.", error);
+}
+
+function clampVolume(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 1;
+  }
+
+  return Math.min(Math.max(value, 0), 1);
 }
 
 const styles = StyleSheet.create({

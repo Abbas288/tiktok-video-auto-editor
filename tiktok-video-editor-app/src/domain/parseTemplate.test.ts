@@ -1,7 +1,6 @@
 import { parseTemplate } from "./parseTemplate";
 
 describe("parseTemplate", () => {
-  // TC2.1: Valid template-like data can be accepted
   it("TC2.1: parses a valid template successfully", () => {
     const validData = {
       id: "test-1",
@@ -25,7 +24,6 @@ describe("parseTemplate", () => {
     expect(result.scenes[0].instruction).toBe("Do something fun");
   });
 
-  // TC2.2 & TC2.6: Invalid template-like data is handled safely (no 'any')
   it("TC2.2 & TC2.6: throws error if input is not a valid object", () => {
     expect(() => parseTemplate(null)).toThrow(
       "Invalid template data: input is not an object",
@@ -38,7 +36,6 @@ describe("parseTemplate", () => {
     );
   });
 
-  // TC2.3: Missing required fields are rejected
   it("TC2.3: throws error if required fields are missing", () => {
     const missingTitle = {
       id: "test-1",
@@ -62,7 +59,6 @@ describe("parseTemplate", () => {
     );
   });
 
-  // TC2.4: Invalid scene timing is rejected
   it("TC2.4: throws error if scene timing is invalid", () => {
     const negativeStart = {
       id: "test-1",
@@ -87,7 +83,6 @@ describe("parseTemplate", () => {
     );
   });
 
-  // TC2.5: Empty scenes array is handled safely
   it("TC2.5: handles empty scenes array safely", () => {
     const emptyScenes = {
       id: "test-empty",
@@ -99,5 +94,27 @@ describe("parseTemplate", () => {
 
     const result = parseTemplate(emptyScenes);
     expect(result.scenes).toEqual([]);
+  });
+
+  it("Safely parses originalVolume and music objects", () => {
+    const dataWithAudio = {
+      id: "test-audio",
+      title: "Audio Template",
+      sourceVideoUrl: "https://example.com/video.mp4",
+      orientation: "landscape",
+      originalVolume: 0.8,
+      music: {
+        url: "https://example.com/music.mp3",
+        volume: 0.5,
+        beatSync: true,
+      },
+      scenes: [],
+    };
+
+    const result = parseTemplate(dataWithAudio);
+    expect(result.originalVolume).toBe(0.8);
+    expect(result.music?.url).toBe("https://example.com/music.mp3");
+    expect(result.music?.volume).toBe(0.5);
+    expect(result.music?.beatSync).toBe(true);
   });
 });

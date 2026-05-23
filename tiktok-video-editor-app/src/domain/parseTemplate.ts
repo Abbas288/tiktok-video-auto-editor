@@ -1,12 +1,17 @@
-import { Template, Scene, Orientation } from "../types/template";
+import {
+  Template,
+  Scene,
+  Orientation,
+  Music,
+  Transition,
+} from "../types/template";
 
 /**
  * Parses and validates unknown input data into a typed Template object.
- * Ensures all required fields exist and that scene timings are logical.
  *
- * @param {unknown} input - The raw data to parse (e.g., from an API or JSON file).
- * @returns {Template} A validated and normalized Template object.
- * @throws {Error} If the data is malformed or validation fails.
+ * @param input Raw template data.
+ * @returns Validated template.
+ * @throws If the data is malformed.
  */
 export function parseTemplate(input: unknown): Template {
   if (!input || typeof input !== "object") {
@@ -15,14 +20,26 @@ export function parseTemplate(input: unknown): Template {
 
   const record = input as Record<string, unknown>;
 
-  if (typeof record.id !== "string")
+  if (typeof record.id !== "string") {
     throw new Error("Missing or invalid field: id");
-  if (typeof record.title !== "string")
+  }
+
+  if (typeof record.title !== "string") {
     throw new Error("Missing or invalid field: title");
-  if (typeof record.sourceVideoUrl !== "string")
+  }
+
+  if (typeof record.sourceVideoUrl !== "string") {
     throw new Error("Missing or invalid field: sourceVideoUrl");
+  }
+
+  const sourceVideoUrl = record.sourceVideoUrl.trim();
+
+  if (!sourceVideoUrl) {
+    throw new Error("Missing or invalid field: sourceVideoUrl");
+  }
 
   const validOrientations: Orientation[] = ["portrait", "landscape", "square"];
+
   if (
     typeof record.orientation !== "string" ||
     !validOrientations.includes(record.orientation as Orientation)
@@ -34,39 +51,134 @@ export function parseTemplate(input: unknown): Template {
     throw new Error("Missing or invalid field: scenes must be an array");
   }
 
-  const parsedScenes: Scene[] = record.scenes.map((sceneInput, index) => {
+  return {
+    id: record.id,
+    title: record.title,
+    sourceVideoUrl,
+    orientation: record.orientation as Orientation,
+    originalVolume: parseOptionalVolume(record.originalVolume),
+    music: parseMusic(record.music),
+    scenes: parseScenes(record.scenes),
+  };
+}
+
+function parseScenes(sceneInputs: unknown[]): Scene[] {
+  return sceneInputs.map((sceneInput, index) => {
     if (!sceneInput || typeof sceneInput !== "object") {
       throw new Error(`Invalid scene at index ${index}`);
     }
 
-    const s = sceneInput as Record<string, unknown>;
+    const sceneRecord = sceneInput as Record<string, unknown>;
 
-    if (typeof s.id !== "string") throw new Error(`Scene ${index} missing id`);
-    if (typeof s.startSeconds !== "number")
+    if (typeof sceneRecord.id !== "string") {
+      throw new Error(`Scene ${index} missing id`);
+    }
+
+    if (typeof sceneRecord.startSeconds !== "number") {
       throw new Error(`Scene ${index} missing startSeconds`);
-    if (typeof s.durationSeconds !== "number")
-      throw new Error(`Scene ${index} missing durationSeconds`);
+    }
 
-    if (s.startSeconds < 0 || s.durationSeconds <= 0) {
+    if (typeof sceneRecord.durationSeconds !== "number") {
+      throw new Error(`Scene ${index} missing durationSeconds`);
+    }
+
+    if (sceneRecord.startSeconds < 0 || sceneRecord.durationSeconds <= 0) {
       throw new Error(`Scene ${index} has invalid timing`);
     }
 
     return {
-      id: s.id,
-      orderIndex: typeof s.orderIndex === "number" ? s.orderIndex : index,
-      startSeconds: s.startSeconds,
-      durationSeconds: s.durationSeconds,
-      instruction: typeof s.instruction === "string" ? s.instruction : "",
-      textOverlays: Array.isArray(s.textOverlays) ? s.textOverlays : [],
-      effects: Array.isArray(s.effects) ? s.effects : [],
+      id: sceneRecord.id,
+      orderIndex:
+        typeof sceneRecord.orderIndex === "number"
+          ? sceneRecord.orderIndex
+          : index,
+      startSeconds: sceneRecord.startSeconds,
+      durationSeconds: sceneRecord.durationSeconds,
+      instruction:
+        typeof sceneRecord.instruction === "string"
+          ? sceneRecord.instruction
+          : "",
+      transition: parseTransition(sceneRecord.transition),
+      textOverlays: Array.isArray(sceneRecord.textOverlays)
+        ? sceneRecord.textOverlays
+        : [],
+      effects: Array.isArray(sceneRecord.effects) ? sceneRecord.effects : [],
     };
   });
+}
+
+function parseTransition(value: unknown): Transition | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  if (!isTransitionType(value.type)) {
+    return undefined;
+  }
+
+  if (typeof value.durationSeconds !== "number" || value.durationSeconds < 0) {
+    return undefined;
+  }
 
   return {
-    id: record.id,
-    title: record.title,
-    sourceVideoUrl: record.sourceVideoUrl,
-    orientation: record.orientation as Orientation,
-    scenes: parsedScenes,
+    type: value.type,
+    durationSeconds: value.durationSeconds,
+    direction: isTransitionDirection(value.direction)
+      ? value.direction
+      : undefined,
   };
+}
+
+function parseMusic(value: unknown): Music | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  if (typeof value.url !== "string") {
+    return undefined;
+  }
+
+  const url = value.url.trim();
+
+  if (!url) {
+    return undefined;
+  }
+
+  return {
+    url,
+    volume: parseOptionalVolume(value.volume) ?? 1,
+    beatSync: typeof value.beatSync === "boolean" ? value.beatSync : false,
+  };
+}
+
+function parseOptionalVolume(value: unknown): number | undefined {
+  if (typeof value !== "number") {
+    return undefined;
+  }
+
+  return clamp01(value);
+}
+
+function isTransitionType(value: unknown): value is Transition["type"] {
+  return value === "cut" || value === "fade" || value === "slide";
+}
+
+function isTransitionDirection(
+  value: unknown,
+): value is NonNullable<Transition["direction"]> {
+  return (
+    value === "left" || value === "right" || value === "up" || value === "down"
+  );
+}
+
+function clamp01(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 1;
+  }
+
+  return Math.min(Math.max(value, 0), 1);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

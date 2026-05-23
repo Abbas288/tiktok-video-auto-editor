@@ -40,9 +40,6 @@ export interface EditSessionState {
   /**
    * Loads a validated template into the active session.
    *
-   * If an edited draft already exists for the same template id, the draft is
-   * loaded instead of the original template.
-   *
    * @param template The validated template data.
    */
   loadTemplate: (template: Template) => void;
@@ -72,8 +69,7 @@ export interface EditSessionState {
   selectOverlay: (overlayId: string | null) => void;
 
   /**
-   * Updates a specific text overlay immutably inside the current template and
-   * saves the updated template as a browser draft.
+   * Updates a specific text overlay.
    *
    * @param sceneId The scene that owns the overlay.
    * @param overlayId The overlay to update.
@@ -112,6 +108,14 @@ export interface EditSessionState {
    * @param sceneId The scene to reset.
    */
   resetSceneEffects: (sceneId: string) => void;
+
+  /**
+   * Updates original and background music volumes.
+   *
+   * @param originalVolume Original video volume.
+   * @param musicVolume Optional background music volume.
+   */
+  updateVolumes: (originalVolume: number, musicVolume?: number) => void;
 }
 
 /**
@@ -125,7 +129,10 @@ export const useEditSession = create<EditSessionState>((set) => ({
 
   loadTemplate: (template: Template) => {
     set((state) => {
-      const templateToLoad = state.editedTemplatesById[template.id] ?? template;
+      const templateToLoad = mergeTemplateWithDraft(
+        template,
+        state.editedTemplatesById[template.id],
+      );
 
       return {
         currentTemplate: templateToLoad,
@@ -232,6 +239,22 @@ export const useEditSession = create<EditSessionState>((set) => ({
       const updatedTemplate = resetTemplateSceneEffects(
         state.currentTemplate,
         sceneId,
+      );
+
+      return persistTemplateUpdate(state, updatedTemplate);
+    });
+  },
+
+  updateVolumes: (originalVolume: number, musicVolume?: number) => {
+    set((state) => {
+      if (!state.currentTemplate) {
+        return state;
+      }
+
+      const updatedTemplate = updateTemplateVolumes(
+        state.currentTemplate,
+        originalVolume,
+        musicVolume,
       );
 
       return persistTemplateUpdate(state, updatedTemplate);
@@ -411,6 +434,72 @@ export function resetTemplateSceneEffects(
   };
 }
 
+/**
+ * Updates audio volumes without mutating the original template.
+ *
+ * @param template Source template.
+ * @param originalVolume Original video volume.
+ * @param musicVolume Optional background music volume.
+ * @returns Updated template, or original template if unchanged.
+ */
+export function updateTemplateVolumes(
+  template: Template,
+  originalVolume: number,
+  musicVolume?: number,
+): Template {
+  const safeOriginalVolume = clamp01(originalVolume);
+  const safeMusicVolume =
+    musicVolume === undefined ? undefined : clamp01(musicVolume);
+
+  const music =
+    template.music && safeMusicVolume !== undefined
+      ? {
+          ...template.music,
+          volume: safeMusicVolume,
+        }
+      : template.music;
+
+  const hasSameOriginalVolume = template.originalVolume === safeOriginalVolume;
+  const hasSameMusicVolume = template.music?.volume === music?.volume;
+
+  if (hasSameOriginalVolume && hasSameMusicVolume) {
+    return template;
+  }
+
+  return {
+    ...template,
+    originalVolume: safeOriginalVolume,
+    music,
+  };
+}
+
+/**
+ * Merges an existing draft with the latest template shape.
+ *
+ * @param sourceTemplate Current template from the repository.
+ * @param draft Saved draft, if one exists.
+ * @returns Template with preserved user edits and current template fields.
+ */
+export function mergeTemplateWithDraft(
+  sourceTemplate: Template,
+  draft: Template | undefined,
+): Template {
+  if (!draft) {
+    return sourceTemplate;
+  }
+
+  return {
+    ...sourceTemplate,
+    ...draft,
+    id: sourceTemplate.id,
+    sourceVideoUrl: draft.sourceVideoUrl || sourceTemplate.sourceVideoUrl,
+    orientation: draft.orientation ?? sourceTemplate.orientation,
+    originalVolume: draft.originalVolume ?? sourceTemplate.originalVolume,
+    music: mergeMusic(sourceTemplate, draft),
+    scenes: mergeScenes(sourceTemplate, draft),
+  };
+}
+
 function persistTemplateUpdate(
   state: EditSessionState,
   updatedTemplate: Template,
@@ -430,4 +519,61 @@ function persistTemplateUpdate(
     currentTemplate: updatedTemplate,
     editedTemplatesById,
   };
+}
+
+function mergeMusic(
+  sourceTemplate: Template,
+  draft: Template,
+): Template["music"] {
+  if (!sourceTemplate.music) {
+    return draft.music;
+  }
+
+  if (!draft.music) {
+    return sourceTemplate.music;
+  }
+
+  return {
+    ...sourceTemplate.music,
+    volume: draft.music.volume ?? sourceTemplate.music.volume,
+    beatSync: draft.music.beatSync ?? sourceTemplate.music.beatSync,
+  };
+}
+
+function mergeScenes(
+  sourceTemplate: Template,
+  draft: Template,
+): Template["scenes"] {
+  const draftScenesById = new Map(
+    draft.scenes.map((scene) => [scene.id, scene]),
+  );
+
+  return sourceTemplate.scenes.map((sourceScene) => {
+    const draftScene = draftScenesById.get(sourceScene.id);
+
+    if (!draftScene) {
+      return sourceScene;
+    }
+
+    return {
+      ...sourceScene,
+      ...draftScene,
+      id: sourceScene.id,
+      orderIndex: sourceScene.orderIndex,
+      startSeconds: sourceScene.startSeconds,
+      durationSeconds: sourceScene.durationSeconds,
+      instruction: draftScene.instruction ?? sourceScene.instruction,
+      transition: draftScene.transition ?? sourceScene.transition,
+      textOverlays: draftScene.textOverlays ?? sourceScene.textOverlays,
+      effects: draftScene.effects ?? sourceScene.effects,
+    };
+  });
+}
+
+function clamp01(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 1;
+  }
+
+  return Math.min(Math.max(value, 0), 1);
 }

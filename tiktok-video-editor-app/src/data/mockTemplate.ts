@@ -1,10 +1,19 @@
 import { Template } from "../types/template";
 
+/**
+ * A mock template for testing the video editor functionality.
+ */
 export const mockBunnyTemplate: Template = {
   id: "bunny-intro-2026",
   title: "The Bunny and the Butterfly",
   sourceVideoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
   orientation: "landscape",
+  originalVolume: 1,
+  music: {
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    volume: 0.5,
+    beatSync: false,
+  },
   scenes: [
     {
       id: "scene-1",
