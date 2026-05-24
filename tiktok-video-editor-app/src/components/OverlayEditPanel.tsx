@@ -9,6 +9,9 @@ import {
 import { TextOverlayUpdate } from "../store/useEditSession";
 import { colors } from "../styles/theme";
 import { TextOverlay } from "../types/template";
+import { ControlRow } from "./editor-panel/ControlRow";
+import { EditorPanel } from "./editor-panel/EditorPanel";
+import { PanelButton } from "./editor-panel/PanelButton";
 
 export interface OverlayEditPanelProps {
   overlay: TextOverlay | null;
@@ -23,6 +26,9 @@ const FONT_SIZE_STEP = 2;
 
 /**
  * Renders editing controls for the selected text overlay.
+ *
+ * @param props Selected overlay and edit handlers.
+ * @returns Overlay editing panel, or null when no overlay is selected.
  */
 export function OverlayEditPanel({
   overlay,
@@ -54,14 +60,12 @@ export function OverlayEditPanel({
   }
 
   return (
-    <View style={styles.panel} testID="overlay-edit-panel">
-      <View style={styles.headerRow}>
-        <Text style={styles.title}>Edit text overlay</Text>
-        <TouchableOpacity onPress={onClose}>
-          <Text style={styles.closeText}>Close</Text>
-        </TouchableOpacity>
-      </View>
-
+    <EditorPanel
+      title="Edit text overlay"
+      actionLabel="Close"
+      onAction={onClose}
+      testID="overlay-edit-panel"
+    >
       <TextInput
         value={overlay.text}
         onChangeText={(text) => onChange({ text })}
@@ -71,61 +75,35 @@ export function OverlayEditPanel({
         testID="overlay-text-input"
       />
 
-      <Text style={styles.label}>Color</Text>
-      <View style={styles.colorRow}>
-        {COLOR_OPTIONS.map((color) => (
-          <TouchableOpacity
-            key={color}
-            style={[
-              styles.colorButton,
-              { backgroundColor: color },
-              overlay.color === color && styles.selectedColorButton,
-            ]}
-            onPress={() => onChange({ color })}
-            testID={`overlay-color-${color}`}
-          />
-        ))}
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Color</Text>
+
+        <View style={styles.colorRow}>
+          {COLOR_OPTIONS.map((color) => (
+            <TouchableOpacity
+              key={color}
+              style={[
+                styles.colorButton,
+                { backgroundColor: color },
+                overlay.color === color && styles.selectedColorButton,
+              ]}
+              onPress={() => onChange({ color })}
+              testID={`overlay-color-${color}`}
+            />
+          ))}
+        </View>
       </View>
 
-      <Text style={styles.label}>Font size: {overlay.fontSizePt} pt</Text>
-      <View style={styles.sizeRow}>
-        <TouchableOpacity style={styles.sizeButton} onPress={decreaseFontSize}>
-          <Text style={styles.sizeButtonText}>Smaller</Text>
-        </TouchableOpacity>
+      <ControlRow label="Font size" value={`${overlay.fontSizePt} pt`}>
+        <PanelButton label="Smaller" minWidth={72} onPress={decreaseFontSize} />
 
-        <TouchableOpacity style={styles.sizeButton} onPress={increaseFontSize}>
-          <Text style={styles.sizeButtonText}>Larger</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+        <PanelButton label="Larger" minWidth={72} onPress={increaseFontSize} />
+      </ControlRow>
+    </EditorPanel>
   );
 }
 
 const styles = StyleSheet.create({
-  panel: {
-    width: "100%",
-    maxWidth: 960,
-    alignSelf: "center",
-    backgroundColor: colors.surface,
-    borderRadius: 14,
-    padding: 16,
-    gap: 12,
-  },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  title: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  closeText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: "700",
-  },
   input: {
     minHeight: 44,
     borderWidth: 1,
@@ -134,6 +112,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     color: colors.text,
     backgroundColor: colors.background,
+  },
+  fieldGroup: {
+    gap: 10,
   },
   label: {
     color: colors.textSecondary,
@@ -153,22 +134,5 @@ const styles = StyleSheet.create({
   },
   selectedColorButton: {
     borderColor: colors.primary,
-  },
-  sizeRow: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  sizeButton: {
-    minHeight: 38,
-    paddingHorizontal: 14,
-    borderRadius: 999,
-    backgroundColor: colors.background,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  sizeButtonText: {
-    color: colors.text,
-    fontSize: 13,
-    fontWeight: "700",
   },
 });
