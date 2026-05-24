@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -8,29 +8,18 @@ import {
   View,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useInitializeEditor } from "../../src/application/useInitializeEditor";
-import { SeekRequest } from "../../src/application/useVideoSync";
+import { useEditorController } from "../../src/application/useEditorController";
 import { AudioPanel } from "../../src/components/AudioPanel";
 import { EditorHeader } from "../../src/components/EditorHeader";
 import { OverlayEditPanel } from "../../src/components/OverlayEditPanel";
 import { SceneEffectsPanel } from "../../src/components/SceneEffectsPanel";
 import { Timeline } from "../../src/components/Timeline";
 import { VideoStage } from "../../src/components/video-stage/VideoStage";
-import { findTextOverlayById } from "../../src/domain/video/findTextOverlay";
-import { getActiveSceneIdAtTime } from "../../src/domain/video/getActiveSceneIdAtTime";
-import { NormalizedOverlayPosition } from "../../src/domain/video/overlayPosition";
-import {
-  EditableSceneEffectType,
-  getSceneFilterValues,
-  ZoomFocusPosition,
-} from "../../src/domain/video/sceneEffects";
-import { TextOverlayUpdate } from "../../src/store/useEditSession";
 import { colors } from "../../src/styles/theme";
 import { normalizeRouteParam } from "../../src/utils/normalizeRouteParam";
 
 /**
  * Renders the editor screen for a selected template.
- * Coordinates all editing panels, video playback, and timeline interactions.
  *
  * @returns Editor screen element.
  */
@@ -39,9 +28,14 @@ export default function EditorScreen(): React.JSX.Element {
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
   const templateId = normalizeRouteParam(id);
 
-  const [seekRequest, setSeekRequest] = useState<SeekRequest>();
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [isDraggingOverlay, setIsDraggingOverlay] = useState<boolean>(false);
+  const handleExitEditor = useCallback((): void => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+
+    router.replace("/");
+  }, [router]);
 
   const {
     isLoading,
@@ -49,141 +43,28 @@ export default function EditorScreen(): React.JSX.Element {
     currentTemplate,
     activeSceneId,
     selectedOverlayId,
-    selectScene,
+    selectedOverlayResult,
+    activeScene,
+    activeSceneFilterValues,
+    seekRequest,
+    currentTime,
+    isDraggingOverlay,
     selectOverlay,
-    updateTextOverlay,
-    updateSceneEffect,
-    updateSceneZoomFocus,
-    resetSceneEffects,
     updateVolumes,
-    clearSession,
-  } = useInitializeEditor(templateId);
-
-  const selectedOverlayResult = useMemo(
-    () =>
-      currentTemplate
-        ? findTextOverlayById(currentTemplate.scenes, selectedOverlayId)
-        : null,
-    [currentTemplate, selectedOverlayId],
-  );
-
-  const activeScene = useMemo(
-    () =>
-      currentTemplate?.scenes.find((scene) => scene.id === activeSceneId) ??
-      null,
-    [activeSceneId, currentTemplate],
-  );
-
-  const activeSceneFilterValues = useMemo(
-    () => (activeScene ? getSceneFilterValues(activeScene.effects) : null),
-    [activeScene],
-  );
-
-  const handleGoBack = useCallback((): void => {
-    clearSession();
-
-    if (router.canGoBack()) {
-      router.back();
-      return;
-    }
-
-    router.replace("/");
-  }, [clearSession, router]);
-
-  const handleSceneClick = useCallback(
-    (sceneId: string): void => {
-      const scene = currentTemplate?.scenes.find((item) => item.id === sceneId);
-
-      if (!scene) {
-        return;
-      }
-
-      selectScene(sceneId);
-      setSeekRequest({
-        time: scene.startSeconds,
-        timestamp: Date.now(),
-      });
-    },
-    [currentTemplate, selectScene],
-  );
-
-  const handleTimeUpdate = useCallback(
-    (time: number): void => {
-      setCurrentTime(time);
-
-      if (!currentTemplate) {
-        return;
-      }
-
-      const matchedSceneId = getActiveSceneIdAtTime(
-        currentTemplate.scenes,
-        time,
-      );
-
-      if (matchedSceneId && matchedSceneId !== activeSceneId) {
-        selectScene(matchedSceneId);
-      }
-    },
-    [activeSceneId, currentTemplate, selectScene],
-  );
-
-  const handleCommitOverlayPosition = useCallback(
-    (overlayId: string, position: NormalizedOverlayPosition): void => {
-      if (!currentTemplate) {
-        return;
-      }
-
-      const result = findTextOverlayById(currentTemplate.scenes, overlayId);
-
-      if (!result) {
-        return;
-      }
-
-      updateTextOverlay(result.sceneId, overlayId, position);
-    },
-    [currentTemplate, updateTextOverlay],
-  );
-
-  const handleChangeSelectedOverlay = useCallback(
-    (patch: TextOverlayUpdate): void => {
-      if (!selectedOverlayResult) {
-        return;
-      }
-
-      updateTextOverlay(
-        selectedOverlayResult.sceneId,
-        selectedOverlayResult.overlay.id,
-        patch,
-      );
-    },
-    [selectedOverlayResult, updateTextOverlay],
-  );
-
-  const handleChangeSceneEffect = useCallback(
-    (effectType: EditableSceneEffectType, value: number): void => {
-      if (!activeScene) {
-        return;
-      }
-
-      updateSceneEffect(activeScene.id, effectType, value);
-    },
-    [activeScene, updateSceneEffect],
-  );
-
-  const handleResetSceneEffects = useCallback((): void => {
-    if (!activeScene) {
-      return;
-    }
-
-    resetSceneEffects(activeScene.id);
-  }, [activeScene, resetSceneEffects]);
-
-  const handleCommitZoomFocus = useCallback(
-    (sceneId: string, position: ZoomFocusPosition): void => {
-      updateSceneZoomFocus(sceneId, position);
-    },
-    [updateSceneZoomFocus],
-  );
+    handleGoBack,
+    handleSceneClick,
+    handleTimeUpdate,
+    handleDragStart,
+    handleDragEnd,
+    handleCommitOverlayPosition,
+    handleChangeSelectedOverlay,
+    handleChangeSceneEffect,
+    handleResetSceneEffects,
+    handleCommitZoomFocus,
+  } = useEditorController({
+    templateId,
+    onExitEditor: handleExitEditor,
+  });
 
   if (isLoading) {
     return (
@@ -221,8 +102,8 @@ export default function EditorScreen(): React.JSX.Element {
             seekRequest={seekRequest}
             onTimeUpdate={handleTimeUpdate}
             onSelectOverlay={selectOverlay}
-            onDragStart={() => setIsDraggingOverlay(true)}
-            onDragEnd={() => setIsDraggingOverlay(false)}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
             onCommitOverlayPosition={handleCommitOverlayPosition}
             onCommitZoomFocus={handleCommitZoomFocus}
           />
