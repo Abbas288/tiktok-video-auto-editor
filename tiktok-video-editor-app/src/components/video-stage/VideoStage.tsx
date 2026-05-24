@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { useBackgroundMusic } from "../../application/useBackgroundMusic";
 import { SeekRequest, useVideoSync } from "../../application/useVideoSync";
+import { clampVolume } from "../../domain/audio/volume";
 import { NormalizedOverlayPosition } from "../../domain/video/overlayPosition";
 import {
   getSceneEffectsAtTime,
@@ -81,8 +82,10 @@ export function VideoStage({
   const originalVolume = template.originalVolume ?? 1;
 
   useEffect(() => {
-    player.volume = clampVolume(originalVolume);
-    player.muted = originalVolume === 0;
+    const safeVolume = clampVolume(originalVolume);
+
+    player.volume = safeVolume;
+    player.muted = safeVolume === 0;
   }, [player, originalVolume]);
 
   const backgroundMusic = useBackgroundMusic({
@@ -228,14 +231,6 @@ function playVideo(player: ExpoVideoPlayer, onRejected: () => void): void {
 
 function handleVideoPlaybackError(error: unknown): void {
   console.warn("Unable to play video.", error);
-}
-
-function clampVolume(value: number): number {
-  if (!Number.isFinite(value)) {
-    return 1;
-  }
-
-  return Math.min(Math.max(value, 0), 1);
 }
 
 const styles = StyleSheet.create({

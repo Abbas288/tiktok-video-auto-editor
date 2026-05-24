@@ -1,5 +1,6 @@
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { clampVolume } from "../domain/audio/volume";
 import { SeekRequest } from "./useVideoSync";
 
 /**
@@ -164,14 +165,6 @@ function normalizePlayableAudioUrl(url: string | undefined): string | null {
   const trimmedUrl = url.trim();
 
   return trimmedUrl.length > 0 ? trimmedUrl : null;
-}
-
-function clampVolume(value: number): number {
-  if (!Number.isFinite(value)) {
-    return 1;
-  }
-
-  return Math.min(Math.max(value, 0), 1);
 }
 
 function runAudioCommand(command: () => void): void {
