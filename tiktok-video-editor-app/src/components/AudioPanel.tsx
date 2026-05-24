@@ -1,5 +1,11 @@
 import React, { useCallback } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  formatVolumePercent,
+  stepVolume,
+  toggleMute,
+  VOLUME_STEP,
+} from "../domain/audio/volume";
 import { colors } from "../styles/theme";
 
 /**
@@ -10,8 +16,6 @@ export interface AudioPanelProps {
   musicVolume: number | null;
   onChangeVolumes: (originalVolume: number, musicVolume?: number) => void;
 }
-
-const STEP_VALUE = 0.1;
 
 /**
  * Renders editing controls for original audio and background music.
@@ -26,14 +30,14 @@ export function AudioPanel({
 }: AudioPanelProps): React.JSX.Element {
   const updateOriginal = useCallback(
     (newValue: number): void => {
-      onChangeVolumes(clamp01(newValue), musicVolume ?? undefined);
+      onChangeVolumes(newValue, musicVolume ?? undefined);
     },
     [musicVolume, onChangeVolumes],
   );
 
   const updateMusic = useCallback(
     (newValue: number): void => {
-      onChangeVolumes(originalVolume, clamp01(newValue));
+      onChangeVolumes(originalVolume, newValue);
     },
     [originalVolume, onChangeVolumes],
   );
@@ -45,6 +49,7 @@ export function AudioPanel({
       <VolumeControlRow
         label="Original Audio"
         value={originalVolume}
+        testIDPrefix="audio-original"
         onChange={updateOriginal}
       />
 
@@ -52,6 +57,7 @@ export function AudioPanel({
         <VolumeControlRow
           label="Background Music"
           value={musicVolume}
+          testIDPrefix="audio-music"
           onChange={updateMusic}
         />
       ) : (
@@ -66,12 +72,14 @@ export function AudioPanel({
 interface VolumeControlRowProps {
   label: string;
   value: number;
+  testIDPrefix: string;
   onChange: (value: number) => void;
 }
 
 function VolumeControlRow({
   label,
   value,
+  testIDPrefix,
   onChange,
 }: VolumeControlRowProps): React.JSX.Element {
   const isMuted = value === 0;
@@ -80,27 +88,30 @@ function VolumeControlRow({
     <View style={styles.effectRow}>
       <View style={styles.effectLabelColumn}>
         <Text style={styles.effectLabel}>{label}</Text>
-        <Text style={styles.effectValue}>{Math.round(value * 100)}%</Text>
+        <Text style={styles.effectValue}>{formatVolumePercent(value)}</Text>
       </View>
 
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={styles.effectButton}
-          onPress={() => onChange(value - STEP_VALUE)}
+          testID={`${testIDPrefix}-decrease`}
+          onPress={() => onChange(stepVolume(value, -VOLUME_STEP))}
         >
           <Text style={styles.effectButtonText}>-</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.effectButton}
-          onPress={() => onChange(value + STEP_VALUE)}
+          testID={`${testIDPrefix}-increase`}
+          onPress={() => onChange(stepVolume(value, VOLUME_STEP))}
         >
           <Text style={styles.effectButtonText}>+</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.effectButton, isMuted && styles.activeButton]}
-          onPress={() => onChange(isMuted ? 1 : 0)}
+          testID={`${testIDPrefix}-mute`}
+          onPress={() => onChange(toggleMute(value))}
         >
           <Text style={styles.effectButtonText}>
             {isMuted ? "Unmute" : "Mute"}
@@ -109,14 +120,6 @@ function VolumeControlRow({
       </View>
     </View>
   );
-}
-
-function clamp01(value: number): number {
-  if (!Number.isFinite(value)) {
-    return 1;
-  }
-
-  return Math.min(Math.max(value, 0), 1);
 }
 
 const styles = StyleSheet.create({

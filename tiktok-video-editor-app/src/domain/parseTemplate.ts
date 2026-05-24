@@ -5,6 +5,7 @@ import {
   Music,
   Transition,
 } from "../types/template";
+import { clampVolume } from "./audio/volume";
 
 /**
  * Parses and validates unknown input data into a typed Template object.
@@ -156,7 +157,7 @@ function parseOptionalVolume(value: unknown): number | undefined {
     return undefined;
   }
 
-  return clamp01(value);
+  return clampVolume(value);
 }
 
 function isTransitionType(value: unknown): value is Transition["type"] {
@@ -169,14 +170,6 @@ function isTransitionDirection(
   return (
     value === "left" || value === "right" || value === "up" || value === "down"
   );
-}
-
-function clamp01(value: number): number {
-  if (!Number.isFinite(value)) {
-    return 1;
-  }
-
-  return Math.min(Math.max(value, 0), 1);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
