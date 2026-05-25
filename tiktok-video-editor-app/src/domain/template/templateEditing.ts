@@ -1,3 +1,4 @@
+import { clampVolume } from "../audio/volume";
 import {
   EditableSceneEffectType,
   resetEditableSceneEffects,
@@ -5,8 +6,8 @@ import {
   upsertSceneZoomFocus,
   ZoomFocusPosition,
 } from "../video/sceneEffects";
-import { clampVolume } from "../audio/volume";
-import { Template, TextOverlay } from "../../types/template";
+import { createTransition, sanitizeTransition } from "../video/transitions";
+import { Template, TextOverlay, Transition } from "../../types/template";
 
 /**
  * Defines editable text overlay fields.
@@ -224,4 +225,67 @@ export function updateTemplateVolumes(
     originalVolume: safeOriginalVolume,
     music,
   };
+}
+
+/**
+ * Updates a scene transition without mutating the original template.
+ *
+ * The transition belongs to the scene before the cut point.
+ *
+ * @param template Source template.
+ * @param sceneId Scene that owns the transition to the next scene.
+ * @param transitionType Selected transition type.
+ * @returns Updated template, or original template if unchanged.
+ */
+export function updateTemplateSceneTransition(
+  template: Template,
+  sceneId: string,
+  transitionType: Transition["type"],
+): Template {
+  let didUpdateScene = false;
+  const nextTransition = createTransition(transitionType);
+
+  const scenes = template.scenes.map((scene) => {
+    if (scene.id !== sceneId) {
+      return scene;
+    }
+
+    didUpdateScene = true;
+
+    if (
+      areTransitionsEqual(sanitizeTransition(scene.transition), nextTransition)
+    ) {
+      return scene;
+    }
+
+    return {
+      ...scene,
+      transition: nextTransition,
+    };
+  });
+
+  if (!didUpdateScene) {
+    return template;
+  }
+
+  const didChangeScene = scenes.some(
+    (scene, index) => scene !== template.scenes[index],
+  );
+
+  if (!didChangeScene) {
+    return template;
+  }
+
+  return {
+    ...template,
+    scenes,
+  };
+}
+
+function areTransitionsEqual(first: Transition, second: Transition): boolean {
+  return (
+    first.type === second.type &&
+    first.durationSeconds === second.durationSeconds &&
+    first.direction === second.direction
+  );
 }

@@ -117,4 +117,55 @@ describe("parseTemplate", () => {
     expect(result.music?.volume).toBe(0.5);
     expect(result.music?.beatSync).toBe(true);
   });
+
+  it("safely parses scene transitions", () => {
+    const dataWithTransition = {
+      id: "test-transition",
+      title: "Transition Template",
+      sourceVideoUrl: "https://example.com/video.mp4",
+      orientation: "landscape",
+      scenes: [
+        {
+          id: "scene-1",
+          startSeconds: 0,
+          durationSeconds: 5,
+          transition: {
+            type: "fade",
+            durationSeconds: 0.3,
+          },
+        },
+      ],
+    };
+
+    const result = parseTemplate(dataWithTransition);
+
+    expect(result.scenes[0].transition).toEqual({
+      type: "fade",
+      durationSeconds: 0.3,
+    });
+  });
+
+  it("ignores invalid scene transitions safely", () => {
+    const dataWithInvalidTransition = {
+      id: "test-transition",
+      title: "Transition Template",
+      sourceVideoUrl: "https://example.com/video.mp4",
+      orientation: "landscape",
+      scenes: [
+        {
+          id: "scene-1",
+          startSeconds: 0,
+          durationSeconds: 5,
+          transition: {
+            type: "spin",
+            durationSeconds: 0.3,
+          },
+        },
+      ],
+    };
+
+    const result = parseTemplate(dataWithInvalidTransition);
+
+    expect(result.scenes[0].transition).toBeUndefined();
+  });
 });
