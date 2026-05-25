@@ -1,5 +1,6 @@
 import { Template } from "../../types/template";
 import {
+  updateTemplateSceneTransition,
   updateTemplateTextOverlay,
   updateTemplateVolumes,
 } from "./templateEditing";
@@ -37,6 +38,15 @@ function createTemplateFixture(): Template {
             durationSeconds: 2,
           },
         ],
+        effects: [],
+      },
+      {
+        id: "scene-2",
+        orderIndex: 1,
+        startSeconds: 3,
+        durationSeconds: 4,
+        instruction: "Second scene",
+        textOverlays: [],
         effects: [],
       },
     ],
@@ -87,6 +97,53 @@ describe("templateEditing", () => {
     const template = createTemplateFixture();
 
     const updatedTemplate = updateTemplateVolumes(template, 1, 0.5);
+
+    expect(updatedTemplate).toBe(template);
+  });
+
+  it("updates scene transition immutably", () => {
+    const template = createTemplateFixture();
+
+    const updatedTemplate = updateTemplateSceneTransition(
+      template,
+      "scene-1",
+      "fade",
+    );
+
+    expect(updatedTemplate).not.toBe(template);
+    expect(updatedTemplate.scenes[0]).not.toBe(template.scenes[0]);
+    expect(updatedTemplate.scenes[1]).toBe(template.scenes[1]);
+    expect(updatedTemplate.scenes[0].transition).toEqual({
+      type: "fade",
+      durationSeconds: 0.3,
+    });
+    expect(template.scenes[0].transition).toBeUndefined();
+  });
+
+  it("updates slide transition with a default direction", () => {
+    const template = createTemplateFixture();
+
+    const updatedTemplate = updateTemplateSceneTransition(
+      template,
+      "scene-1",
+      "slide",
+    );
+
+    expect(updatedTemplate.scenes[0].transition).toEqual({
+      type: "slide",
+      durationSeconds: 0.3,
+      direction: "left",
+    });
+  });
+
+  it("returns original template when transition scene does not exist", () => {
+    const template = createTemplateFixture();
+
+    const updatedTemplate = updateTemplateSceneTransition(
+      template,
+      "missing-scene",
+      "slide",
+    );
 
     expect(updatedTemplate).toBe(template);
   });

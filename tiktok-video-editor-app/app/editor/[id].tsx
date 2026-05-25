@@ -14,6 +14,7 @@ import { EditorHeader } from "../../src/components/EditorHeader";
 import { OverlayEditPanel } from "../../src/components/OverlayEditPanel";
 import { SceneEffectsPanel } from "../../src/components/SceneEffectsPanel";
 import { Timeline } from "../../src/components/Timeline";
+import { TransitionPickerPanel } from "../../src/components/TransitionPickerPanel";
 import { VideoStage } from "../../src/components/video-stage/VideoStage";
 import { colors } from "../../src/styles/theme";
 import { normalizeRouteParam } from "../../src/utils/normalizeRouteParam";
@@ -43,6 +44,7 @@ export default function EditorScreen(): React.JSX.Element {
     currentTemplate,
     activeSceneId,
     selectedOverlayId,
+    selectedTransition,
     selectedOverlayResult,
     activeScene,
     activeSceneFilterValues,
@@ -61,6 +63,9 @@ export default function EditorScreen(): React.JSX.Element {
     handleChangeSceneEffect,
     handleResetSceneEffects,
     handleCommitZoomFocus,
+    handleSelectTransition,
+    handleChangeTransition,
+    handleCloseTransitionPicker,
   } = useEditorController({
     templateId,
     onExitEditor: handleExitEditor,
@@ -138,6 +143,14 @@ export default function EditorScreen(): React.JSX.Element {
           scenes={currentTemplate.scenes}
           activeSceneId={activeSceneId}
           onSelectScene={handleSceneClick}
+          onSelectTransition={handleSelectTransition}
+        />
+
+        <TransitionPickerPanel
+          scene={selectedTransition?.scene ?? null}
+          selectedTransition={selectedTransition?.transition ?? null}
+          onChangeTransition={handleChangeTransition}
+          onClose={handleCloseTransitionPicker}
         />
       </ScrollView>
     </View>

@@ -19,7 +19,7 @@ export const mockBunnyTemplate: Template = {
       id: "scene-1",
       orderIndex: 0,
       startSeconds: 0.0,
-      durationSeconds: 3.0,
+      durationSeconds: 4.0,
       instruction: "Butterfly flies above a giant bunny",
       textOverlays: [
         {
@@ -40,8 +40,8 @@ export const mockBunnyTemplate: Template = {
     {
       id: "scene-2",
       orderIndex: 1,
-      startSeconds: 3.0,
-      durationSeconds: 7.0,
+      startSeconds: 4.0,
+      durationSeconds: 6.0,
       instruction:
         "The bunny follows the butterfly with its eyes until it lands on a flower; at the last moment, the butterfly is crushed by a falling apple",
       textOverlays: [

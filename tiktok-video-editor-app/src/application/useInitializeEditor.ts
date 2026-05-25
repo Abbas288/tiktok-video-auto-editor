@@ -5,7 +5,7 @@ import {
 } from "../domain/video/sceneEffects";
 import { templateRepository } from "../infrastructure/templateRepository";
 import { TextOverlayUpdate, useEditSession } from "../store/useEditSession";
-import { Template } from "../types/template";
+import { Template, Transition } from "../types/template";
 
 /**
  * The unified interface returned by the editor initialization hook.
@@ -31,6 +31,10 @@ interface EditorInitializationResult {
   updateSceneZoomFocus: (sceneId: string, position: ZoomFocusPosition) => void;
   resetSceneEffects: (sceneId: string) => void;
   updateVolumes: (originalVolume: number, musicVolume?: number) => void;
+  updateSceneTransition: (
+    sceneId: string,
+    transitionType: Transition["type"],
+  ) => void;
   clearSession: () => void;
 }
 
@@ -56,6 +60,7 @@ export function useInitializeEditor(
     updateSceneZoomFocus,
     resetSceneEffects,
     updateVolumes,
+    updateSceneTransition,
   } = useEditSession();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -129,6 +134,7 @@ export function useInitializeEditor(
     updateSceneZoomFocus,
     resetSceneEffects,
     updateVolumes,
+    updateSceneTransition,
     clearSession,
   };
 }

@@ -285,3 +285,57 @@ describe("useEditSession volume editing", () => {
     expect(updatedTemplate).not.toBe(template);
   });
 });
+
+describe("useEditSession transition editing", () => {
+  beforeEach(() => {
+    resetStore();
+  });
+
+  it("updates and stores scene transition as a draft", () => {
+    const template = createTemplateFixture();
+
+    useEditSession.getState().loadTemplate(template);
+    useEditSession.getState().updateSceneTransition("scene-1", "slide");
+
+    const updatedTemplate = getCurrentTemplate();
+
+    expect(updatedTemplate.scenes[0].transition).toEqual({
+      type: "slide",
+      durationSeconds: 0.3,
+      direction: "left",
+    });
+
+    const draft =
+      useEditSession.getState().editedTemplatesById["bunny-intro-2026"];
+
+    expect(draft.scenes[0].transition).toEqual({
+      type: "slide",
+      durationSeconds: 0.3,
+      direction: "left",
+    });
+  });
+
+  it("loads saved scene transition draft instead of original template", () => {
+    const template = createTemplateFixture();
+
+    useEditSession.getState().loadTemplate(template);
+    useEditSession.getState().updateSceneTransition("scene-1", "fade");
+
+    useEditSession.getState().clearSession();
+    useEditSession.getState().loadTemplate(template);
+
+    expect(getCurrentTemplate().scenes[0].transition).toEqual({
+      type: "fade",
+      durationSeconds: 0.3,
+    });
+  });
+
+  it("does not update transition when scene is missing", () => {
+    const template = createTemplateFixture();
+
+    useEditSession.getState().loadTemplate(template);
+    useEditSession.getState().updateSceneTransition("missing-scene", "fade");
+
+    expect(getCurrentTemplate().scenes[0].transition).toBeUndefined();
+  });
+});
