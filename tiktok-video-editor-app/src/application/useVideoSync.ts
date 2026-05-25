@@ -12,11 +12,14 @@ interface UseVideoSyncProps {
   onTimeUpdate?: (time: number) => void;
 }
 
+const TIME_UPDATE_INTERVAL_SECONDS = 0.033;
+const TIME_UPDATE_POLL_INTERVAL_MS = 33;
+
 /**
- * Encapsulates main video player setup, seeking and time reporting.
+ * Encapsulates expo-video player setup, timeline seeking and time reporting.
  *
- * @param props Main video synchronization properties.
- * @returns Main video player instance.
+ * @param props Video source, optional seek request and time update handler.
+ * @returns Expo video player instance.
  */
 export function useVideoSync({
   videoUrl,
@@ -27,7 +30,7 @@ export function useVideoSync({
 
   const player = useVideoPlayer(sourceUrl, (createdPlayer) => {
     createdPlayer.loop = false;
-    createdPlayer.timeUpdateEventInterval = 0.1;
+    createdPlayer.timeUpdateEventInterval = TIME_UPDATE_INTERVAL_SECONDS;
   });
 
   useEffect(() => {
@@ -45,7 +48,7 @@ export function useVideoSync({
 
     const interval = setInterval(() => {
       onTimeUpdate(player.currentTime);
-    }, 100);
+    }, TIME_UPDATE_POLL_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, [onTimeUpdate, player]);

@@ -3,6 +3,7 @@ import { type VideoPlayer as ExpoVideoPlayer } from "expo-video";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { useBackgroundMusic } from "../../application/useBackgroundMusic";
+import { useTransitionPreviewPlayer } from "../../application/useTransitionPreviewPlayer";
 import { SeekRequest, useVideoSync } from "../../application/useVideoSync";
 import { clampVolume } from "../../domain/audio/volume";
 import { NormalizedOverlayPosition } from "../../domain/video/overlayPosition";
@@ -11,6 +12,7 @@ import {
   getSceneFilterValues,
   ZoomFocusPosition,
 } from "../../domain/video/sceneEffects";
+import { getActiveTransitionSimulation } from "../../domain/video/transitionSimulation";
 import {
   getContainedMediaRect,
   getVideoCanvas,
@@ -19,6 +21,7 @@ import { Template } from "../../types/template";
 import { VideoErrorState } from "../VideoErrorState";
 import { OverlayWorld } from "./OverlayWorld";
 import { StageControls } from "./StageControls";
+import { TransitionPreviewLayer } from "./TransitionPreviewLayer";
 import { useMeasuredSize } from "./useMeasuredSize";
 import { useStageFullscreen } from "./useStageFullscreen";
 import { VideoSurface } from "./VideoSurface";
@@ -77,6 +80,25 @@ export function VideoStage({
 
   const { status } = useEvent(player, "statusChange", {
     status: player.status,
+  });
+
+  const activeTransitionSimulation = useMemo(
+    () => getActiveTransitionSimulation(template.scenes, currentTime),
+    [currentTime, template.scenes],
+  );
+
+  const previewPlayerSimulation = useMemo(
+    () =>
+      activeTransitionSimulation?.type === "slide"
+        ? activeTransitionSimulation
+        : null,
+    [activeTransitionSimulation],
+  );
+
+  const transitionPreviewPlayer = useTransitionPreviewPlayer({
+    videoUrl: template.sourceVideoUrl,
+    simulation: previewPlayerSimulation,
+    isPlaying,
   });
 
   const originalVolume = template.originalVolume ?? 1;
@@ -180,6 +202,12 @@ export function VideoStage({
             onZoomPanStart={onDragStart}
             onZoomPanEnd={onDragEnd}
             onCommitZoomFocus={handleCommitZoomFocus}
+          />
+
+          <TransitionPreviewLayer
+            simulation={activeTransitionSimulation}
+            mediaRect={mediaRect}
+            previewPlayer={transitionPreviewPlayer}
           />
 
           <OverlayWorld

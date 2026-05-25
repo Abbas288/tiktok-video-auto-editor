@@ -7,12 +7,13 @@ import {
   resetTemplateSceneEffects,
   TextOverlayUpdate,
   updateTemplateSceneEffect,
+  updateTemplateSceneTransition,
   updateTemplateSceneZoomFocus,
   updateTemplateTextOverlay,
   updateTemplateVolumes,
 } from "../domain/template/templateEditing";
 import { mergeTemplateWithDraft } from "../domain/template/templateDraftMerge";
-import { Template } from "../types/template";
+import { Template, Transition } from "../types/template";
 import {
   clearEditedTemplateDraftsStorage,
   EditedTemplatesById,
@@ -25,6 +26,7 @@ export type { TextOverlayUpdate } from "../domain/template/templateEditing";
 export {
   resetTemplateSceneEffects,
   updateTemplateSceneEffect,
+  updateTemplateSceneTransition,
   updateTemplateSceneZoomFocus,
   updateTemplateTextOverlay,
   updateTemplateVolumes,
@@ -127,6 +129,17 @@ export interface EditSessionState {
    * @param musicVolume Optional background music volume.
    */
   updateVolumes: (originalVolume: number, musicVolume?: number) => void;
+
+  /**
+   * Updates the transition from one scene to the next.
+   *
+   * @param sceneId Scene that owns the transition.
+   * @param transitionType Selected transition type.
+   */
+  updateSceneTransition: (
+    sceneId: string,
+    transitionType: Transition["type"],
+  ) => void;
 }
 
 /**
@@ -266,6 +279,25 @@ export const useEditSession = create<EditSessionState>((set) => ({
         state.currentTemplate,
         originalVolume,
         musicVolume,
+      );
+
+      return persistTemplateUpdate(state, updatedTemplate);
+    });
+  },
+
+  updateSceneTransition: (
+    sceneId: string,
+    transitionType: Transition["type"],
+  ) => {
+    set((state) => {
+      if (!state.currentTemplate) {
+        return state;
+      }
+
+      const updatedTemplate = updateTemplateSceneTransition(
+        state.currentTemplate,
+        sceneId,
+        transitionType,
       );
 
       return persistTemplateUpdate(state, updatedTemplate);

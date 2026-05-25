@@ -8,8 +8,9 @@ import {
   SceneFilterValues,
   ZoomFocusPosition,
 } from "../domain/video/sceneEffects";
+import { getSceneTransition } from "../domain/video/transitions";
 import { TextOverlayUpdate } from "../store/useEditSession";
-import { Scene, Template } from "../types/template";
+import { Scene, Template, Transition } from "../types/template";
 import { useInitializeEditor } from "./useInitializeEditor";
 import { SeekRequest } from "./useVideoSync";
 
@@ -18,12 +19,18 @@ interface UseEditorControllerProps {
   onExitEditor: () => void;
 }
 
+interface SelectedTransition {
+  scene: Scene;
+  transition: Transition;
+}
+
 interface EditorControllerResult {
   isLoading: boolean;
   error: string | null;
   currentTemplate: Template | null;
   activeSceneId: string | null;
   selectedOverlayId: string | null;
+  selectedTransition: SelectedTransition | null;
   selectedOverlayResult: ReturnType<typeof findTextOverlayById>;
   activeScene: Scene | null;
   activeSceneFilterValues: SceneFilterValues | null;
@@ -48,10 +55,13 @@ interface EditorControllerResult {
   ) => void;
   handleResetSceneEffects: () => void;
   handleCommitZoomFocus: (sceneId: string, position: ZoomFocusPosition) => void;
+  handleSelectTransition: (sceneId: string) => void;
+  handleChangeTransition: (transitionType: Transition["type"]) => void;
+  handleCloseTransitionPicker: () => void;
 }
 
 /**
- * Coordinates editor state, scene selection, overlays, effects and seek requests.
+ * Coordinates editor state, scene selection, overlays, effects, transitions and seek requests.
  *
  * @param props Editor controller properties.
  * @returns Editor state and handlers used by the editor screen.
@@ -63,6 +73,9 @@ export function useEditorController({
   const [seekRequest, setSeekRequest] = useState<SeekRequest>();
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isDraggingOverlay, setIsDraggingOverlay] = useState<boolean>(false);
+  const [selectedTransitionSceneId, setSelectedTransitionSceneId] = useState<
+    string | null
+  >(null);
 
   const {
     isLoading,
@@ -77,6 +90,7 @@ export function useEditorController({
     updateSceneZoomFocus,
     resetSceneEffects,
     updateVolumes,
+    updateSceneTransition,
     clearSession,
   } = useInitializeEditor(templateId);
 
@@ -94,6 +108,27 @@ export function useEditorController({
       null,
     [activeSceneId, currentTemplate],
   );
+
+  const selectedTransition = useMemo<SelectedTransition | null>(() => {
+    if (!currentTemplate || !selectedTransitionSceneId) {
+      return null;
+    }
+
+    const sceneIndex = currentTemplate.scenes.findIndex(
+      (scene) => scene.id === selectedTransitionSceneId,
+    );
+
+    const scene = currentTemplate.scenes[sceneIndex];
+
+    if (!scene || sceneIndex >= currentTemplate.scenes.length - 1) {
+      return null;
+    }
+
+    return {
+      scene,
+      transition: getSceneTransition(scene),
+    };
+  }, [currentTemplate, selectedTransitionSceneId]);
 
   const activeSceneFilterValues = useMemo(
     () => (activeScene ? getSceneFilterValues(activeScene.effects) : null),
@@ -113,6 +148,7 @@ export function useEditorController({
         return;
       }
 
+      setSelectedTransitionSceneId(null);
       selectScene(sceneId);
       setSeekRequest({
         time: scene.startSeconds,
@@ -208,12 +244,48 @@ export function useEditorController({
     [updateSceneZoomFocus],
   );
 
+  const handleSelectTransition = useCallback(
+    (sceneId: string): void => {
+      if (!currentTemplate) {
+        return;
+      }
+
+      const sceneIndex = currentTemplate.scenes.findIndex(
+        (scene) => scene.id === sceneId,
+      );
+
+      if (sceneIndex < 0 || sceneIndex >= currentTemplate.scenes.length - 1) {
+        return;
+      }
+
+      selectOverlay(null);
+      setSelectedTransitionSceneId(sceneId);
+    },
+    [currentTemplate, selectOverlay],
+  );
+
+  const handleChangeTransition = useCallback(
+    (transitionType: Transition["type"]): void => {
+      if (!selectedTransitionSceneId) {
+        return;
+      }
+
+      updateSceneTransition(selectedTransitionSceneId, transitionType);
+    },
+    [selectedTransitionSceneId, updateSceneTransition],
+  );
+
+  const handleCloseTransitionPicker = useCallback((): void => {
+    setSelectedTransitionSceneId(null);
+  }, []);
+
   return {
     isLoading,
     error,
     currentTemplate,
     activeSceneId,
     selectedOverlayId,
+    selectedTransition,
     selectedOverlayResult,
     activeScene,
     activeSceneFilterValues,
@@ -232,5 +304,8 @@ export function useEditorController({
     handleChangeSceneEffect,
     handleResetSceneEffects,
     handleCommitZoomFocus,
+    handleSelectTransition,
+    handleChangeTransition,
+    handleCloseTransitionPicker,
   };
 }
