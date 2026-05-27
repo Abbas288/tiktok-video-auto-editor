@@ -3,6 +3,7 @@ import {
   updateTemplateSceneTransition,
   updateTemplateTextOverlay,
   updateTemplateVolumes,
+  updateTemplateCompiledVideo,
 } from "./templateEditing";
 
 function createTemplateFixture(): Template {
@@ -146,5 +147,20 @@ describe("templateEditing", () => {
     );
 
     expect(updatedTemplate).toBe(template);
+  });
+
+  it("stores compiled video url immutably", () => {
+    const template = createTemplateFixture();
+
+    const updatedTemplate = updateTemplateCompiledVideo(
+      template,
+      "https://example.com/compiled.mp4",
+    );
+
+    expect(updatedTemplate).not.toBe(template);
+    expect(updatedTemplate.compiledVideoUrl).toBe(
+      "https://example.com/compiled.mp4",
+    );
+    expect(template.compiledVideoUrl).toBeUndefined();
   });
 });

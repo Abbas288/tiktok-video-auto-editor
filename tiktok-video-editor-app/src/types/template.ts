@@ -17,7 +17,7 @@ export interface Transition {
 
 /**
  * Represents a text element rendered over the video.
- * positionX and positionY are normalized (0-1) coordinates.
+ * positionX and positionY are normalized coordinates between 0 and 1.
  */
 export interface TextOverlay {
   id: string;
@@ -55,7 +55,7 @@ export interface Scene {
 
 /**
  * The root template object containing the full editing blueprint.
- * This drives the entire EditorSession.
+ * compiledVideoUrl is set after a successful compile response.
  */
 export interface Template {
   id: string;
@@ -63,6 +63,7 @@ export interface Template {
   sourceVideoUrl: string;
   orientation: Orientation;
   originalVolume?: number;
+  compiledVideoUrl?: string;
   music?: Music;
   scenes: Scene[];
 }

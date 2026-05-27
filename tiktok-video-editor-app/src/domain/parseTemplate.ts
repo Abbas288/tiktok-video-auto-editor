@@ -58,6 +58,7 @@ export function parseTemplate(input: unknown): Template {
     sourceVideoUrl,
     orientation: record.orientation as Orientation,
     originalVolume: parseOptionalVolume(record.originalVolume),
+    compiledVideoUrl: parseOptionalUrl(record.compiledVideoUrl),
     music: parseMusic(record.music),
     scenes: parseScenes(record.scenes),
   };
@@ -135,11 +136,7 @@ function parseMusic(value: unknown): Music | undefined {
     return undefined;
   }
 
-  if (typeof value.url !== "string") {
-    return undefined;
-  }
-
-  const url = value.url.trim();
+  const url = parseOptionalUrl(value.url);
 
   if (!url) {
     return undefined;
@@ -150,6 +147,16 @@ function parseMusic(value: unknown): Music | undefined {
     volume: parseOptionalVolume(value.volume) ?? 1,
     beatSync: typeof value.beatSync === "boolean" ? value.beatSync : false,
   };
+}
+
+function parseOptionalUrl(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const trimmedValue = value.trim();
+
+  return trimmedValue.length > 0 ? trimmedValue : undefined;
 }
 
 function parseOptionalVolume(value: unknown): number | undefined {

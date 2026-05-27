@@ -22,6 +22,7 @@ export function mergeTemplateWithDraft(
     sourceVideoUrl: draft.sourceVideoUrl || sourceTemplate.sourceVideoUrl,
     orientation: draft.orientation ?? sourceTemplate.orientation,
     originalVolume: draft.originalVolume ?? sourceTemplate.originalVolume,
+    compiledVideoUrl: draft.compiledVideoUrl ?? sourceTemplate.compiledVideoUrl,
     music: mergeMusic(sourceTemplate, draft),
     scenes: mergeScenes(sourceTemplate, draft),
   };

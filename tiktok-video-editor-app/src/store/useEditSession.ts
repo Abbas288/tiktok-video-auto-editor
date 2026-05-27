@@ -6,6 +6,7 @@ import {
 import {
   resetTemplateSceneEffects,
   TextOverlayUpdate,
+  updateTemplateCompiledVideo,
   updateTemplateSceneEffect,
   updateTemplateSceneTransition,
   updateTemplateSceneZoomFocus,
@@ -25,6 +26,7 @@ export type { TextOverlayUpdate } from "../domain/template/templateEditing";
 
 export {
   resetTemplateSceneEffects,
+  updateTemplateCompiledVideo,
   updateTemplateSceneEffect,
   updateTemplateSceneTransition,
   updateTemplateSceneZoomFocus,
@@ -140,6 +142,13 @@ export interface EditSessionState {
     sceneId: string,
     transitionType: Transition["type"],
   ) => void;
+
+  /**
+   * Stores the compiled video URL returned by the compile server.
+   *
+   * @param compiledVideoUrl Compiled video URL.
+   */
+  updateCompiledVideo: (compiledVideoUrl: string) => void;
 }
 
 /**
@@ -298,6 +307,21 @@ export const useEditSession = create<EditSessionState>((set) => ({
         state.currentTemplate,
         sceneId,
         transitionType,
+      );
+
+      return persistTemplateUpdate(state, updatedTemplate);
+    });
+  },
+
+  updateCompiledVideo: (compiledVideoUrl: string) => {
+    set((state) => {
+      if (!state.currentTemplate) {
+        return state;
+      }
+
+      const updatedTemplate = updateTemplateCompiledVideo(
+        state.currentTemplate,
+        compiledVideoUrl,
       );
 
       return persistTemplateUpdate(state, updatedTemplate);

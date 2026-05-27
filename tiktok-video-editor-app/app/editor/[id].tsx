@@ -10,6 +10,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEditorController } from "../../src/application/useEditorController";
 import { AudioPanel } from "../../src/components/AudioPanel";
+import { CompilePanel } from "../../src/components/CompilePanel";
 import { EditorHeader } from "../../src/components/EditorHeader";
 import { OverlayEditPanel } from "../../src/components/OverlayEditPanel";
 import { SceneEffectsPanel } from "../../src/components/SceneEffectsPanel";
@@ -51,6 +52,8 @@ export default function EditorScreen(): React.JSX.Element {
     seekRequest,
     currentTime,
     isDraggingOverlay,
+    compileStatus,
+    compileMessage,
     selectOverlay,
     updateVolumes,
     handleGoBack,
@@ -66,6 +69,7 @@ export default function EditorScreen(): React.JSX.Element {
     handleSelectTransition,
     handleChangeTransition,
     handleCloseTransitionPicker,
+    handleCompileProject,
   } = useEditorController({
     templateId,
     onExitEditor: handleExitEditor,
@@ -113,6 +117,13 @@ export default function EditorScreen(): React.JSX.Element {
             onCommitZoomFocus={handleCommitZoomFocus}
           />
         </View>
+
+        <CompilePanel
+          status={compileStatus}
+          message={compileMessage}
+          compiledVideoUrl={currentTemplate.compiledVideoUrl ?? null}
+          onCompile={handleCompileProject}
+        />
 
         <OverlayEditPanel
           overlay={selectedOverlayResult?.overlay ?? null}

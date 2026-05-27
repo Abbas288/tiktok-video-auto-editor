@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { buildCompilePayload } from "../domain/compile/compilePayload";
 import { findTextOverlayById } from "../domain/video/findTextOverlay";
 import { getActiveSceneIdAtTime } from "../domain/video/getActiveSceneIdAtTime";
 import { NormalizedOverlayPosition } from "../domain/video/overlayPosition";
@@ -9,8 +10,10 @@ import {
   ZoomFocusPosition,
 } from "../domain/video/sceneEffects";
 import { getSceneTransition } from "../domain/video/transitions";
+import { compileService } from "../infrastructure/compileService";
 import { TextOverlayUpdate } from "../store/useEditSession";
 import { Scene, Template, Transition } from "../types/template";
+import { CompileStatus } from "../components/CompilePanel";
 import { useInitializeEditor } from "./useInitializeEditor";
 import { SeekRequest } from "./useVideoSync";
 
@@ -37,6 +40,8 @@ interface EditorControllerResult {
   seekRequest: SeekRequest | undefined;
   currentTime: number;
   isDraggingOverlay: boolean;
+  compileStatus: CompileStatus;
+  compileMessage: string | null;
   selectOverlay: (overlayId: string | null) => void;
   updateVolumes: (originalVolume: number, musicVolume?: number) => void;
   handleGoBack: () => void;
@@ -58,10 +63,11 @@ interface EditorControllerResult {
   handleSelectTransition: (sceneId: string) => void;
   handleChangeTransition: (transitionType: Transition["type"]) => void;
   handleCloseTransitionPicker: () => void;
+  handleCompileProject: () => Promise<void>;
 }
 
 /**
- * Coordinates editor state, scene selection, overlays, effects, transitions and seek requests.
+ * Coordinates editor state, scene selection, overlays, effects, transitions, compile flow and seek requests.
  *
  * @param props Editor controller properties.
  * @returns Editor state and handlers used by the editor screen.
@@ -73,6 +79,8 @@ export function useEditorController({
   const [seekRequest, setSeekRequest] = useState<SeekRequest>();
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isDraggingOverlay, setIsDraggingOverlay] = useState<boolean>(false);
+  const [compileStatus, setCompileStatus] = useState<CompileStatus>("idle");
+  const [compileMessage, setCompileMessage] = useState<string | null>(null);
   const [selectedTransitionSceneId, setSelectedTransitionSceneId] = useState<
     string | null
   >(null);
@@ -91,6 +99,7 @@ export function useEditorController({
     resetSceneEffects,
     updateVolumes,
     updateSceneTransition,
+    updateCompiledVideo,
     clearSession,
   } = useInitializeEditor(templateId);
 
@@ -279,6 +288,27 @@ export function useEditorController({
     setSelectedTransitionSceneId(null);
   }, []);
 
+  const handleCompileProject = useCallback(async (): Promise<void> => {
+    if (!currentTemplate || compileStatus === "compiling") {
+      return;
+    }
+
+    try {
+      setCompileStatus("compiling");
+      setCompileMessage("Compiling video...");
+
+      const payload = buildCompilePayload(currentTemplate);
+      const result = await compileService.compile(payload);
+
+      updateCompiledVideo(result.compiledVideoUrl);
+      setCompileStatus("success");
+      setCompileMessage("Compile finished. The compiled video is ready.");
+    } catch {
+      setCompileStatus("error");
+      setCompileMessage("Compile failed. Please try again.");
+    }
+  }, [compileStatus, currentTemplate, updateCompiledVideo]);
+
   return {
     isLoading,
     error,
@@ -292,6 +322,8 @@ export function useEditorController({
     seekRequest,
     currentTime,
     isDraggingOverlay,
+    compileStatus,
+    compileMessage,
     selectOverlay,
     updateVolumes,
     handleGoBack,
@@ -307,5 +339,6 @@ export function useEditorController({
     handleSelectTransition,
     handleChangeTransition,
     handleCloseTransitionPicker,
+    handleCompileProject,
   };
 }
