@@ -282,6 +282,29 @@ export function updateTemplateSceneTransition(
   };
 }
 
+/**
+ * Stores the latest compiled video URL on the template.
+ *
+ * @param template Source template.
+ * @param compiledVideoUrl Compiled video URL returned by the compile server.
+ * @returns Updated template, or original template if unchanged.
+ */
+export function updateTemplateCompiledVideo(
+  template: Template,
+  compiledVideoUrl: string,
+): Template {
+  const normalizedUrl = compiledVideoUrl.trim();
+
+  if (!normalizedUrl || template.compiledVideoUrl === normalizedUrl) {
+    return template;
+  }
+
+  return {
+    ...template,
+    compiledVideoUrl: normalizedUrl,
+  };
+}
+
 function areTransitionsEqual(first: Transition, second: Transition): boolean {
   return (
     first.type === second.type &&

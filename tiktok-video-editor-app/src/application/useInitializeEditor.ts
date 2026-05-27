@@ -35,6 +35,7 @@ interface EditorInitializationResult {
     sceneId: string,
     transitionType: Transition["type"],
   ) => void;
+  updateCompiledVideo: (compiledVideoUrl: string) => void;
   clearSession: () => void;
 }
 
@@ -61,6 +62,7 @@ export function useInitializeEditor(
     resetSceneEffects,
     updateVolumes,
     updateSceneTransition,
+    updateCompiledVideo,
   } = useEditSession();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -135,6 +137,7 @@ export function useInitializeEditor(
     resetSceneEffects,
     updateVolumes,
     updateSceneTransition,
+    updateCompiledVideo,
     clearSession,
   };
 }

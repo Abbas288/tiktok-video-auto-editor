@@ -339,3 +339,29 @@ describe("useEditSession transition editing", () => {
     expect(getCurrentTemplate().scenes[0].transition).toBeUndefined();
   });
 });
+
+describe("useEditSession compile result", () => {
+  beforeEach(() => {
+    resetStore();
+  });
+
+  it("stores compiled video url as a draft", () => {
+    const template = createTemplateFixture();
+
+    useEditSession.getState().loadTemplate(template);
+    useEditSession
+      .getState()
+      .updateCompiledVideo("https://example.com/compiled.mp4");
+
+    const updatedTemplate = getCurrentTemplate();
+
+    expect(updatedTemplate.compiledVideoUrl).toBe(
+      "https://example.com/compiled.mp4",
+    );
+
+    const draft =
+      useEditSession.getState().editedTemplatesById["bunny-intro-2026"];
+
+    expect(draft.compiledVideoUrl).toBe("https://example.com/compiled.mp4");
+  });
+});
