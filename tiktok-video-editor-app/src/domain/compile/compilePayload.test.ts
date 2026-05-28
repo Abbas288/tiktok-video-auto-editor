@@ -93,6 +93,20 @@ describe("buildCompilePayload", () => {
               animationIn: "none",
               startSeconds: 0.5,
               durationSeconds: 2,
+              layout: {
+                anchor: "center",
+                textAlign: "center",
+                referenceWidth: 720,
+                referenceHeight: 405,
+                boxWidthRatio: 0.86,
+                maxLines: 4,
+                lineHeightRatio: 1.15,
+                paddingXRatio: 0.012,
+                paddingYRatio: 0.007,
+                minFontRatio: 0.028,
+                maxFontRatio: 0.12,
+                lines: ["Edited text"],
+              },
             },
           ],
           effects: [
@@ -115,5 +129,18 @@ describe("buildCompilePayload", () => {
         },
       ],
     });
+  });
+
+  it("adds export-safe wrapped lines for long overlay text", () => {
+    const template = createTemplateFixture();
+
+    template.scenes[0].textOverlays[0].text =
+      "One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty.";
+
+    const payload = buildCompilePayload(template);
+    const overlay = payload.scenes[0].textOverlays[0];
+
+    expect(overlay.layout.lines.length).toBeGreaterThan(1);
+    expect(overlay.layout.lines.length).toBeLessThanOrEqual(4);
   });
 });

@@ -8,6 +8,7 @@ function createValidPayload(): Record<string, unknown> {
   return {
     templateId: "bunny-intro-2026",
     sourceVideoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+    orientation: "landscape",
     originalVolume: 0.8,
     music: {
       url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
@@ -64,6 +65,7 @@ describe("compilePayloadSchema", () => {
     expect(payload.sourceVideoUrl).toBe(
       "https://www.w3schools.com/html/mov_bbb.mp4",
     );
+    expect(payload.orientation).toBe("landscape");
     expect(payload.scenes).toHaveLength(1);
     expect(payload.scenes[0].transition?.type).toBe("fade");
     expect(payload.scenes[0].textOverlays).toHaveLength(1);
@@ -87,7 +89,7 @@ describe("compilePayloadSchema", () => {
     expect(payload.sourceVideoUrl).toBe("https://example.com/source.mp4");
   });
 
-  it("defaults missing optional arrays", () => {
+  it("defaults missing optional fields", () => {
     const payload = parseCompilePayload({
       templateId: "template-1",
       sourceVideoUrl: "https://example.com/source.mp4",
@@ -100,6 +102,7 @@ describe("compilePayloadSchema", () => {
       ],
     });
 
+    expect(payload.orientation).toBe("landscape");
     expect(payload.scenes[0].textOverlays).toEqual([]);
     expect(payload.scenes[0].effects).toEqual([]);
   });

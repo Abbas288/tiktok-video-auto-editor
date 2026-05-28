@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+export type CompileOrientation = "portrait" | "landscape" | "square";
 export type CompileTransitionType = "cut" | "fade" | "slide";
 export type CompileTransitionDirection = "left" | "right" | "up" | "down";
 export type CompileEffectType = "zoom" | "brightness" | "contrast" | "blur";
@@ -10,6 +11,21 @@ export interface CompileTransition {
   type: CompileTransitionType;
   durationSeconds: number;
   direction?: CompileTransitionDirection;
+}
+
+export interface CompileTextOverlayLayout {
+  anchor: "center";
+  textAlign: "center";
+  referenceWidth: number;
+  referenceHeight: number;
+  boxWidthRatio: number;
+  maxLines: number;
+  lineHeightRatio: number;
+  paddingXRatio: number;
+  paddingYRatio: number;
+  minFontRatio: number;
+  maxFontRatio: number;
+  lines: string[];
 }
 
 export interface CompileTextOverlay {
@@ -23,6 +39,7 @@ export interface CompileTextOverlay {
   animationIn: CompileTextAnimation;
   startSeconds: number;
   durationSeconds: number;
+  layout?: CompileTextOverlayLayout;
 }
 
 export interface CompileEffect {
@@ -53,6 +70,7 @@ export interface CompilePayloadMusic {
 export interface CompilePayload {
   templateId: string;
   sourceVideoUrl: string;
+  orientation: CompileOrientation;
   originalVolume: number;
   music?: CompilePayloadMusic;
   scenes: CompilePayloadScene[];
@@ -63,6 +81,7 @@ interface ParsedCompilePayloadInput {
   id?: string;
   sourceVideoUrl?: string;
   videoUrl?: string;
+  orientation?: CompileOrientation;
   originalVolume?: number;
   music?: CompilePayloadMusic;
   scenes: CompilePayloadScene[];
@@ -70,11 +89,32 @@ interface ParsedCompilePayloadInput {
 
 const volumeSchema = z.number().finite().min(0).max(1);
 
+const orientationSchema = z
+  .enum(["portrait", "landscape", "square"])
+  .default("landscape");
+
 const transitionSchema = z
   .object({
     type: z.enum(["cut", "fade", "slide"]),
     durationSeconds: z.number().finite().min(0),
     direction: z.enum(["left", "right", "up", "down"]).optional(),
+  })
+  .passthrough();
+
+const textOverlayLayoutSchema = z
+  .object({
+    anchor: z.enum(["center"]).default("center"),
+    textAlign: z.enum(["center"]).default("center"),
+    referenceWidth: z.number().finite().positive(),
+    referenceHeight: z.number().finite().positive(),
+    boxWidthRatio: z.number().finite().positive().max(1),
+    maxLines: z.number().int().positive().max(12),
+    lineHeightRatio: z.number().finite().positive(),
+    paddingXRatio: z.number().finite().min(0).max(0.2),
+    paddingYRatio: z.number().finite().min(0).max(0.2),
+    minFontRatio: z.number().finite().positive(),
+    maxFontRatio: z.number().finite().positive(),
+    lines: z.array(z.string()).max(12).default([]),
   })
   .passthrough();
 
@@ -90,6 +130,7 @@ const textOverlaySchema = z
     animationIn: z.enum(["none", "fadeUp", "fadeIn"]),
     startSeconds: z.number().finite().min(0),
     durationSeconds: z.number().finite().positive(),
+    layout: textOverlayLayoutSchema.optional(),
   })
   .passthrough();
 
@@ -130,6 +171,7 @@ const compilePayloadInputSchema = z
     id: z.string().min(1).optional(),
     sourceVideoUrl: z.string().url().optional(),
     videoUrl: z.string().url().optional(),
+    orientation: orientationSchema,
     originalVolume: volumeSchema.optional(),
     music: musicSchema.optional(),
     scenes: z.array(sceneSchema).min(1),
@@ -199,6 +241,7 @@ export function parseCompilePayload(input: unknown): CompilePayload {
   return {
     templateId,
     sourceVideoUrl,
+    orientation: data.orientation ?? "landscape",
     originalVolume: data.originalVolume ?? 1,
     music: data.music,
     scenes: data.scenes,

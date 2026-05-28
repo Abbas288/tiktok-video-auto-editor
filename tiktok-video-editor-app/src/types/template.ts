@@ -16,8 +16,26 @@ export interface Transition {
 }
 
 /**
+ * Describes the export-safe text box model used by both preview and compile-server.
+ */
+export interface TextOverlayLayout {
+  anchor: "center";
+  textAlign: "center";
+  referenceWidth: number;
+  referenceHeight: number;
+  boxWidthRatio: number;
+  maxLines: number;
+  lineHeightRatio: number;
+  paddingXRatio: number;
+  paddingYRatio: number;
+  minFontRatio: number;
+  maxFontRatio: number;
+  lines: string[];
+}
+
+/**
  * Represents a text element rendered over the video.
- * positionX and positionY are normalized coordinates between 0 and 1.
+ * positionX and positionY are normalized center coordinates between 0 and 1.
  */
 export interface TextOverlay {
   id: string;
@@ -30,6 +48,7 @@ export interface TextOverlay {
   animationIn: "none" | "fadeUp" | "fadeIn";
   startSeconds: number;
   durationSeconds: number;
+  layout?: TextOverlayLayout;
 }
 
 /** Visual effects applied to a specific scene. */

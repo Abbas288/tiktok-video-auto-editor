@@ -1,11 +1,28 @@
 import request from "supertest";
 import { describe, expect, it } from "vitest";
+import { CompileServerConfig } from "../config";
 import { createApp } from "./createApp";
+
+function createConfig(overrides: Partial<CompileServerConfig> = {}): CompileServerConfig {
+  return {
+    port: 3030,
+    publicBaseUrl: "http://localhost:3030",
+    renderer: "placeholder",
+    outputDir: ".compiled",
+    tempDir: ".tmp",
+    ffmpegPath: "ffmpeg",
+    ffprobePath: "ffprobe",
+    renderTimeoutMs: 120000,
+    cleanupTempFiles: true,
+    ...overrides,
+  };
+}
 
 function createValidPayload(): Record<string, unknown> {
   return {
     templateId: "bunny-intro-2026",
     sourceVideoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+    orientation: "landscape",
     originalVolume: 1,
     scenes: [
       {
@@ -23,9 +40,7 @@ function createValidPayload(): Record<string, unknown> {
 
 describe("createApp", () => {
   it("returns health status", async () => {
-    const app = createApp({
-      port: 3030,
-    });
+    const app = createApp(createConfig());
 
     const response = await request(app).get("/health").expect(200);
 
@@ -35,10 +50,11 @@ describe("createApp", () => {
   });
 
   it("compiles a valid payload", async () => {
-    const app = createApp({
-      port: 3030,
-      placeholderVideoUrl: "https://example.com/compiled.mp4",
-    });
+    const app = createApp(
+      createConfig({
+        placeholderVideoUrl: "https://example.com/compiled.mp4",
+      }),
+    );
 
     const response = await request(app)
       .post("/compile")
@@ -53,9 +69,7 @@ describe("createApp", () => {
   });
 
   it("rejects invalid payloads", async () => {
-    const app = createApp({
-      port: 3030,
-    });
+    const app = createApp(createConfig());
 
     const response = await request(app)
       .post("/compile")
@@ -69,9 +83,7 @@ describe("createApp", () => {
   });
 
   it("returns 404 for unknown routes", async () => {
-    const app = createApp({
-      port: 3030,
-    });
+    const app = createApp(createConfig());
 
     const response = await request(app).get("/missing").expect(404);
 

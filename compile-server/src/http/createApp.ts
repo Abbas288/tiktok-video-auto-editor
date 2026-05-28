@@ -23,6 +23,7 @@ export function createApp(config: CompileServerConfig): Express {
 
   app.use(cors({ origin: true }));
   app.use(express.json({ limit: "2mb" }));
+  app.use("/compiled", express.static(config.outputDir));
 
   app.get("/health", (_request: Request, response: Response): void => {
     response.status(200).json({
