@@ -29,7 +29,15 @@
     "plugins": [
       "expo-router",
       "expo-video",
-      "expo-audio"
+      "expo-audio",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow the app to access your media library.",
+          "savePhotosPermission": "Allow the app to save exported videos.",
+          "granularPermissions": ["video"]
+        }
+      ]
     ]
   }
 }

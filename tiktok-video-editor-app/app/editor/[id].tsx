@@ -54,6 +54,10 @@ export default function EditorScreen(): React.JSX.Element {
     isDraggingOverlay,
     compileStatus,
     compileMessage,
+    compiledOutputUrl,
+    compiledOutputKind,
+    saveStatus,
+    saveMessage,
     selectOverlay,
     updateVolumes,
     handleGoBack,
@@ -70,6 +74,8 @@ export default function EditorScreen(): React.JSX.Element {
     handleChangeTransition,
     handleCloseTransitionPicker,
     handleCompileProject,
+    handleSaveCompiledVideo,
+    handleOpenCompiledVideo,
   } = useEditorController({
     templateId,
     onExitEditor: handleExitEditor,
@@ -121,8 +127,13 @@ export default function EditorScreen(): React.JSX.Element {
         <CompilePanel
           status={compileStatus}
           message={compileMessage}
-          compiledVideoUrl={currentTemplate.compiledVideoUrl ?? null}
+          compiledVideoUrl={compiledOutputUrl}
+          outputKind={compiledOutputKind}
+          saveStatus={saveStatus}
+          saveMessage={saveMessage}
           onCompile={handleCompileProject}
+          onSaveCompiledVideo={handleSaveCompiledVideo}
+          onOpenCompiledVideo={handleOpenCompiledVideo}
         />
 
         <OverlayEditPanel

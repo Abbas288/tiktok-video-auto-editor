@@ -1,8 +1,11 @@
 import { CompilePayload } from "../domain/compile/compilePayload";
 
+export type CompileRendererName = "placeholder" | "ffmpeg";
+
 export interface CompileResult {
   compiledVideoUrl: string;
   jobId?: string;
+  renderer?: CompileRendererName;
 }
 
 export interface CompileClient {
@@ -66,64 +69,53 @@ class LocalPreviewCompileClient implements CompileClient {
 
     return {
       compiledVideoUrl: payload.sourceVideoUrl,
-      jobId: "local-preview",
+      renderer: "placeholder",
     };
   }
 }
 
-/**
- * Compile service used by the editor.
- */
-export const compileService: CompileClient = createCompileClient();
+const compileServerUrl = process.env.EXPO_PUBLIC_COMPILE_SERVER_URL;
 
-function createCompileClient(): CompileClient {
-  const baseUrl = process.env.EXPO_PUBLIC_COMPILE_SERVER_URL?.trim();
-
-  if (!baseUrl) {
-    return new LocalPreviewCompileClient();
-  }
-
-  return new HttpCompileClient(baseUrl);
-}
+export const compileService: CompileClient = compileServerUrl
+  ? new HttpCompileClient(compileServerUrl)
+  : new LocalPreviewCompileClient();
 
 function parseCompileResponse(data: unknown): CompileResult {
-  if (!isRecord(data)) {
-    throw new Error("Compile server returned an invalid response.");
+  if (!isObject(data)) {
+    throw new Error("Compile response was not an object.");
   }
 
-  const compiledVideoUrl = readStringValue(data, [
-    "compiledVideoUrl",
-    "videoUrl",
-    "url",
-  ]);
+  const compiledVideoUrl = data.compiledVideoUrl;
 
-  if (!compiledVideoUrl) {
-    throw new Error("Compile server response does not contain a video URL.");
+  if (typeof compiledVideoUrl !== "string" || compiledVideoUrl.trim() === "") {
+    throw new Error(
+      "Compile response did not include a usable video reference.",
+    );
   }
-
-  const jobId = readStringValue(data, ["jobId", "id"]);
 
   return {
     compiledVideoUrl,
-    jobId,
+    jobId: typeof data.jobId === "string" ? data.jobId : undefined,
+    renderer: parseRenderer(data),
   };
 }
 
-function readStringValue(
-  record: Record<string, unknown>,
-  keys: string[],
-): string | undefined {
-  for (const key of keys) {
-    const value = record[key];
+function parseRenderer(
+  data: Record<string, unknown>,
+): CompileRendererName | undefined {
+  const summary = data.summary;
 
-    if (typeof value === "string" && value.trim().length > 0) {
-      return value.trim();
-    }
+  if (!isObject(summary)) {
+    return undefined;
+  }
+
+  if (summary.renderer === "placeholder" || summary.renderer === "ffmpeg") {
+    return summary.renderer;
   }
 
   return undefined;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
 }

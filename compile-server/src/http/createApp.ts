@@ -5,8 +5,8 @@ import express, {
   Request,
   Response,
 } from "express";
-import { CompileServerConfig } from "../config";
 import { compileSession } from "../application/compileService";
+import { CompileServerConfig } from "../config";
 import {
   CompilePayloadValidationError,
   parseCompilePayload,
@@ -23,7 +23,16 @@ export function createApp(config: CompileServerConfig): Express {
 
   app.use(cors({ origin: true }));
   app.use(express.json({ limit: "2mb" }));
-  app.use("/compiled", express.static(config.outputDir));
+
+  app.use(
+    "/compiled",
+    express.static(config.outputDir, {
+      fallthrough: true,
+      setHeaders: (response) => {
+        response.setHeader("Cache-Control", "no-store");
+      },
+    }),
+  );
 
   app.get("/health", (_request: Request, response: Response): void => {
     response.status(200).json({
@@ -57,6 +66,10 @@ export function createApp(config: CompileServerConfig): Express {
     },
   );
 
+  app.use("/compiled/:filename", (request: Request, response: Response): void => {
+    sendCompiledVideoNotFound(request, response);
+  });
+
   app.use((_request: Request, response: Response): void => {
     response.status(404).json({
       error: "Route not found.",
@@ -80,4 +93,152 @@ export function createApp(config: CompileServerConfig): Express {
   );
 
   return app;
+}
+
+function sendCompiledVideoNotFound(
+  request: Request,
+  response: Response,
+): void {
+  const filename = request.params.filename;
+  const details = `The compiled output "${filename}" is no longer available. Run compile again.`;
+
+  response.status(404);
+  response.setHeader("Cache-Control", "no-store");
+
+  if (request.method === "HEAD") {
+    response.end();
+    return;
+  }
+
+  if (shouldReturnHtml(request)) {
+    response.type("html").send(createCompiledVideoNotFoundHtml(filename));
+    return;
+  }
+
+  response.json({
+    error: "Compiled video not found.",
+    details,
+  });
+}
+
+function shouldReturnHtml(request: Request): boolean {
+  const acceptHeader = request.header("accept") ?? "";
+
+  return acceptHeader.toLowerCase().includes("text/html");
+}
+
+function createCompiledVideoNotFoundHtml(filename: string): string {
+  const safeFilename = escapeHtml(filename);
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Compiled video not found</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #050505;
+      color: #f5f5f5;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at top, rgba(0, 229, 255, 0.12), transparent 35%),
+        #050505;
+    }
+
+    main {
+      width: min(92vw, 560px);
+      border: 1px solid #242424;
+      border-radius: 22px;
+      background: #111111;
+      padding: 32px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: #1f2933;
+      color: #00f5d4;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 5vw, 38px);
+      line-height: 1.1;
+    }
+
+    p {
+      color: #b6bcc6;
+      line-height: 1.6;
+      margin: 16px 0 0;
+    }
+
+    code {
+      display: block;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 14px;
+      background: #050505;
+      color: #facc15;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    button {
+      margin-top: 26px;
+      min-height: 44px;
+      border: 0;
+      border-radius: 999px;
+      background: #00e5ff;
+      color: #000000;
+      font-size: 15px;
+      font-weight: 900;
+      padding: 0 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      filter: brightness(0.92);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="badge">Export unavailable</div>
+    <h1>Compiled video not found</h1>
+    <p>This video is no longer available. It may have been removed, cleaned up, or replaced by a newer compile result.</p>
+    <code>${safeFilename}</code>
+    <button type="button" onclick="history.length > 1 ? history.back() : location.href='/'">
+      Go back
+    </button>
+  </main>
+</body>
+</html>`;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
