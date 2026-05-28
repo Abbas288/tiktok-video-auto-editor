@@ -23,6 +23,7 @@ describe("TextOverlayLayer - Normal Flow", () => {
     const { getByText } = render(
       <TextOverlayLayer overlays={mockOverlays} currentTime={2.0} />,
     );
+
     expect(getByText("Jest Overlay Test")).toBeTruthy();
   });
 
@@ -30,6 +31,7 @@ describe("TextOverlayLayer - Normal Flow", () => {
     const { getByText } = render(
       <TextOverlayLayer overlays={mockOverlays} currentTime={3.5} />,
     );
+
     expect(getByText("Jest Overlay Test")).toBeTruthy();
   });
 
@@ -37,6 +39,7 @@ describe("TextOverlayLayer - Normal Flow", () => {
     const { queryByText } = render(
       <TextOverlayLayer overlays={mockOverlays} currentTime={1.9} />,
     );
+
     expect(queryByText("Jest Overlay Test")).toBeNull();
   });
 
@@ -44,6 +47,7 @@ describe("TextOverlayLayer - Normal Flow", () => {
     const { queryByText } = render(
       <TextOverlayLayer overlays={mockOverlays} currentTime={5.0} />,
     );
+
     expect(queryByText("Jest Overlay Test")).toBeNull();
   });
 });
@@ -53,19 +57,23 @@ describe("TextOverlayLayer - Defect Testing & Edge Cases", () => {
     const longText = "A".repeat(1000);
     const overlays: TextOverlay[] = [{ ...mockOverlays[0], text: longText }];
 
-    const { getByText } = render(
+    const { getByTestId, getByText, queryByText } = render(
       <TextOverlayLayer overlays={overlays} currentTime={2.5} />,
     );
-    expect(getByText(longText)).toBeTruthy();
+
+    expect(getByTestId("editable-overlay-test-1")).toBeTruthy();
+    expect(getByText(/A{20}/)).toBeTruthy();
+    expect(queryByText(longText)).toBeNull();
   });
 
   it("handles completely empty text strings", () => {
     const overlays: TextOverlay[] = [{ ...mockOverlays[0], text: "" }];
 
-    const { getByText } = render(
+    const { getByTestId } = render(
       <TextOverlayLayer overlays={overlays} currentTime={2.5} />,
     );
-    expect(getByText("")).toBeTruthy();
+
+    expect(getByTestId("editable-overlay-test-1")).toBeTruthy();
   });
 
   it("renders multiple overlapping overlays correctly", () => {
@@ -78,6 +86,7 @@ describe("TextOverlayLayer - Defect Testing & Edge Cases", () => {
     const { getByText } = render(
       <TextOverlayLayer overlays={overlays} currentTime={2.5} />,
     );
+
     expect(getByText("First")).toBeTruthy();
     expect(getByText("Second")).toBeTruthy();
     expect(getByText("Third")).toBeTruthy();
@@ -91,6 +100,7 @@ describe("TextOverlayLayer - Defect Testing & Edge Cases", () => {
     const { getByText } = render(
       <TextOverlayLayer overlays={overlays} currentTime={2.5} />,
     );
+
     expect(getByText("🐰 🦋 漢字")).toBeTruthy();
   });
 });

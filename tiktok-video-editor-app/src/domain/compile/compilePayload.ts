@@ -1,4 +1,5 @@
 import { getSceneTransition } from "../video/transitions";
+import { createTextOverlayLayoutSpec } from "../video/textOverlayLayout";
 import {
   Effect,
   Music,
@@ -6,6 +7,7 @@ import {
   Scene,
   Template,
   TextOverlay,
+  TextOverlayLayout,
   Transition,
 } from "../../types/template";
 
@@ -18,6 +20,10 @@ export interface CompilePayload {
   scenes: CompileScene[];
 }
 
+export interface CompileTextOverlay extends TextOverlay {
+  layout: TextOverlayLayout;
+}
+
 export interface CompileScene {
   id: string;
   orderIndex: number;
@@ -25,7 +31,7 @@ export interface CompileScene {
   durationSeconds: number;
   instruction: string;
   transition: Transition;
-  textOverlays: TextOverlay[];
+  textOverlays: CompileTextOverlay[];
   effects: Effect[];
 }
 
@@ -42,11 +48,16 @@ export function buildCompilePayload(template: Template): CompilePayload {
     orientation: template.orientation,
     originalVolume: template.originalVolume ?? 1,
     music: template.music ? { ...template.music } : undefined,
-    scenes: template.scenes.map(createCompileScene),
+    scenes: template.scenes.map((scene) =>
+      createCompileScene(scene, template.orientation),
+    ),
   };
 }
 
-function createCompileScene(scene: Scene): CompileScene {
+function createCompileScene(
+  scene: Scene,
+  orientation: Orientation,
+): CompileScene {
   return {
     id: scene.id,
     orderIndex: scene.orderIndex,
@@ -54,7 +65,19 @@ function createCompileScene(scene: Scene): CompileScene {
     durationSeconds: scene.durationSeconds,
     instruction: scene.instruction,
     transition: getSceneTransition(scene),
-    textOverlays: scene.textOverlays.map((overlay) => ({ ...overlay })),
+    textOverlays: scene.textOverlays.map((overlay) =>
+      createCompileTextOverlay(overlay, orientation),
+    ),
     effects: scene.effects.map((effect) => ({ ...effect })),
+  };
+}
+
+function createCompileTextOverlay(
+  overlay: TextOverlay,
+  orientation: Orientation,
+): CompileTextOverlay {
+  return {
+    ...overlay,
+    layout: createTextOverlayLayoutSpec(orientation, overlay),
   };
 }

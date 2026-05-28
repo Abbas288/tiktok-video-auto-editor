@@ -16,3 +16,6 @@ pnpm-debug.log*
 
 *.tsbuildinfo
 .DS_Store
+
+.compiled/
+.tmp/
