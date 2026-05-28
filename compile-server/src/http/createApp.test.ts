@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import { CompileServerConfig } from "../config";
 import { createApp } from "./createApp";
 
-function createConfig(overrides: Partial<CompileServerConfig> = {}): CompileServerConfig {
+function createConfig(
+  overrides: Partial<CompileServerConfig> = {},
+): CompileServerConfig {
   return {
     port: 3030,
     publicBaseUrl: "http://localhost:3030",
@@ -80,6 +82,38 @@ describe("createApp", () => {
 
     expect(response.body.error).toBe("Invalid compile payload.");
     expect(response.body.details.length).toBeGreaterThan(0);
+  });
+
+  it("returns JSON when compiled video file is missing for API clients", async () => {
+    const app = createApp(createConfig());
+
+    const response = await request(app)
+      .get("/compiled/missing-video.mp4")
+      .set("Accept", "application/json")
+      .expect(404);
+
+    expect(response.body.error).toBe("Compiled video not found.");
+    expect(response.body.details).toContain("missing-video.mp4");
+  });
+
+  it("returns a friendly HTML page when compiled video file is missing in browser navigation", async () => {
+    const app = createApp(createConfig());
+
+    const response = await request(app)
+      .get("/compiled/missing-video.mp4")
+      .set("Accept", "text/html")
+      .expect(404);
+
+    expect(response.text).toContain("Compiled video not found");
+    expect(response.text).toContain("Go back");
+    expect(response.text).toContain("missing-video.mp4");
+    expect(response.headers["content-type"]).toContain("text/html");
+  });
+
+  it("returns 404 for HEAD request when compiled video file is missing", async () => {
+    const app = createApp(createConfig());
+
+    await request(app).head("/compiled/missing-video.mp4").expect(404);
   });
 
   it("returns 404 for unknown routes", async () => {

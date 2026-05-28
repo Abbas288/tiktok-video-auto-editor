@@ -1,13 +1,7 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 import { fireEvent, render } from "@testing-library/react-native";
 import { CompilePanel } from "./CompilePanel";
-
-jest.mock("expo-video", () => ({
-  VideoView: "VideoView",
-  useVideoPlayer: jest.fn(() => ({
-    loop: false,
-  })),
-}));
 
 describe("CompilePanel", () => {
   it("renders compile button", () => {
@@ -46,17 +40,167 @@ describe("CompilePanel", () => {
     expect(onCompile).not.toHaveBeenCalled();
   });
 
-  it("renders compiled video preview when compile result exists", () => {
+  it("renders compiling message in warning color", () => {
     const { getByTestId } = render(
       <CompilePanel
-        status="success"
-        message="Compile finished."
-        compiledVideoUrl="https://example.com/compiled.mp4"
+        status="compiling"
+        message="Compiling video..."
         onCompile={jest.fn()}
       />,
     );
 
-    expect(getByTestId("compiled-video-preview")).toBeTruthy();
+    const messageStyle = StyleSheet.flatten(
+      getByTestId("compile-message").props.style,
+    );
+
+    expect(messageStyle.color).toBe("#FACC15");
+  });
+
+  it("does not render export actions when no finished video exists", () => {
+    const { queryByTestId } = render(
+      <CompilePanel status="idle" message={null} onCompile={jest.fn()} />,
+    );
+
+    expect(queryByTestId("compiled-output-card")).toBeNull();
+    expect(queryByTestId("save-compiled-video-button")).toBeNull();
+  });
+
+  it("does not render stale export actions before a successful compile", () => {
+    const { queryByTestId } = render(
+      <CompilePanel
+        status="idle"
+        message={null}
+        compiledVideoUrl="http://localhost:3030/compiled/stale.mp4"
+        onCompile={jest.fn()}
+      />,
+    );
+
+    expect(queryByTestId("compiled-output-card")).toBeNull();
+    expect(queryByTestId("save-compiled-video-button")).toBeNull();
+  });
+
+  it("does not render export actions while compiling", () => {
+    const { queryByTestId } = render(
+      <CompilePanel
+        status="compiling"
+        message="Compiling video..."
+        compiledVideoUrl="http://localhost:3030/compiled/stale.mp4"
+        onCompile={jest.fn()}
+      />,
+    );
+
+    expect(queryByTestId("compiled-output-card")).toBeNull();
+  });
+
+  it("renders export actions when a finished video exists after success", () => {
+    const { getByTestId } = render(
+      <CompilePanel
+        status="success"
+        message="Rendered video is ready."
+        compiledVideoUrl="https://example.com/compiled.mp4"
+        outputKind="rendered"
+        onCompile={jest.fn()}
+        onSaveCompiledVideo={jest.fn()}
+        onOpenCompiledVideo={jest.fn()}
+      />,
+    );
+
+    expect(getByTestId("compiled-output-card")).toBeTruthy();
+    expect(getByTestId("save-compiled-video-button")).toBeTruthy();
+    expect(getByTestId("open-compiled-video-button")).toBeTruthy();
+  });
+
+  it("calls onSaveCompiledVideo when save button is pressed", () => {
+    const onSaveCompiledVideo = jest.fn();
+
+    const { getByTestId } = render(
+      <CompilePanel
+        status="success"
+        message="Rendered video is ready."
+        compiledVideoUrl="https://example.com/compiled.mp4"
+        onCompile={jest.fn()}
+        onSaveCompiledVideo={onSaveCompiledVideo}
+        onOpenCompiledVideo={jest.fn()}
+      />,
+    );
+
+    fireEvent.press(getByTestId("save-compiled-video-button"));
+
+    expect(onSaveCompiledVideo).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls onOpenCompiledVideo when open button is pressed", () => {
+    const onOpenCompiledVideo = jest.fn();
+
+    const { getByTestId } = render(
+      <CompilePanel
+        status="success"
+        message="Rendered video is ready."
+        compiledVideoUrl="https://example.com/compiled.mp4"
+        onCompile={jest.fn()}
+        onSaveCompiledVideo={jest.fn()}
+        onOpenCompiledVideo={onOpenCompiledVideo}
+      />,
+    );
+
+    fireEvent.press(getByTestId("open-compiled-video-button"));
+
+    expect(onOpenCompiledVideo).toHaveBeenCalledTimes(1);
+  });
+
+  it("blocks save attempts while saving", () => {
+    const onSaveCompiledVideo = jest.fn();
+
+    const { getByTestId } = render(
+      <CompilePanel
+        status="success"
+        message="Rendered video is ready."
+        compiledVideoUrl="https://example.com/compiled.mp4"
+        saveStatus="saving"
+        onCompile={jest.fn()}
+        onSaveCompiledVideo={onSaveCompiledVideo}
+        onOpenCompiledVideo={jest.fn()}
+      />,
+    );
+
+    fireEvent.press(getByTestId("save-compiled-video-button"));
+
+    expect(onSaveCompiledVideo).not.toHaveBeenCalled();
+  });
+
+  it("renders save feedback", () => {
+    const { getByText } = render(
+      <CompilePanel
+        status="success"
+        message="Rendered video is ready."
+        compiledVideoUrl="https://example.com/compiled.mp4"
+        saveStatus="success"
+        saveMessage="Video saved to your gallery."
+        onCompile={jest.fn()}
+        onSaveCompiledVideo={jest.fn()}
+        onOpenCompiledVideo={jest.fn()}
+      />,
+    );
+
+    expect(getByText("Video saved to your gallery.")).toBeTruthy();
+  });
+
+  it("renders save error feedback even when output actions are hidden", () => {
+    const { getByText } = render(
+      <CompilePanel
+        status="error"
+        message="Compile failed."
+        saveStatus="error"
+        saveMessage="The finished video is no longer available. Run compile again."
+        onCompile={jest.fn()}
+      />,
+    );
+
+    expect(
+      getByText(
+        "The finished video is no longer available. Run compile again.",
+      ),
+    ).toBeTruthy();
   });
 
   it("renders error message when compile fails", () => {

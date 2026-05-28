@@ -10,10 +10,23 @@ import {
   ZoomFocusPosition,
 } from "../domain/video/sceneEffects";
 import { getSceneTransition } from "../domain/video/transitions";
-import { compileService } from "../infrastructure/compileService";
+import {
+  compileService,
+  CompileRendererName,
+} from "../infrastructure/compileService";
+import { saveCompiledVideoToDevice } from "../infrastructure/saveCompiledVideo";
+import {
+  ensureVideoReferenceAvailable,
+  openVideoReference,
+  UNAVAILABLE_VIDEO_MESSAGE,
+} from "../infrastructure/videoReference";
 import { TextOverlayUpdate } from "../store/useEditSession";
 import { Scene, Template, Transition } from "../types/template";
-import { CompileStatus } from "../components/CompilePanel";
+import {
+  CompileOutputKind,
+  CompileStatus,
+  SaveCompiledVideoStatus,
+} from "../components/CompilePanel";
 import { useInitializeEditor } from "./useInitializeEditor";
 import { SeekRequest } from "./useVideoSync";
 
@@ -42,6 +55,10 @@ interface EditorControllerResult {
   isDraggingOverlay: boolean;
   compileStatus: CompileStatus;
   compileMessage: string | null;
+  compiledOutputUrl: string | null;
+  compiledOutputKind: CompileOutputKind;
+  saveStatus: SaveCompiledVideoStatus;
+  saveMessage: string | null;
   selectOverlay: (overlayId: string | null) => void;
   updateVolumes: (originalVolume: number, musicVolume?: number) => void;
   handleGoBack: () => void;
@@ -64,10 +81,12 @@ interface EditorControllerResult {
   handleChangeTransition: (transitionType: Transition["type"]) => void;
   handleCloseTransitionPicker: () => void;
   handleCompileProject: () => Promise<void>;
+  handleSaveCompiledVideo: () => Promise<void>;
+  handleOpenCompiledVideo: () => Promise<void>;
 }
 
 /**
- * Coordinates editor state, scene selection, overlays, effects, transitions, compile flow and seek requests.
+ * Coordinates editor state, scene selection, overlays, effects, transitions, compile flow and export actions.
  *
  * @param props Editor controller properties.
  * @returns Editor state and handlers used by the editor screen.
@@ -81,6 +100,13 @@ export function useEditorController({
   const [isDraggingOverlay, setIsDraggingOverlay] = useState<boolean>(false);
   const [compileStatus, setCompileStatus] = useState<CompileStatus>("idle");
   const [compileMessage, setCompileMessage] = useState<string | null>(null);
+  const [compiledOutputUrl, setCompiledOutputUrl] = useState<string | null>(
+    null,
+  );
+  const [compiledOutputKind, setCompiledOutputKind] =
+    useState<CompileOutputKind>("unknown");
+  const [saveStatus, setSaveStatus] = useState<SaveCompiledVideoStatus>("idle");
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [selectedTransitionSceneId, setSelectedTransitionSceneId] = useState<
     string | null
   >(null);
@@ -296,18 +322,96 @@ export function useEditorController({
     try {
       setCompileStatus("compiling");
       setCompileMessage("Compiling video...");
+      setCompiledOutputUrl(null);
+      setCompiledOutputKind("unknown");
+      setSaveStatus("idle");
+      setSaveMessage(null);
 
       const payload = buildCompilePayload(currentTemplate);
       const result = await compileService.compile(payload);
+      const outputKind = toCompileOutputKind(result.renderer);
+      const availableVideoUrl = await ensureVideoReferenceAvailable(
+        result.compiledVideoUrl,
+      );
 
-      updateCompiledVideo(result.compiledVideoUrl);
+      updateCompiledVideo(availableVideoUrl);
+      setCompiledOutputUrl(availableVideoUrl);
+      setCompiledOutputKind(outputKind);
       setCompileStatus("success");
-      setCompileMessage("Compile finished. The compiled video is ready.");
-    } catch {
+
+      if (outputKind === "placeholder") {
+        setCompileMessage(
+          "Preview output is ready. No rendered export was created.",
+        );
+        return;
+      }
+
+      setCompileMessage("Rendered video is ready.");
+    } catch (error) {
+      setCompiledOutputUrl(null);
+      setCompiledOutputKind("unknown");
       setCompileStatus("error");
-      setCompileMessage("Compile failed. Please try again.");
+      setCompileMessage(
+        error instanceof Error
+          ? error.message
+          : "Compile failed. Please try again.",
+      );
     }
   }, [compileStatus, currentTemplate, updateCompiledVideo]);
+
+  const handleSaveCompiledVideo = useCallback(async (): Promise<void> => {
+    if (!compiledOutputUrl || saveStatus === "saving") {
+      return;
+    }
+
+    try {
+      setSaveStatus("saving");
+      setSaveMessage("Preparing video...");
+
+      const result = await saveCompiledVideoToDevice(compiledOutputUrl);
+
+      setSaveStatus("success");
+      setSaveMessage(result.message);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "The video could not be saved.";
+
+      if (message === UNAVAILABLE_VIDEO_MESSAGE) {
+        setCompiledOutputUrl(null);
+        setCompiledOutputKind("unknown");
+      }
+
+      setSaveStatus("error");
+      setSaveMessage(message);
+    }
+  }, [compiledOutputUrl, saveStatus]);
+
+  const handleOpenCompiledVideo = useCallback(async (): Promise<void> => {
+    if (!compiledOutputUrl) {
+      return;
+    }
+
+    try {
+      setSaveStatus("idle");
+      setSaveMessage(null);
+      await openVideoReference(compiledOutputUrl);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "The video could not be opened.";
+
+      if (message === UNAVAILABLE_VIDEO_MESSAGE) {
+        setCompiledOutputUrl(null);
+        setCompiledOutputKind("unknown");
+      }
+
+      setSaveStatus("error");
+      setSaveMessage(message);
+    }
+  }, [compiledOutputUrl]);
 
   return {
     isLoading,
@@ -324,6 +428,10 @@ export function useEditorController({
     isDraggingOverlay,
     compileStatus,
     compileMessage,
+    compiledOutputUrl,
+    compiledOutputKind,
+    saveStatus,
+    saveMessage,
     selectOverlay,
     updateVolumes,
     handleGoBack,
@@ -340,5 +448,21 @@ export function useEditorController({
     handleChangeTransition,
     handleCloseTransitionPicker,
     handleCompileProject,
+    handleSaveCompiledVideo,
+    handleOpenCompiledVideo,
   };
+}
+
+function toCompileOutputKind(
+  renderer: CompileRendererName | undefined,
+): CompileOutputKind {
+  if (renderer === "placeholder") {
+    return "placeholder";
+  }
+
+  if (renderer === "ffmpeg") {
+    return "rendered";
+  }
+
+  return "unknown";
 }
