@@ -14,17 +14,14 @@ import { CompilePanel } from "../../src/components/CompilePanel";
 import { EditorHeader } from "../../src/components/EditorHeader";
 import { OverlayEditPanel } from "../../src/components/OverlayEditPanel";
 import { SceneEffectsPanel } from "../../src/components/SceneEffectsPanel";
+import { SceneVideoChecklist } from "../../src/components/SceneVideoChecklist";
+import { SceneVideoPanel } from "../../src/components/SceneVideoPanel";
 import { Timeline } from "../../src/components/Timeline";
 import { TransitionPickerPanel } from "../../src/components/TransitionPickerPanel";
 import { VideoStage } from "../../src/components/video-stage/VideoStage";
 import { colors } from "../../src/styles/theme";
 import { normalizeRouteParam } from "../../src/utils/normalizeRouteParam";
 
-/**
- * Renders the editor screen for a selected template.
- *
- * @returns Editor screen element.
- */
 export default function EditorScreen(): React.JSX.Element {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
@@ -39,49 +36,12 @@ export default function EditorScreen(): React.JSX.Element {
     router.replace("/");
   }, [router]);
 
-  const {
-    isLoading,
-    error,
-    currentTemplate,
-    activeSceneId,
-    selectedOverlayId,
-    selectedTransition,
-    selectedOverlayResult,
-    activeScene,
-    activeSceneFilterValues,
-    seekRequest,
-    currentTime,
-    isDraggingOverlay,
-    compileStatus,
-    compileMessage,
-    compiledOutputUrl,
-    compiledOutputKind,
-    saveStatus,
-    saveMessage,
-    selectOverlay,
-    updateVolumes,
-    handleGoBack,
-    handleSceneClick,
-    handleTimeUpdate,
-    handleDragStart,
-    handleDragEnd,
-    handleCommitOverlayPosition,
-    handleChangeSelectedOverlay,
-    handleChangeSceneEffect,
-    handleResetSceneEffects,
-    handleCommitZoomFocus,
-    handleSelectTransition,
-    handleChangeTransition,
-    handleCloseTransitionPicker,
-    handleCompileProject,
-    handleSaveCompiledVideo,
-    handleOpenCompiledVideo,
-  } = useEditorController({
+  const controller = useEditorController({
     templateId,
     onExitEditor: handleExitEditor,
   });
 
-  if (isLoading) {
+  if (controller.isLoading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={colors.text} />
@@ -89,11 +49,13 @@ export default function EditorScreen(): React.JSX.Element {
     );
   }
 
-  if (error || !currentTemplate) {
+  if (controller.error || !controller.currentTemplate) {
     return (
       <View style={styles.center}>
-        <Text style={styles.errorText}>{error || "No project loaded."}</Text>
-        <TouchableOpacity onPress={handleGoBack}>
+        <Text style={styles.errorText}>
+          {controller.error || "No project loaded."}
+        </Text>
+        <TouchableOpacity onPress={controller.handleGoBack}>
           <Text style={styles.link}>Go back</Text>
         </TouchableOpacity>
       </View>
@@ -102,77 +64,99 @@ export default function EditorScreen(): React.JSX.Element {
 
   return (
     <View style={styles.container}>
-      <EditorHeader title={currentTemplate.title} onGoBack={handleGoBack} />
+      <EditorHeader
+        title={controller.currentTemplate.title}
+        onGoBack={controller.handleGoBack}
+      />
 
       <ScrollView
         style={styles.scroll}
-        scrollEnabled={!isDraggingOverlay}
+        scrollEnabled={!controller.isDraggingOverlay}
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.stageShell}>
           <VideoStage
-            template={currentTemplate}
-            currentTime={currentTime}
-            selectedOverlayId={selectedOverlayId}
-            seekRequest={seekRequest}
-            onTimeUpdate={handleTimeUpdate}
-            onSelectOverlay={selectOverlay}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onCommitOverlayPosition={handleCommitOverlayPosition}
-            onCommitZoomFocus={handleCommitZoomFocus}
+            template={controller.currentTemplate}
+            currentTime={controller.currentTime}
+            selectedOverlayId={controller.selectedOverlayId}
+            seekRequest={controller.seekRequest}
+            onTimeUpdate={controller.handleTimeUpdate}
+            onSelectOverlay={controller.selectOverlay}
+            onDragStart={controller.handleDragStart}
+            onDragEnd={controller.handleDragEnd}
+            onCommitOverlayPosition={controller.handleCommitOverlayPosition}
+            onCommitZoomFocus={controller.handleCommitZoomFocus}
           />
         </View>
 
+        <SceneVideoChecklist
+          scenes={controller.currentTemplate.scenes}
+          activeSceneId={controller.activeSceneId}
+          onSelectScene={controller.handleSceneClick}
+        />
+
+        <SceneVideoPanel
+          scene={controller.activeScene}
+          message={controller.sceneVideoMessage}
+          trimDraft={controller.sceneVideoTrimDraft}
+          isBusy={controller.isSceneVideoBusy}
+          onPickVideo={controller.handlePickSceneVideo}
+          onConfirmTrim={controller.handleConfirmSceneVideoTrim}
+          onCancelTrim={controller.handleCancelSceneVideoTrim}
+          onRemoveVideo={controller.handleRemoveSceneVideo}
+        />
+
         <CompilePanel
-          status={compileStatus}
-          message={compileMessage}
-          compiledVideoUrl={compiledOutputUrl}
-          outputKind={compiledOutputKind}
-          saveStatus={saveStatus}
-          saveMessage={saveMessage}
-          onCompile={handleCompileProject}
-          onSaveCompiledVideo={handleSaveCompiledVideo}
-          onOpenCompiledVideo={handleOpenCompiledVideo}
+          status={controller.compileStatus}
+          message={controller.compileMessage}
+          compiledVideoUrl={controller.compiledOutputUrl}
+          outputKind={controller.compiledOutputKind}
+          saveStatus={controller.saveStatus}
+          saveMessage={controller.saveMessage}
+          onCompile={controller.handleCompileProject}
+          onSaveCompiledVideo={controller.handleSaveCompiledVideo}
+          onOpenCompiledVideo={controller.handleOpenCompiledVideo}
         />
 
         <OverlayEditPanel
-          overlay={selectedOverlayResult?.overlay ?? null}
-          onChange={handleChangeSelectedOverlay}
-          onClose={() => selectOverlay(null)}
+          overlay={controller.selectedOverlayResult?.overlay ?? null}
+          onChange={controller.handleChangeSelectedOverlay}
+          onClose={() => controller.selectOverlay(null)}
         />
 
-        {!selectedOverlayId && (
+        {!controller.selectedOverlayId && (
           <>
             <SceneEffectsPanel
-              sceneTitle={activeScene?.instruction ?? null}
-              values={activeSceneFilterValues}
-              onChange={handleChangeSceneEffect}
-              onReset={handleResetSceneEffects}
+              sceneTitle={controller.activeScene?.instruction ?? null}
+              values={controller.activeSceneFilterValues}
+              onChange={controller.handleChangeSceneEffect}
+              onReset={controller.handleResetSceneEffects}
             />
 
             <AudioPanel
-              originalVolume={currentTemplate.originalVolume ?? 1}
+              originalVolume={controller.currentTemplate.originalVolume ?? 1}
               musicVolume={
-                currentTemplate.music ? currentTemplate.music.volume : null
+                controller.currentTemplate.music
+                  ? controller.currentTemplate.music.volume
+                  : null
               }
-              onChangeVolumes={updateVolumes}
+              onChangeVolumes={controller.updateVolumes}
             />
           </>
         )}
 
         <Timeline
-          scenes={currentTemplate.scenes}
-          activeSceneId={activeSceneId}
-          onSelectScene={handleSceneClick}
-          onSelectTransition={handleSelectTransition}
+          scenes={controller.currentTemplate.scenes}
+          activeSceneId={controller.activeSceneId}
+          onSelectScene={controller.handleSceneClick}
+          onSelectTransition={controller.handleSelectTransition}
         />
 
         <TransitionPickerPanel
-          scene={selectedTransition?.scene ?? null}
-          selectedTransition={selectedTransition?.transition ?? null}
-          onChangeTransition={handleChangeTransition}
-          onClose={handleCloseTransitionPicker}
+          scene={controller.selectedTransition?.scene ?? null}
+          selectedTransition={controller.selectedTransition?.transition ?? null}
+          onChangeTransition={controller.handleChangeTransition}
+          onClose={controller.handleCloseTransitionPicker}
         />
       </ScrollView>
     </View>

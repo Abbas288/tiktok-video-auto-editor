@@ -9,12 +9,13 @@ import {
   updateTemplateCompiledVideo,
   updateTemplateSceneEffect,
   updateTemplateSceneTransition,
+  updateTemplateSceneVideoSource,
   updateTemplateSceneZoomFocus,
   updateTemplateTextOverlay,
   updateTemplateVolumes,
 } from "../domain/template/templateEditing";
 import { mergeTemplateWithDraft } from "../domain/template/templateDraftMerge";
-import { Template, Transition } from "../types/template";
+import { SceneVideoSource, Template, Transition } from "../types/template";
 import {
   clearEditedTemplateDraftsStorage,
   EditedTemplatesById,
@@ -29,6 +30,7 @@ export {
   updateTemplateCompiledVideo,
   updateTemplateSceneEffect,
   updateTemplateSceneTransition,
+  updateTemplateSceneVideoSource,
   updateTemplateSceneZoomFocus,
   updateTemplateTextOverlay,
   updateTemplateVolumes,
@@ -36,124 +38,40 @@ export {
 
 export { mergeTemplateWithDraft } from "../domain/template/templateDraftMerge";
 
-/**
- * Represents the state and actions for an active video editing session.
- */
 export interface EditSessionState {
-  /** The currently loaded template project. */
   currentTemplate: Template | null;
-
-  /** Cached edited templates by template id. */
   editedTemplatesById: EditedTemplatesById;
-
-  /** The ID of the currently active or selected scene in the timeline. */
   activeSceneId: string | null;
-
-  /** The ID of the currently selected text overlay. */
   selectedOverlayId: string | null;
-
-  /**
-   * Loads a validated template into the active session.
-   *
-   * @param template The validated template data.
-   */
   loadTemplate: (template: Template) => void;
-
-  /**
-   * Clears the currently opened editing session without deleting saved drafts.
-   */
   clearSession: () => void;
-
-  /**
-   * Clears all cached edited template drafts.
-   */
   clearDrafts: () => void;
-
-  /**
-   * Selects the active scene.
-   *
-   * @param sceneId The scene ID to select.
-   */
   selectScene: (sceneId: string) => void;
-
-  /**
-   * Selects a text overlay for editing.
-   *
-   * @param overlayId The selected overlay ID, or null to clear selection.
-   */
   selectOverlay: (overlayId: string | null) => void;
-
-  /**
-   * Updates a specific text overlay.
-   *
-   * @param sceneId The scene that owns the overlay.
-   * @param overlayId The overlay to update.
-   * @param patch Editable overlay fields to update.
-   */
   updateTextOverlay: (
     sceneId: string,
     overlayId: string,
     patch: TextOverlayUpdate,
   ) => void;
-
-  /**
-   * Adds or updates one visual filter effect for a scene.
-   *
-   * @param sceneId The scene to update.
-   * @param effectType Editable effect type.
-   * @param value New effect value.
-   */
   updateSceneEffect: (
     sceneId: string,
     effectType: EditableSceneEffectType,
     value: number,
   ) => void;
-
-  /**
-   * Updates the zoom focus for a scene.
-   *
-   * @param sceneId The scene to update.
-   * @param position New normalized zoom focus position.
-   */
   updateSceneZoomFocus: (sceneId: string, position: ZoomFocusPosition) => void;
-
-  /**
-   * Resets editable visual filters for one scene.
-   *
-   * @param sceneId The scene to reset.
-   */
   resetSceneEffects: (sceneId: string) => void;
-
-  /**
-   * Updates original and background music volumes.
-   *
-   * @param originalVolume Original video volume.
-   * @param musicVolume Optional background music volume.
-   */
   updateVolumes: (originalVolume: number, musicVolume?: number) => void;
-
-  /**
-   * Updates the transition from one scene to the next.
-   *
-   * @param sceneId Scene that owns the transition.
-   * @param transitionType Selected transition type.
-   */
   updateSceneTransition: (
     sceneId: string,
     transitionType: Transition["type"],
   ) => void;
-
-  /**
-   * Stores the compiled video URL returned by the compile server.
-   *
-   * @param compiledVideoUrl Compiled video URL.
-   */
+  updateSceneVideoSource: (
+    sceneId: string,
+    videoSource: SceneVideoSource | null,
+  ) => void;
   updateCompiledVideo: (compiledVideoUrl: string) => void;
 }
 
-/**
- * Zustand store managing the global state for the video editing session.
- */
 export const useEditSession = create<EditSessionState>((set) => ({
   currentTemplate: null,
   editedTemplatesById: loadEditedTemplateDrafts(),
@@ -162,10 +80,10 @@ export const useEditSession = create<EditSessionState>((set) => ({
 
   loadTemplate: (template: Template) => {
     set((state) => {
-      const templateToLoad = mergeTemplateWithDraft(
-        template,
-        state.editedTemplatesById[template.id],
-      );
+      const draft = state.editedTemplatesById[template.id];
+      const templateToLoad = draft
+        ? mergeTemplateWithDraft(template, draft)
+        : template;
 
       return {
         currentTemplate: templateToLoad,
@@ -215,14 +133,15 @@ export const useEditSession = create<EditSessionState>((set) => ({
         return state;
       }
 
-      const updatedTemplate = updateTemplateTextOverlay(
-        state.currentTemplate,
-        sceneId,
-        overlayId,
-        patch,
+      return persistTemplateUpdate(
+        state,
+        updateTemplateTextOverlay(
+          state.currentTemplate,
+          sceneId,
+          overlayId,
+          patch,
+        ),
       );
-
-      return persistTemplateUpdate(state, updatedTemplate);
     });
   },
 
@@ -236,14 +155,15 @@ export const useEditSession = create<EditSessionState>((set) => ({
         return state;
       }
 
-      const updatedTemplate = updateTemplateSceneEffect(
-        state.currentTemplate,
-        sceneId,
-        effectType,
-        value,
+      return persistTemplateUpdate(
+        state,
+        updateTemplateSceneEffect(
+          state.currentTemplate,
+          sceneId,
+          effectType,
+          value,
+        ),
       );
-
-      return persistTemplateUpdate(state, updatedTemplate);
     });
   },
 
@@ -253,13 +173,10 @@ export const useEditSession = create<EditSessionState>((set) => ({
         return state;
       }
 
-      const updatedTemplate = updateTemplateSceneZoomFocus(
-        state.currentTemplate,
-        sceneId,
-        position,
+      return persistTemplateUpdate(
+        state,
+        updateTemplateSceneZoomFocus(state.currentTemplate, sceneId, position),
       );
-
-      return persistTemplateUpdate(state, updatedTemplate);
     });
   },
 
@@ -269,12 +186,10 @@ export const useEditSession = create<EditSessionState>((set) => ({
         return state;
       }
 
-      const updatedTemplate = resetTemplateSceneEffects(
-        state.currentTemplate,
-        sceneId,
+      return persistTemplateUpdate(
+        state,
+        resetTemplateSceneEffects(state.currentTemplate, sceneId),
       );
-
-      return persistTemplateUpdate(state, updatedTemplate);
     });
   },
 
@@ -284,13 +199,14 @@ export const useEditSession = create<EditSessionState>((set) => ({
         return state;
       }
 
-      const updatedTemplate = updateTemplateVolumes(
-        state.currentTemplate,
-        originalVolume,
-        musicVolume,
+      return persistTemplateUpdate(
+        state,
+        updateTemplateVolumes(
+          state.currentTemplate,
+          originalVolume,
+          musicVolume,
+        ),
       );
-
-      return persistTemplateUpdate(state, updatedTemplate);
     });
   },
 
@@ -303,13 +219,34 @@ export const useEditSession = create<EditSessionState>((set) => ({
         return state;
       }
 
-      const updatedTemplate = updateTemplateSceneTransition(
-        state.currentTemplate,
-        sceneId,
-        transitionType,
+      return persistTemplateUpdate(
+        state,
+        updateTemplateSceneTransition(
+          state.currentTemplate,
+          sceneId,
+          transitionType,
+        ),
       );
+    });
+  },
 
-      return persistTemplateUpdate(state, updatedTemplate);
+  updateSceneVideoSource: (
+    sceneId: string,
+    videoSource: SceneVideoSource | null,
+  ) => {
+    set((state) => {
+      if (!state.currentTemplate) {
+        return state;
+      }
+
+      return persistTemplateUpdate(
+        state,
+        updateTemplateSceneVideoSource(
+          state.currentTemplate,
+          sceneId,
+          videoSource,
+        ),
+      );
     });
   },
 
@@ -319,12 +256,10 @@ export const useEditSession = create<EditSessionState>((set) => ({
         return state;
       }
 
-      const updatedTemplate = updateTemplateCompiledVideo(
-        state.currentTemplate,
-        compiledVideoUrl,
+      return persistTemplateUpdate(
+        state,
+        updateTemplateCompiledVideo(state.currentTemplate, compiledVideoUrl),
       );
-
-      return persistTemplateUpdate(state, updatedTemplate);
     });
   },
 }));

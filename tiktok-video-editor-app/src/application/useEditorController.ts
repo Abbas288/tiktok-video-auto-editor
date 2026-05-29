@@ -1,5 +1,16 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import {
+  CompileOutputKind,
+  CompileStatus,
+  SaveCompiledVideoStatus,
+} from "../components/CompilePanel";
+import { SceneVideoTrimDraft } from "../components/SceneVideoPanel";
 import { buildCompilePayload } from "../domain/compile/compilePayload";
+import {
+  clampSceneVideoStart,
+  createSceneVideoDecision,
+} from "../domain/scene-video/sceneVideoSelection";
+import { getSceneVideoReadiness } from "../domain/scene-video/sceneVideoReadiness";
 import { findTextOverlayById } from "../domain/video/findTextOverlay";
 import { getActiveSceneIdAtTime } from "../domain/video/getActiveSceneIdAtTime";
 import { NormalizedOverlayPosition } from "../domain/video/overlayPosition";
@@ -14,6 +25,10 @@ import {
   compileService,
   CompileRendererName,
 } from "../infrastructure/compileService";
+import {
+  pickSceneVideoCandidate,
+  uploadSceneVideoCandidate,
+} from "../infrastructure/sceneVideoAssetService";
 import { saveCompiledVideoToDevice } from "../infrastructure/saveCompiledVideo";
 import {
   ensureVideoReferenceAvailable,
@@ -21,12 +36,12 @@ import {
   UNAVAILABLE_VIDEO_MESSAGE,
 } from "../infrastructure/videoReference";
 import { TextOverlayUpdate } from "../store/useEditSession";
-import { Scene, Template, Transition } from "../types/template";
 import {
-  CompileOutputKind,
-  CompileStatus,
-  SaveCompiledVideoStatus,
-} from "../components/CompilePanel";
+  Scene,
+  SceneVideoSource,
+  Template,
+  Transition,
+} from "../types/template";
 import { useInitializeEditor } from "./useInitializeEditor";
 import { SeekRequest } from "./useVideoSync";
 
@@ -59,6 +74,9 @@ interface EditorControllerResult {
   compiledOutputKind: CompileOutputKind;
   saveStatus: SaveCompiledVideoStatus;
   saveMessage: string | null;
+  sceneVideoMessage: string | null;
+  sceneVideoTrimDraft: SceneVideoTrimDraft | null;
+  isSceneVideoBusy: boolean;
   selectOverlay: (overlayId: string | null) => void;
   updateVolumes: (originalVolume: number, musicVolume?: number) => void;
   handleGoBack: () => void;
@@ -83,18 +101,20 @@ interface EditorControllerResult {
   handleCompileProject: () => Promise<void>;
   handleSaveCompiledVideo: () => Promise<void>;
   handleOpenCompiledVideo: () => Promise<void>;
+  handlePickSceneVideo: (sceneId: string) => Promise<void>;
+  handleConfirmSceneVideoTrim: (startSeconds: number) => Promise<void>;
+  handleCancelSceneVideoTrim: () => void;
+  handleRemoveSceneVideo: (sceneId: string) => void;
 }
 
-/**
- * Coordinates editor state, scene selection, overlays, effects, transitions, compile flow and export actions.
- *
- * @param props Editor controller properties.
- * @returns Editor state and handlers used by the editor screen.
- */
+const MANUAL_SEEK_GUARD_MS = 900;
+
 export function useEditorController({
   templateId,
   onExitEditor,
 }: UseEditorControllerProps): EditorControllerResult {
+  const manualSeekGuardUntilRef = useRef<number>(0);
+
   const [seekRequest, setSeekRequest] = useState<SeekRequest>();
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isDraggingOverlay, setIsDraggingOverlay] = useState<boolean>(false);
@@ -107,6 +127,12 @@ export function useEditorController({
     useState<CompileOutputKind>("unknown");
   const [saveStatus, setSaveStatus] = useState<SaveCompiledVideoStatus>("idle");
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [sceneVideoMessage, setSceneVideoMessage] = useState<string | null>(
+    null,
+  );
+  const [sceneVideoTrimDraft, setSceneVideoTrimDraft] =
+    useState<SceneVideoTrimDraft | null>(null);
+  const [isSceneVideoBusy, setIsSceneVideoBusy] = useState<boolean>(false);
   const [selectedTransitionSceneId, setSelectedTransitionSceneId] = useState<
     string | null
   >(null);
@@ -125,6 +151,7 @@ export function useEditorController({
     resetSceneEffects,
     updateVolumes,
     updateSceneTransition,
+    updateSceneVideoSource,
     updateCompiledVideo,
     clearSession,
   } = useInitializeEditor(templateId);
@@ -152,7 +179,6 @@ export function useEditorController({
     const sceneIndex = currentTemplate.scenes.findIndex(
       (scene) => scene.id === selectedTransitionSceneId,
     );
-
     const scene = currentTemplate.scenes[sceneIndex];
 
     if (!scene || sceneIndex >= currentTemplate.scenes.length - 1) {
@@ -170,6 +196,18 @@ export function useEditorController({
     [activeScene],
   );
 
+  const resetFinishedOutput = useCallback((): void => {
+    setCompiledOutputUrl(null);
+    setCompiledOutputKind("unknown");
+    setSaveStatus("idle");
+    setSaveMessage(null);
+
+    if (compileStatus !== "compiling") {
+      setCompileStatus("idle");
+      setCompileMessage(null);
+    }
+  }, [compileStatus]);
+
   const handleGoBack = useCallback((): void => {
     clearSession();
     onExitEditor();
@@ -183,7 +221,10 @@ export function useEditorController({
         return;
       }
 
+      manualSeekGuardUntilRef.current = Date.now() + MANUAL_SEEK_GUARD_MS;
+
       setSelectedTransitionSceneId(null);
+      setCurrentTime(scene.startSeconds);
       selectScene(sceneId);
       setSeekRequest({
         time: scene.startSeconds,
@@ -195,6 +236,10 @@ export function useEditorController({
 
   const handleTimeUpdate = useCallback(
     (time: number): void => {
+      if (Date.now() < manualSeekGuardUntilRef.current) {
+        return;
+      }
+
       setCurrentTime(time);
 
       if (!currentTemplate) {
@@ -255,21 +300,17 @@ export function useEditorController({
 
   const handleChangeSceneEffect = useCallback(
     (effectType: EditableSceneEffectType, value: number): void => {
-      if (!activeScene) {
-        return;
+      if (activeScene) {
+        updateSceneEffect(activeScene.id, effectType, value);
       }
-
-      updateSceneEffect(activeScene.id, effectType, value);
     },
     [activeScene, updateSceneEffect],
   );
 
   const handleResetSceneEffects = useCallback((): void => {
-    if (!activeScene) {
-      return;
+    if (activeScene) {
+      resetSceneEffects(activeScene.id);
     }
-
-    resetSceneEffects(activeScene.id);
   }, [activeScene, resetSceneEffects]);
 
   const handleCommitZoomFocus = useCallback(
@@ -301,11 +342,9 @@ export function useEditorController({
 
   const handleChangeTransition = useCallback(
     (transitionType: Transition["type"]): void => {
-      if (!selectedTransitionSceneId) {
-        return;
+      if (selectedTransitionSceneId) {
+        updateSceneTransition(selectedTransitionSceneId, transitionType);
       }
-
-      updateSceneTransition(selectedTransitionSceneId, transitionType);
     },
     [selectedTransitionSceneId, updateSceneTransition],
   );
@@ -314,8 +353,148 @@ export function useEditorController({
     setSelectedTransitionSceneId(null);
   }, []);
 
+  const saveSceneVideoSource = useCallback(
+    async (options: {
+      sceneId: string;
+      candidate: SceneVideoTrimDraft["candidate"];
+      sourceStartSeconds: number;
+      durationSeconds: number;
+    }): Promise<void> => {
+      const upload = await uploadSceneVideoCandidate(options.candidate);
+      const source: SceneVideoSource = {
+        type: "user",
+        localUri: options.candidate.localUri,
+        uploadUrl: upload.uploadUrl,
+        fileName: upload.fileName,
+        originalDurationSeconds: options.candidate.durationSeconds,
+        sourceStartSeconds: options.sourceStartSeconds,
+        durationSeconds: options.durationSeconds,
+      };
+
+      updateSceneVideoSource(options.sceneId, source);
+      resetFinishedOutput();
+      setSceneVideoMessage("Video approved.");
+    },
+    [resetFinishedOutput, updateSceneVideoSource],
+  );
+
+  const handlePickSceneVideo = useCallback(
+    async (sceneId: string): Promise<void> => {
+      const scene = currentTemplate?.scenes.find((item) => item.id === sceneId);
+
+      if (!scene || isSceneVideoBusy) {
+        return;
+      }
+
+      try {
+        setIsSceneVideoBusy(true);
+        setSceneVideoMessage(null);
+        setSceneVideoTrimDraft(null);
+
+        const candidate = await pickSceneVideoCandidate();
+
+        if (!candidate) {
+          return;
+        }
+
+        const decision = createSceneVideoDecision(
+          candidate,
+          scene.durationSeconds,
+        );
+
+        if (decision.type === "too-short") {
+          setSceneVideoMessage(
+            `Video is too short. Required: ${decision.requiredDurationSeconds}s.`,
+          );
+          return;
+        }
+
+        if (decision.type === "needs-trim") {
+          setSceneVideoTrimDraft({
+            sceneId,
+            candidate: decision.candidate,
+            maxStartSeconds: decision.maxStartSeconds,
+            durationSeconds: decision.durationSeconds,
+          });
+          return;
+        }
+
+        await saveSceneVideoSource({
+          sceneId,
+          candidate: decision.candidate,
+          sourceStartSeconds: decision.sourceStartSeconds,
+          durationSeconds: decision.durationSeconds,
+        });
+      } catch (error) {
+        setSceneVideoMessage(
+          error instanceof Error ? error.message : "Could not select video.",
+        );
+      } finally {
+        setIsSceneVideoBusy(false);
+      }
+    },
+    [currentTemplate, isSceneVideoBusy, saveSceneVideoSource],
+  );
+
+  const handleConfirmSceneVideoTrim = useCallback(
+    async (startSeconds: number): Promise<void> => {
+      if (!sceneVideoTrimDraft || isSceneVideoBusy) {
+        return;
+      }
+
+      try {
+        setIsSceneVideoBusy(true);
+
+        await saveSceneVideoSource({
+          sceneId: sceneVideoTrimDraft.sceneId,
+          candidate: sceneVideoTrimDraft.candidate,
+          sourceStartSeconds: clampSceneVideoStart(
+            startSeconds,
+            sceneVideoTrimDraft.maxStartSeconds,
+          ),
+          durationSeconds: sceneVideoTrimDraft.durationSeconds,
+        });
+
+        setSceneVideoTrimDraft(null);
+      } catch (error) {
+        setSceneVideoMessage(
+          error instanceof Error ? error.message : "Could not save video.",
+        );
+      } finally {
+        setIsSceneVideoBusy(false);
+      }
+    },
+    [isSceneVideoBusy, saveSceneVideoSource, sceneVideoTrimDraft],
+  );
+
+  const handleCancelSceneVideoTrim = useCallback((): void => {
+    setSceneVideoTrimDraft(null);
+  }, []);
+
+  const handleRemoveSceneVideo = useCallback(
+    (sceneId: string): void => {
+      updateSceneVideoSource(sceneId, null);
+      resetFinishedOutput();
+      setSceneVideoTrimDraft(null);
+      setSceneVideoMessage("Video removed.");
+    },
+    [resetFinishedOutput, updateSceneVideoSource],
+  );
+
   const handleCompileProject = useCallback(async (): Promise<void> => {
     if (!currentTemplate || compileStatus === "compiling") {
+      return;
+    }
+
+    const readiness = getSceneVideoReadiness(currentTemplate.scenes);
+
+    if (!readiness.isReadyForCompile) {
+      if (readiness.firstMissingScene) {
+        selectScene(readiness.firstMissingScene.id);
+      }
+
+      setCompileStatus("error");
+      setCompileMessage("Add videos for all scenes first.");
       return;
     }
 
@@ -338,15 +517,11 @@ export function useEditorController({
       setCompiledOutputUrl(availableVideoUrl);
       setCompiledOutputKind(outputKind);
       setCompileStatus("success");
-
-      if (outputKind === "placeholder") {
-        setCompileMessage(
-          "Preview output is ready. No rendered export was created.",
-        );
-        return;
-      }
-
-      setCompileMessage("Rendered video is ready.");
+      setCompileMessage(
+        outputKind === "placeholder"
+          ? "Preview output is ready."
+          : "Rendered video is ready.",
+      );
     } catch (error) {
       setCompiledOutputUrl(null);
       setCompiledOutputKind("unknown");
@@ -357,7 +532,7 @@ export function useEditorController({
           : "Compile failed. Please try again.",
       );
     }
-  }, [compileStatus, currentTemplate, updateCompiledVideo]);
+  }, [compileStatus, currentTemplate, selectScene, updateCompiledVideo]);
 
   const handleSaveCompiledVideo = useCallback(async (): Promise<void> => {
     if (!compiledOutputUrl || saveStatus === "saving") {
@@ -432,6 +607,9 @@ export function useEditorController({
     compiledOutputKind,
     saveStatus,
     saveMessage,
+    sceneVideoMessage,
+    sceneVideoTrimDraft,
+    isSceneVideoBusy,
     selectOverlay,
     updateVolumes,
     handleGoBack,
@@ -450,6 +628,10 @@ export function useEditorController({
     handleCompileProject,
     handleSaveCompiledVideo,
     handleOpenCompiledVideo,
+    handlePickSceneVideo,
+    handleConfirmSceneVideoTrim,
+    handleCancelSceneVideoTrim,
+    handleRemoveSceneVideo,
   };
 }
 

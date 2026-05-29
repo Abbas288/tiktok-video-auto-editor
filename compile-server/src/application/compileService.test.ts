@@ -10,6 +10,7 @@ function createConfig(overrides: Partial<CompileServerConfig> = {}): CompileServ
     renderer: "placeholder",
     outputDir: ".compiled",
     tempDir: ".tmp",
+    uploadDir: ".uploads",
     ffmpegPath: "ffmpeg",
     ffprobePath: "ffprobe",
     renderTimeoutMs: 120000,

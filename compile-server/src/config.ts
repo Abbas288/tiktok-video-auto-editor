@@ -4,9 +4,6 @@ import path from "node:path";
 
 export type CompileRendererMode = "placeholder" | "ffmpeg";
 
-/**
- * Runtime configuration used by the compile server.
- */
 export interface CompileServerConfig {
   port: number;
   publicBaseUrl: string;
@@ -14,6 +11,7 @@ export interface CompileServerConfig {
   placeholderVideoUrl?: string;
   outputDir: string;
   tempDir: string;
+  uploadDir: string;
   ffmpegPath: string;
   ffprobePath: string;
   renderTimeoutMs: number;
@@ -21,12 +19,6 @@ export interface CompileServerConfig {
   cleanupTempFiles: boolean;
 }
 
-/**
- * Reads server configuration from environment variables.
- *
- * @param env Environment variables.
- * @returns Normalized compile server configuration.
- */
 export function getServerConfig(
   env: NodeJS.ProcessEnv = process.env,
 ): CompileServerConfig {
@@ -39,8 +31,12 @@ export function getServerConfig(
     placeholderVideoUrl: parseOptionalUrl(env.COMPILE_PLACEHOLDER_VIDEO_URL),
     outputDir: ensureDirectory(parseDirectory(env.COMPILE_OUTPUT_DIR, ".compiled")),
     tempDir: ensureDirectory(
-      parseDirectory(env.COMPILE_TEMP_DIR, path.join(tmpdir(), "letrend-compile-server")),
+      parseDirectory(
+        env.COMPILE_TEMP_DIR,
+        path.join(tmpdir(), "letrend-compile-server"),
+      ),
     ),
+    uploadDir: ensureDirectory(parseDirectory(env.COMPILE_UPLOAD_DIR, ".uploads")),
     ffmpegPath: parseCommand(env.COMPILE_FFMPEG_PATH, "ffmpeg"),
     ffprobePath: parseCommand(env.COMPILE_FFPROBE_PATH, "ffprobe"),
     renderTimeoutMs: parsePositiveInteger(env.COMPILE_RENDER_TIMEOUT_MS, 120000),
@@ -52,19 +48,11 @@ export function getServerConfig(
 function parsePort(value: string | undefined): number {
   const parsedValue = Number(value);
 
-  if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
-    return 3030;
-  }
-
-  return parsedValue;
+  return Number.isInteger(parsedValue) && parsedValue > 0 ? parsedValue : 3030;
 }
 
 function parseRenderer(value: string | undefined): CompileRendererMode {
-  if (value === "ffmpeg" || value === "placeholder") {
-    return value;
-  }
-
-  return "placeholder";
+  return value === "ffmpeg" || value === "placeholder" ? value : "placeholder";
 }
 
 function parsePublicBaseUrl(value: string | undefined, port: number): string {
@@ -74,29 +62,15 @@ function parsePublicBaseUrl(value: string | undefined, port: number): string {
     return fallback;
   }
 
-  try {
-    return removeTrailingSlash(new URL(value.trim()).toString());
-  } catch {
-    throw new Error("COMPILE_PUBLIC_BASE_URL must be a valid URL.");
-  }
+  return removeTrailingSlash(new URL(value.trim()).toString());
 }
 
 function parseOptionalUrl(value: string | undefined): string | undefined {
-  if (typeof value !== "string") {
+  if (typeof value !== "string" || value.trim().length === 0) {
     return undefined;
   }
 
-  const trimmedValue = value.trim();
-
-  if (!trimmedValue) {
-    return undefined;
-  }
-
-  try {
-    return new URL(trimmedValue).toString();
-  } catch {
-    throw new Error("COMPILE_PLACEHOLDER_VIDEO_URL must be a valid URL.");
-  }
+  return new URL(value.trim()).toString();
 }
 
 function parseDirectory(value: string | undefined, fallback: string): string {
@@ -107,21 +81,15 @@ function parseDirectory(value: string | undefined, fallback: string): string {
 }
 
 function parseCommand(value: string | undefined, fallback: string): string {
-  if (typeof value !== "string" || value.trim().length === 0) {
-    return fallback;
-  }
-
-  return value.trim();
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : fallback;
 }
 
 function parsePositiveInteger(value: string | undefined, fallback: number): number {
   const parsedValue = Number(value);
 
-  if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
-    return fallback;
-  }
-
-  return parsedValue;
+  return Number.isInteger(parsedValue) && parsedValue > 0 ? parsedValue : fallback;
 }
 
 function parseFontFile(value: string | undefined): string | undefined {

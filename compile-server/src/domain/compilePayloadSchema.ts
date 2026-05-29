@@ -13,6 +13,12 @@ export interface CompileTransition {
   direction?: CompileTransitionDirection;
 }
 
+export interface CompileSceneVideoSource {
+  url: string;
+  sourceStartSeconds: number;
+  durationSeconds: number;
+}
+
 export interface CompileTextOverlayLayout {
   anchor: "center";
   textAlign: "center";
@@ -59,6 +65,7 @@ export interface CompilePayloadScene {
   transition?: CompileTransition;
   textOverlays: CompileTextOverlay[];
   effects: CompileEffect[];
+  videoSource?: CompileSceneVideoSource;
 }
 
 export interface CompilePayloadMusic {
@@ -76,22 +83,15 @@ export interface CompilePayload {
   scenes: CompilePayloadScene[];
 }
 
-interface ParsedCompilePayloadInput {
-  templateId?: string;
-  id?: string;
-  sourceVideoUrl?: string;
-  videoUrl?: string;
-  orientation?: CompileOrientation;
-  originalVolume?: number;
-  music?: CompilePayloadMusic;
-  scenes: CompilePayloadScene[];
-}
-
 const volumeSchema = z.number().finite().min(0).max(1);
 
-const orientationSchema = z
-  .enum(["portrait", "landscape", "square"])
-  .default("landscape");
+const sceneVideoSourceSchema = z
+  .object({
+    url: z.string().url(),
+    sourceStartSeconds: z.number().finite().min(0),
+    durationSeconds: z.number().finite().positive(),
+  })
+  .passthrough();
 
 const transitionSchema = z
   .object({
@@ -154,6 +154,7 @@ const sceneSchema = z
     transition: transitionSchema.optional(),
     textOverlays: z.array(textOverlaySchema).default([]),
     effects: z.array(effectSchema).default([]),
+    videoSource: sceneVideoSourceSchema.optional(),
   })
   .passthrough();
 
@@ -171,7 +172,7 @@ const compilePayloadInputSchema = z
     id: z.string().min(1).optional(),
     sourceVideoUrl: z.string().url().optional(),
     videoUrl: z.string().url().optional(),
-    orientation: orientationSchema,
+    orientation: z.enum(["portrait", "landscape", "square"]).default("landscape"),
     originalVolume: volumeSchema.optional(),
     music: musicSchema.optional(),
     scenes: z.array(sceneSchema).min(1),
@@ -195,9 +196,6 @@ const compilePayloadInputSchema = z
     }
   });
 
-/**
- * Error thrown when a compile payload cannot be accepted.
- */
 export class CompilePayloadValidationError extends Error {
   public readonly details: string[];
 
@@ -208,13 +206,6 @@ export class CompilePayloadValidationError extends Error {
   }
 }
 
-/**
- * Validates and normalizes a compile payload from the app.
- *
- * @param input Unknown request body.
- * @returns Compile payload normalized for server-side processing.
- * @throws CompilePayloadValidationError when the payload is invalid.
- */
 export function parseCompilePayload(input: unknown): CompilePayload {
   const result = compilePayloadInputSchema.safeParse(input);
 
@@ -228,9 +219,8 @@ export function parseCompilePayload(input: unknown): CompilePayload {
     );
   }
 
-  const data = result.data as ParsedCompilePayloadInput;
-  const templateId = data.templateId ?? data.id;
-  const sourceVideoUrl = data.sourceVideoUrl ?? data.videoUrl;
+  const templateId = result.data.templateId ?? result.data.id;
+  const sourceVideoUrl = result.data.sourceVideoUrl ?? result.data.videoUrl;
 
   if (!templateId || !sourceVideoUrl) {
     throw new CompilePayloadValidationError([
@@ -241,9 +231,9 @@ export function parseCompilePayload(input: unknown): CompilePayload {
   return {
     templateId,
     sourceVideoUrl,
-    orientation: data.orientation ?? "landscape",
-    originalVolume: data.originalVolume ?? 1,
-    music: data.music,
-    scenes: data.scenes,
+    orientation: result.data.orientation,
+    originalVolume: result.data.originalVolume ?? 1,
+    music: result.data.music,
+    scenes: result.data.scenes,
   };
 }

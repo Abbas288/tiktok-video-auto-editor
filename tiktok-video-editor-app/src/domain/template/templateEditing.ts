@@ -7,24 +7,18 @@ import {
   ZoomFocusPosition,
 } from "../video/sceneEffects";
 import { createTransition, sanitizeTransition } from "../video/transitions";
-import { Template, TextOverlay, Transition } from "../../types/template";
+import {
+  Scene,
+  SceneVideoSource,
+  Template,
+  TextOverlay,
+  Transition,
+} from "../../types/template";
 
-/**
- * Defines editable text overlay fields.
- */
 export type TextOverlayUpdate = Partial<
   Pick<TextOverlay, "text" | "positionX" | "positionY" | "fontSizePt" | "color">
 >;
 
-/**
- * Updates a text overlay inside a template without mutating the original object.
- *
- * @param template Source template.
- * @param sceneId Scene that owns the target overlay.
- * @param overlayId Target overlay id.
- * @param patch Editable overlay fields to update.
- * @returns Updated template, or the original template if no matching overlay exists.
- */
 export function updateTemplateTextOverlay(
   template: Template,
   sceneId: string,
@@ -74,128 +68,39 @@ export function updateTemplateTextOverlay(
   };
 }
 
-/**
- * Updates one scene visual effect without mutating the original template.
- *
- * @param template Source template.
- * @param sceneId Target scene id.
- * @param effectType Editable effect type.
- * @param value New effect value.
- * @returns Updated template, or original template if no scene matches.
- */
 export function updateTemplateSceneEffect(
   template: Template,
   sceneId: string,
   effectType: EditableSceneEffectType,
   value: number,
 ): Template {
-  let didUpdateScene = false;
-
-  const scenes = template.scenes.map((scene) => {
-    if (scene.id !== sceneId) {
-      return scene;
-    }
-
-    didUpdateScene = true;
-
-    return {
-      ...scene,
-      effects: upsertSceneEffect(scene.effects ?? [], effectType, value),
-    };
-  });
-
-  if (!didUpdateScene) {
-    return template;
-  }
-
-  return {
-    ...template,
-    scenes,
-  };
+  return updateTemplateScene(template, sceneId, (scene) => ({
+    ...scene,
+    effects: upsertSceneEffect(scene.effects, effectType, value),
+  }));
 }
 
-/**
- * Updates one scene zoom focus without mutating the original template.
- *
- * @param template Source template.
- * @param sceneId Target scene id.
- * @param position New normalized zoom focus position.
- * @returns Updated template, or original template if no scene matches.
- */
 export function updateTemplateSceneZoomFocus(
   template: Template,
   sceneId: string,
   position: ZoomFocusPosition,
 ): Template {
-  let didUpdateScene = false;
-
-  const scenes = template.scenes.map((scene) => {
-    if (scene.id !== sceneId) {
-      return scene;
-    }
-
-    didUpdateScene = true;
-
-    return {
-      ...scene,
-      effects: upsertSceneZoomFocus(scene.effects ?? [], position),
-    };
-  });
-
-  if (!didUpdateScene) {
-    return template;
-  }
-
-  return {
-    ...template,
-    scenes,
-  };
+  return updateTemplateScene(template, sceneId, (scene) => ({
+    ...scene,
+    effects: upsertSceneZoomFocus(scene.effects, position),
+  }));
 }
 
-/**
- * Resets editable scene effects without mutating the original template.
- *
- * @param template Source template.
- * @param sceneId Target scene id.
- * @returns Updated template, or original template if no scene matches.
- */
 export function resetTemplateSceneEffects(
   template: Template,
   sceneId: string,
 ): Template {
-  let didUpdateScene = false;
-
-  const scenes = template.scenes.map((scene) => {
-    if (scene.id !== sceneId) {
-      return scene;
-    }
-
-    didUpdateScene = true;
-
-    return {
-      ...scene,
-      effects: resetEditableSceneEffects(scene.effects ?? []),
-    };
-  });
-
-  if (!didUpdateScene) {
-    return template;
-  }
-
-  return {
-    ...template,
-    scenes,
-  };
+  return updateTemplateScene(template, sceneId, (scene) => ({
+    ...scene,
+    effects: resetEditableSceneEffects(scene.effects),
+  }));
 }
 
-/**
- * Updates audio volumes without mutating the original template.
- *
- * @param template Source template.
- * @param originalVolume Original video volume.
- * @param musicVolume Optional background music volume.
- * @returns Updated template, or original template if unchanged.
- */
 export function updateTemplateVolumes(
   template: Template,
   originalVolume: number,
@@ -203,47 +108,82 @@ export function updateTemplateVolumes(
 ): Template {
   const safeOriginalVolume = clampVolume(originalVolume);
   const safeMusicVolume =
-    musicVolume === undefined ? undefined : clampVolume(musicVolume);
+    typeof musicVolume === "number" ? clampVolume(musicVolume) : undefined;
 
-  const music =
-    template.music && safeMusicVolume !== undefined
-      ? {
-          ...template.music,
-          volume: safeMusicVolume,
-        }
-      : template.music;
+  const originalVolumeChanged = template.originalVolume !== safeOriginalVolume;
+  const musicVolumeChanged =
+    typeof safeMusicVolume === "number" &&
+    template.music &&
+    template.music.volume !== safeMusicVolume;
 
-  const hasSameOriginalVolume = template.originalVolume === safeOriginalVolume;
-  const hasSameMusicVolume = template.music?.volume === music?.volume;
-
-  if (hasSameOriginalVolume && hasSameMusicVolume) {
+  if (!originalVolumeChanged && !musicVolumeChanged) {
     return template;
   }
 
   return {
     ...template,
     originalVolume: safeOriginalVolume,
-    music,
+    music:
+      template.music && typeof safeMusicVolume === "number"
+        ? {
+            ...template.music,
+            volume: safeMusicVolume,
+          }
+        : template.music,
   };
 }
 
-/**
- * Updates a scene transition without mutating the original template.
- *
- * The transition belongs to the scene before the cut point.
- *
- * @param template Source template.
- * @param sceneId Scene that owns the transition to the next scene.
- * @param transitionType Selected transition type.
- * @returns Updated template, or original template if unchanged.
- */
 export function updateTemplateSceneTransition(
   template: Template,
   sceneId: string,
   transitionType: Transition["type"],
 ): Template {
+  return updateTemplateScene(template, sceneId, (scene) => ({
+    ...scene,
+    transition: sanitizeTransition(createTransition(transitionType)),
+  }));
+}
+
+export function updateTemplateCompiledVideo(
+  template: Template,
+  compiledVideoUrl: string,
+): Template {
+  if (template.compiledVideoUrl === compiledVideoUrl) {
+    return template;
+  }
+
+  return {
+    ...template,
+    compiledVideoUrl,
+  };
+}
+
+export function updateTemplateSceneVideoSource(
+  template: Template,
+  sceneId: string,
+  videoSource: SceneVideoSource | null,
+): Template {
+  return updateTemplateScene(template, sceneId, (scene) => {
+    if (!videoSource) {
+      const { videoSource: _removedVideoSource, ...sceneWithoutVideoSource } =
+        scene;
+
+      return sceneWithoutVideoSource;
+    }
+
+    return {
+      ...scene,
+      videoSource,
+    };
+  });
+}
+
+function updateTemplateScene(
+  template: Template,
+  sceneId: string,
+  updater: (scene: Scene) => Scene,
+): Template {
   let didUpdateScene = false;
-  const nextTransition = createTransition(transitionType);
 
   const scenes = template.scenes.map((scene) => {
     if (scene.id !== sceneId) {
@@ -251,28 +191,10 @@ export function updateTemplateSceneTransition(
     }
 
     didUpdateScene = true;
-
-    if (
-      areTransitionsEqual(sanitizeTransition(scene.transition), nextTransition)
-    ) {
-      return scene;
-    }
-
-    return {
-      ...scene,
-      transition: nextTransition,
-    };
+    return updater(scene);
   });
 
   if (!didUpdateScene) {
-    return template;
-  }
-
-  const didChangeScene = scenes.some(
-    (scene, index) => scene !== template.scenes[index],
-  );
-
-  if (!didChangeScene) {
     return template;
   }
 
@@ -280,35 +202,4 @@ export function updateTemplateSceneTransition(
     ...template,
     scenes,
   };
-}
-
-/**
- * Stores the latest compiled video URL on the template.
- *
- * @param template Source template.
- * @param compiledVideoUrl Compiled video URL returned by the compile server.
- * @returns Updated template, or original template if unchanged.
- */
-export function updateTemplateCompiledVideo(
-  template: Template,
-  compiledVideoUrl: string,
-): Template {
-  const normalizedUrl = compiledVideoUrl.trim();
-
-  if (!normalizedUrl || template.compiledVideoUrl === normalizedUrl) {
-    return template;
-  }
-
-  return {
-    ...template,
-    compiledVideoUrl: normalizedUrl,
-  };
-}
-
-function areTransitionsEqual(first: Transition, second: Transition): boolean {
-  return (
-    first.type === second.type &&
-    first.durationSeconds === second.durationSeconds &&
-    first.direction === second.direction
-  );
 }
