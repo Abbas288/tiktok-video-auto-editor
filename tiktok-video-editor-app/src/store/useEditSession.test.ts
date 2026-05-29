@@ -1,4 +1,5 @@
 import { Template } from "../types/template";
+import { DEFAULT_TRANSITION_DURATION_SECONDS } from "../domain/video/transitions";
 import { clearEditedTemplateDraftsStorage } from "./editSessionDrafts";
 import { updateTemplateTextOverlay, useEditSession } from "./useEditSession";
 
@@ -301,7 +302,7 @@ describe("useEditSession transition editing", () => {
 
     expect(updatedTemplate.scenes[0].transition).toEqual({
       type: "slide",
-      durationSeconds: 0.3,
+      durationSeconds: DEFAULT_TRANSITION_DURATION_SECONDS,
       direction: "left",
     });
 
@@ -310,7 +311,7 @@ describe("useEditSession transition editing", () => {
 
     expect(draft.scenes[0].transition).toEqual({
       type: "slide",
-      durationSeconds: 0.3,
+      durationSeconds: DEFAULT_TRANSITION_DURATION_SECONDS,
       direction: "left",
     });
   });
@@ -326,7 +327,7 @@ describe("useEditSession transition editing", () => {
 
     expect(getCurrentTemplate().scenes[0].transition).toEqual({
       type: "fade",
-      durationSeconds: 0.3,
+      durationSeconds: DEFAULT_TRANSITION_DURATION_SECONDS,
     });
   });
 

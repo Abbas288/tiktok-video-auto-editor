@@ -1,6 +1,8 @@
 import { Scene, Transition } from "../../types/template";
 
-export const DEFAULT_TRANSITION_DURATION_SECONDS = 0.3;
+export const DEFAULT_TRANSITION_DURATION_SECONDS = 0.18;
+export const MIN_TRANSITION_DURATION_SECONDS = 0.1;
+export const MAX_TRANSITION_DURATION_SECONDS = 0.2;
 
 export const TRANSITION_TYPES: Transition["type"][] = ["cut", "fade", "slide"];
 
@@ -10,12 +12,6 @@ const TRANSITION_LABELS: Record<Transition["type"], string> = {
   slide: "Slide",
 };
 
-/**
- * Creates a normalized transition for a selected transition type.
- *
- * @param type Selected transition type.
- * @returns Transition data stored on a scene.
- */
 export function createTransition(type: Transition["type"]): Transition {
   if (type === "cut") {
     return {
@@ -38,44 +34,18 @@ export function createTransition(type: Transition["type"]): Transition {
   };
 }
 
-/**
- * Returns the transition that should be shown for a scene.
- *
- * Missing transition data is treated as cut.
- *
- * @param scene Scene that owns the transition to the next scene.
- * @returns Safe transition value.
- */
 export function getSceneTransition(scene: Scene): Transition {
   return sanitizeTransition(scene.transition);
 }
 
-/**
- * Returns a human-readable label for a transition type.
- *
- * @param type Transition type.
- * @returns Display label.
- */
 export function getTransitionLabel(type: Transition["type"]): string {
   return TRANSITION_LABELS[type];
 }
 
-/**
- * Checks if a value is a supported transition type.
- *
- * @param value Unknown value.
- * @returns True when the value is supported.
- */
 export function isTransitionType(value: unknown): value is Transition["type"] {
   return value === "cut" || value === "fade" || value === "slide";
 }
 
-/**
- * Sanitizes transition data from templates and drafts.
- *
- * @param transition Transition value to sanitize.
- * @returns Safe transition value.
- */
 export function sanitizeTransition(
   transition: Transition | undefined,
 ): Transition {
@@ -87,11 +57,9 @@ export function sanitizeTransition(
     return createTransition("cut");
   }
 
-  const durationSeconds =
-    Number.isFinite(transition.durationSeconds) &&
-    transition.durationSeconds > 0
-      ? transition.durationSeconds
-      : DEFAULT_TRANSITION_DURATION_SECONDS;
+  const durationSeconds = sanitizeTransitionDuration(
+    transition.durationSeconds,
+  );
 
   if (transition.type === "slide") {
     return {
@@ -109,10 +77,26 @@ export function sanitizeTransition(
   };
 }
 
+function sanitizeTransitionDuration(value: number): number {
+  if (!Number.isFinite(value) || value <= 0) {
+    return DEFAULT_TRANSITION_DURATION_SECONDS;
+  }
+
+  return clamp(
+    value,
+    MIN_TRANSITION_DURATION_SECONDS,
+    MAX_TRANSITION_DURATION_SECONDS,
+  );
+}
+
 function isTransitionDirection(
   value: unknown,
 ): value is NonNullable<Transition["direction"]> {
   return (
     value === "left" || value === "right" || value === "up" || value === "down"
   );
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
 }

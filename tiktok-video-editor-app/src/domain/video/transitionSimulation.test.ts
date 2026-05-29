@@ -1,4 +1,5 @@
 import { Scene } from "../../types/template";
+import { DEFAULT_TRANSITION_DURATION_SECONDS } from "./transitions";
 import { getActiveTransitionSimulation } from "./transitionSimulation";
 
 function createScenes(): Scene[] {
@@ -11,7 +12,7 @@ function createScenes(): Scene[] {
       instruction: "First scene",
       transition: {
         type: "fade",
-        durationSeconds: 0.4,
+        durationSeconds: DEFAULT_TRANSITION_DURATION_SECONDS,
       },
       textOverlays: [],
       effects: [],
@@ -42,7 +43,10 @@ describe("transitionSimulation", () => {
     expect(result?.progress).toBeCloseTo(0.5, 5);
     expect(result?.easedProgress).toBeCloseTo(0.5, 5);
     expect(result?.intensity).toBeCloseTo(1, 5);
-    expect(result?.previewTimeSeconds).toBeCloseTo(3.575, 5);
+    expect(result?.previewTimeSeconds).toBeCloseTo(
+      3 + DEFAULT_TRANSITION_DURATION_SECONDS / 2,
+      5,
+    );
     expect(result?.transitionKey).toBe("scene-1:scene-2:fade");
   });
 
@@ -60,7 +64,7 @@ describe("transitionSimulation", () => {
     const scenes = createScenes();
     scenes[0].transition = {
       type: "slide",
-      durationSeconds: 0.4,
+      durationSeconds: DEFAULT_TRANSITION_DURATION_SECONDS,
       direction: "left",
     };
 
@@ -72,7 +76,10 @@ describe("transitionSimulation", () => {
     expect(result?.progress).toBeCloseTo(0.5, 5);
     expect(result?.easedProgress).toBeCloseTo(0.5, 5);
     expect(result?.intensity).toBeCloseTo(1, 5);
-    expect(result?.previewTimeSeconds).toBeCloseTo(3.2, 5);
+    expect(result?.previewTimeSeconds).toBeCloseTo(
+      3 + DEFAULT_TRANSITION_DURATION_SECONDS / 2,
+      5,
+    );
     expect(result?.transitionKey).toBe("scene-1:scene-2:slide");
   });
 

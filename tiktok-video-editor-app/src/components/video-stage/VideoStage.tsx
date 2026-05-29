@@ -11,20 +11,22 @@ import React, {
 } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { useBackgroundMusic } from "../../application/useBackgroundMusic";
+import { useTransitionPreviewPlayer } from "../../application/useTransitionPreviewPlayer";
 import { SeekRequest, useVideoSync } from "../../application/useVideoSync";
 import { clampVolume } from "../../domain/audio/volume";
 import {
   getScenePreviewPlaybackSource,
   getTemplateDurationSeconds,
+  getTransitionPreviewPlaybackSource,
 } from "../../domain/scene-video/scenePreviewTimeline";
 import { getSceneVideoReadiness } from "../../domain/scene-video/sceneVideoReadiness";
 import { NormalizedOverlayPosition } from "../../domain/video/overlayPosition";
+import { getPreviewSceneFilterValues } from "../../domain/video/previewSceneEffects";
 import {
-  getSceneEffectsAtTime,
-  getSceneFilterValues,
   SceneFilterValues,
   ZoomFocusPosition,
 } from "../../domain/video/sceneEffects";
+import { getActiveTransitionSimulation } from "../../domain/video/transitionSimulation";
 import {
   getContainedMediaRect,
   getVideoCanvas,
@@ -34,6 +36,7 @@ import { Template } from "../../types/template";
 import { VideoErrorState } from "../VideoErrorState";
 import { OverlayWorld } from "./OverlayWorld";
 import { StageControls } from "./StageControls";
+import { TransitionPreviewLayer } from "./TransitionPreviewLayer";
 import { useMeasuredSize } from "./useMeasuredSize";
 import { useStageFullscreen } from "./useStageFullscreen";
 import { VideoStageEmptyState } from "./VideoStageEmptyState";
@@ -41,6 +44,7 @@ import { VideoSurface } from "./VideoSurface";
 
 export interface VideoStageProps {
   template: Template;
+  activeSceneId: string | null;
   currentTime: number;
   selectedOverlayId: string | null;
   seekRequest?: SeekRequest;
@@ -63,6 +67,7 @@ const NATIVE_RESTART_PLAY_DELAY_MS = 120;
 
 export function VideoStage({
   template,
+  activeSceneId,
   currentTime,
   selectedOverlayId,
   seekRequest,
@@ -147,6 +152,37 @@ export function VideoStage({
   const isPlaying = isWeb ? webIsPlaying : nativeIsPlaying;
   const originalVolume = template.originalVolume ?? 1;
 
+  const transitionSimulation = useMemo(
+    () =>
+      readiness.isReadyForCompile
+        ? getActiveTransitionSimulation(template.scenes, currentTime)
+        : null,
+    [currentTime, readiness.isReadyForCompile, template.scenes],
+  );
+
+  const transitionPreviewSource = useMemo(
+    () => getTransitionPreviewPlaybackSource(template, transitionSimulation),
+    [template, transitionSimulation],
+  );
+
+  const transitionPlayerSimulation = useMemo(
+    () =>
+      transitionSimulation && transitionPreviewSource
+        ? {
+            ...transitionSimulation,
+            previewTimeSeconds:
+              transitionPreviewSource.sourcePreviewTimeSeconds,
+          }
+        : transitionSimulation,
+    [transitionPreviewSource, transitionSimulation],
+  );
+
+  const transitionPreviewPlayer = useTransitionPreviewPlayer({
+    videoUrl: transitionPreviewSource?.videoUrl,
+    simulation: transitionPlayerSimulation,
+    isPlaying,
+  });
+
   useEffect(() => {
     if (isWeb) {
       return;
@@ -192,8 +228,12 @@ export function VideoStage({
 
   const activeSceneFilters = useMemo(
     () =>
-      getSceneFilterValues(getSceneEffectsAtTime(template.scenes, currentTime)),
-    [currentTime, template.scenes],
+      getPreviewSceneFilterValues({
+        scenes: template.scenes,
+        currentTime,
+        activeSceneId,
+      }),
+    [activeSceneId, currentTime, template.scenes],
   );
 
   const mediaRect = useMemo(
@@ -427,6 +467,14 @@ export function VideoStage({
                   onCommitZoomFocus={handleCommitZoomFocus}
                 />
               )}
+
+              <TransitionPreviewLayer
+                simulation={transitionSimulation}
+                mediaRect={mediaRect}
+                previewPlayer={
+                  transitionPreviewSource ? transitionPreviewPlayer : null
+                }
+              />
 
               <OverlayWorld
                 overlays={overlays}

@@ -1,4 +1,5 @@
 import { Scene, Template } from "../../types/template";
+import { TransitionSimulation } from "../video/transitionSimulation";
 import { getSceneVideoReadiness } from "./sceneVideoReadiness";
 
 export interface ScenePreviewPlaybackSource {
@@ -8,6 +9,11 @@ export interface ScenePreviewPlaybackSource {
   timelineEndSeconds: number;
   sourceStartSeconds: number;
   sourceEndSeconds: number;
+}
+
+export interface TransitionPreviewPlaybackSource {
+  videoUrl: string;
+  sourcePreviewTimeSeconds: number;
 }
 
 const END_EPSILON_SECONDS = 0.001;
@@ -77,6 +83,73 @@ export function getScenePreviewPlaybackSource(
     sourceStartSeconds,
     sourceEndSeconds: sourceStartSeconds + durationSeconds,
   };
+}
+
+export function getTransitionPreviewPlaybackSource(
+  template: Template,
+  simulation: TransitionSimulation | null,
+): TransitionPreviewPlaybackSource | null {
+  if (
+    !simulation ||
+    !getSceneVideoReadiness(template.scenes).isReadyForCompile
+  ) {
+    return null;
+  }
+
+  const transitionScenes = findTransitionScenes(template.scenes, simulation);
+
+  if (!transitionScenes?.nextScene.videoSource) {
+    return null;
+  }
+
+  const videoUrl = getPlayableSceneVideoUrl(transitionScenes.nextScene);
+
+  if (!videoUrl) {
+    return null;
+  }
+
+  const sourceStartSeconds = Math.max(
+    transitionScenes.nextScene.videoSource.sourceStartSeconds,
+    0,
+  );
+  const sourceDurationSeconds = Math.max(
+    transitionScenes.nextScene.videoSource.durationSeconds,
+    0,
+  );
+  const sourceEndSeconds = sourceStartSeconds + sourceDurationSeconds;
+  const timelineOffsetSeconds = Math.max(
+    simulation.previewTimeSeconds - transitionScenes.nextScene.startSeconds,
+    0,
+  );
+
+  return {
+    videoUrl,
+    sourcePreviewTimeSeconds: clamp(
+      sourceStartSeconds + timelineOffsetSeconds,
+      sourceStartSeconds,
+      Math.max(sourceEndSeconds - END_EPSILON_SECONDS, sourceStartSeconds),
+    ),
+  };
+}
+
+function findTransitionScenes(
+  scenes: Scene[],
+  simulation: TransitionSimulation,
+): { currentScene: Scene; nextScene: Scene } | null {
+  for (let index = 0; index < scenes.length - 1; index += 1) {
+    const currentScene = scenes[index];
+    const nextScene = scenes[index + 1];
+    const transitionKey = `${currentScene.id}:${nextScene.id}:${simulation.type}`;
+
+    if (transitionKey === simulation.transitionKey) {
+      return {
+        currentScene,
+        nextScene,
+      };
+    }
+  }
+
+  return null;
 }
 
 function getPlayableSceneVideoUrl(scene: Scene): string | null {

@@ -3,18 +3,11 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   clampSceneVideoStart,
   formatSceneVideoSeconds,
-  SceneVideoCandidate,
 } from "../domain/scene-video/sceneVideoSelection";
 import { getSceneUploadMetadata } from "../domain/scene-video/sceneVideoReadiness";
 import { colors } from "../styles/theme";
+import { SceneVideoTrimDraft } from "../types/sceneVideo";
 import { Scene } from "../types/template";
-
-export interface SceneVideoTrimDraft {
-  sceneId: string;
-  candidate: SceneVideoCandidate;
-  maxStartSeconds: number;
-  durationSeconds: number;
-}
 
 interface SceneVideoPanelProps {
   scene: Scene | null;

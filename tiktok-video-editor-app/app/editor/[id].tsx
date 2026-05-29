@@ -77,6 +77,7 @@ export default function EditorScreen(): React.JSX.Element {
         <View style={styles.stageShell}>
           <VideoStage
             template={controller.currentTemplate}
+            activeSceneId={controller.activeSceneId}
             currentTime={controller.currentTime}
             selectedOverlayId={controller.selectedOverlayId}
             seekRequest={controller.seekRequest}

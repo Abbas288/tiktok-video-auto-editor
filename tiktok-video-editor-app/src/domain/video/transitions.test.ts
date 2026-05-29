@@ -1,5 +1,7 @@
 import { Scene } from "../../types/template";
 import {
+  DEFAULT_TRANSITION_DURATION_SECONDS,
+  MAX_TRANSITION_DURATION_SECONDS,
   createTransition,
   getSceneTransition,
   getTransitionLabel,
@@ -30,14 +32,14 @@ describe("transitions", () => {
   it("creates a fade transition with default duration", () => {
     expect(createTransition("fade")).toEqual({
       type: "fade",
-      durationSeconds: 0.3,
+      durationSeconds: DEFAULT_TRANSITION_DURATION_SECONDS,
     });
   });
 
-  it("creates a slide transition with default direction", () => {
+  it("creates a slide transition with default duration and direction", () => {
     expect(createTransition("slide")).toEqual({
       type: "slide",
-      durationSeconds: 0.3,
+      durationSeconds: DEFAULT_TRANSITION_DURATION_SECONDS,
       direction: "left",
     });
   });
@@ -59,11 +61,23 @@ describe("transitions", () => {
       }),
     ).toEqual({
       type: "fade",
-      durationSeconds: 0.3,
+      durationSeconds: DEFAULT_TRANSITION_DURATION_SECONDS,
     });
   });
 
-  it("sanitizes invalid slide direction", () => {
+  it("caps slower stored transition durations", () => {
+    expect(
+      sanitizeTransition({
+        type: "fade",
+        durationSeconds: 0.3,
+      }),
+    ).toEqual({
+      type: "fade",
+      durationSeconds: MAX_TRANSITION_DURATION_SECONDS,
+    });
+  });
+
+  it("sanitizes slide transition while preserving valid direction", () => {
     expect(
       sanitizeTransition({
         type: "slide",
@@ -72,7 +86,7 @@ describe("transitions", () => {
       }),
     ).toEqual({
       type: "slide",
-      durationSeconds: 0.5,
+      durationSeconds: MAX_TRANSITION_DURATION_SECONDS,
       direction: "up",
     });
   });
