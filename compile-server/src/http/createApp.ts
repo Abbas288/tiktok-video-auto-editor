@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+import path from "node:path";
 import cors from "cors";
 import express, {
   Express,
@@ -5,6 +7,7 @@ import express, {
   Request,
   Response,
 } from "express";
+import multer from "multer";
 import { compileSession } from "../application/compileService";
 import { CompileServerConfig } from "../config";
 import {
@@ -12,12 +15,9 @@ import {
   parseCompilePayload,
 } from "../domain/compilePayloadSchema";
 
-/**
- * Creates the HTTP application for the compile server.
- *
- * @param config Server configuration.
- * @returns Express application.
- */
+const VIDEO_UPLOAD_FIELD = "video";
+const MAX_VIDEO_UPLOAD_SIZE_BYTES = 250 * 1024 * 1024;
+
 export function createApp(config: CompileServerConfig): Express {
   const app = express();
 
@@ -34,11 +34,63 @@ export function createApp(config: CompileServerConfig): Express {
     }),
   );
 
+  app.use(
+    "/assets/videos",
+    express.static(config.uploadDir, {
+      fallthrough: true,
+      setHeaders: (response) => {
+        response.setHeader("Cache-Control", "no-store");
+      },
+    }),
+  );
+
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: (_request, _file, callback) => {
+        callback(null, config.uploadDir);
+      },
+      filename: (_request, file, callback) => {
+        callback(null, `${randomUUID()}${normalizeExtension(file.originalname)}`);
+      },
+    }),
+    limits: {
+      fileSize: MAX_VIDEO_UPLOAD_SIZE_BYTES,
+    },
+    fileFilter: (_request, file, callback) => {
+      if (file.mimetype.startsWith("video/")) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Only video uploads are allowed."));
+    },
+  });
+
   app.get("/health", (_request: Request, response: Response): void => {
     response.status(200).json({
       status: "ok",
     });
   });
+
+  app.post(
+    "/assets/videos",
+    upload.single(VIDEO_UPLOAD_FIELD),
+    (request: Request, response: Response): void => {
+      if (!request.file) {
+        response.status(400).json({
+          error: "No video file was uploaded.",
+        });
+        return;
+      }
+
+      response.status(201).json({
+        fileName: request.file.filename,
+        assetUrl: `${config.publicBaseUrl.replace(/\/$/, "")}/assets/videos/${encodeURIComponent(
+          request.file.filename,
+        )}`,
+      });
+    },
+  );
 
   app.post(
     "/compile",
@@ -86,6 +138,16 @@ export function createApp(config: CompileServerConfig): Express {
       const message =
         error instanceof Error ? error.message : "Unexpected server error.";
 
+      if (
+        error instanceof multer.MulterError ||
+        message === "Only video uploads are allowed."
+      ) {
+        response.status(400).json({
+          error: message,
+        });
+        return;
+      }
+
       response.status(500).json({
         error: message,
       });
@@ -110,7 +172,7 @@ function sendCompiledVideoNotFound(
     return;
   }
 
-  if (shouldReturnHtml(request)) {
+  if ((request.header("accept") ?? "").toLowerCase().includes("text/html")) {
     response.type("html").send(createCompiledVideoNotFoundHtml(filename));
     return;
   }
@@ -119,12 +181,6 @@ function sendCompiledVideoNotFound(
     error: "Compiled video not found.",
     details,
   });
-}
-
-function shouldReturnHtml(request: Request): boolean {
-  const acceptHeader = request.header("accept") ?? "";
-
-  return acceptHeader.toLowerCase().includes("text/html");
 }
 
 function createCompiledVideoNotFoundHtml(filename: string): string {
@@ -166,8 +222,6 @@ function createCompiledVideoNotFoundHtml(filename: string): string {
 
     .badge {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
       border-radius: 999px;
       padding: 6px 12px;
       background: #1f2933;
@@ -191,7 +245,6 @@ function createCompiledVideoNotFoundHtml(filename: string): string {
 
     code {
       display: block;
-      max-width: 100%;
       overflow-wrap: anywhere;
       margin-top: 18px;
       padding: 12px;
@@ -214,10 +267,6 @@ function createCompiledVideoNotFoundHtml(filename: string): string {
       padding: 0 20px;
       cursor: pointer;
     }
-
-    button:hover {
-      filter: brightness(0.92);
-    }
   </style>
 </head>
 <body>
@@ -232,6 +281,12 @@ function createCompiledVideoNotFoundHtml(filename: string): string {
   </main>
 </body>
 </html>`;
+}
+
+function normalizeExtension(fileName: string): string {
+  const extension = path.extname(fileName).toLowerCase();
+
+  return extension.length > 0 ? extension : ".mp4";
 }
 
 function escapeHtml(value: string): string {

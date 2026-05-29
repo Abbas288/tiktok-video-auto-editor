@@ -1,15 +1,16 @@
-import { getSceneTransition } from "../video/transitions";
-import { createTextOverlayLayoutSpec } from "../video/textOverlayLayout";
 import {
   Effect,
   Music,
   Orientation,
   Scene,
+  SceneVideoSource,
   Template,
   TextOverlay,
   TextOverlayLayout,
   Transition,
 } from "../../types/template";
+import { createTextOverlayLayoutSpec } from "../video/textOverlayLayout";
+import { getSceneTransition } from "../video/transitions";
 
 export interface CompilePayload {
   templateId: string;
@@ -18,6 +19,12 @@ export interface CompilePayload {
   originalVolume: number;
   music?: Music;
   scenes: CompileScene[];
+}
+
+export interface CompileSceneVideoSource {
+  url: string;
+  sourceStartSeconds: number;
+  durationSeconds: number;
 }
 
 export interface CompileTextOverlay extends TextOverlay {
@@ -33,14 +40,9 @@ export interface CompileScene {
   transition: Transition;
   textOverlays: CompileTextOverlay[];
   effects: Effect[];
+  videoSource?: CompileSceneVideoSource;
 }
 
-/**
- * Builds the payload sent from the editor client to the compile server.
- *
- * @param template Current edited template session.
- * @returns Compile payload containing the full editable session state.
- */
 export function buildCompilePayload(template: Template): CompilePayload {
   return {
     templateId: template.id,
@@ -69,6 +71,7 @@ function createCompileScene(
       createCompileTextOverlay(overlay, orientation),
     ),
     effects: scene.effects.map((effect) => ({ ...effect })),
+    videoSource: createCompileSceneVideoSource(scene.videoSource),
   };
 }
 
@@ -79,5 +82,19 @@ function createCompileTextOverlay(
   return {
     ...overlay,
     layout: createTextOverlayLayoutSpec(orientation, overlay),
+  };
+}
+
+function createCompileSceneVideoSource(
+  source: SceneVideoSource | undefined,
+): CompileSceneVideoSource | undefined {
+  if (!source) {
+    return undefined;
+  }
+
+  return {
+    url: source.uploadUrl,
+    sourceStartSeconds: source.sourceStartSeconds,
+    durationSeconds: source.durationSeconds,
   };
 }

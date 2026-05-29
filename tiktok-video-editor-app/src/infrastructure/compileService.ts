@@ -13,28 +13,19 @@ export interface CompileClient {
 }
 
 const DEFAULT_COMPILE_PATH = "/compile";
+const compileServerUrl = process.env.EXPO_PUBLIC_COMPILE_SERVER_URL;
 
-/**
- * HTTP client for sending compile payloads to the compile server.
- */
+export function getCompileServerBaseUrl(): string | undefined {
+  return compileServerUrl?.trim() || undefined;
+}
+
 class HttpCompileClient implements CompileClient {
   private readonly endpointUrl: string;
 
-  /**
-   * Creates a compile client.
-   *
-   * @param baseUrl Compile server base URL.
-   */
   public constructor(baseUrl: string) {
     this.endpointUrl = `${baseUrl.replace(/\/$/, "")}${DEFAULT_COMPILE_PATH}`;
   }
 
-  /**
-   * Sends a compile payload and returns the compiled video location.
-   *
-   * @param payload Current editor session payload.
-   * @returns Compile result from the server.
-   */
   public async compile(payload: CompilePayload): Promise<CompileResult> {
     const response = await fetch(this.endpointUrl, {
       method: "POST",
@@ -48,22 +39,11 @@ class HttpCompileClient implements CompileClient {
       throw new Error(`Compile request failed with status ${response.status}.`);
     }
 
-    const data: unknown = await response.json();
-
-    return parseCompileResponse(data);
+    return parseCompileResponse(await response.json());
   }
 }
 
-/**
- * Local fallback client used when no compile server URL is configured.
- */
 class LocalPreviewCompileClient implements CompileClient {
-  /**
-   * Returns the source video as a local development compile result.
-   *
-   * @param payload Current editor session payload.
-   * @returns Compile result using the source video URL.
-   */
   public async compile(payload: CompilePayload): Promise<CompileResult> {
     await new Promise((resolve) => setTimeout(resolve, 700));
 
@@ -74,8 +54,6 @@ class LocalPreviewCompileClient implements CompileClient {
   }
 }
 
-const compileServerUrl = process.env.EXPO_PUBLIC_COMPILE_SERVER_URL;
-
 export const compileService: CompileClient = compileServerUrl
   ? new HttpCompileClient(compileServerUrl)
   : new LocalPreviewCompileClient();
@@ -85,16 +63,17 @@ function parseCompileResponse(data: unknown): CompileResult {
     throw new Error("Compile response was not an object.");
   }
 
-  const compiledVideoUrl = data.compiledVideoUrl;
-
-  if (typeof compiledVideoUrl !== "string" || compiledVideoUrl.trim() === "") {
+  if (
+    typeof data.compiledVideoUrl !== "string" ||
+    data.compiledVideoUrl.trim() === ""
+  ) {
     throw new Error(
       "Compile response did not include a usable video reference.",
     );
   }
 
   return {
-    compiledVideoUrl,
+    compiledVideoUrl: data.compiledVideoUrl,
     jobId: typeof data.jobId === "string" ? data.jobId : undefined,
     renderer: parseRenderer(data),
   };

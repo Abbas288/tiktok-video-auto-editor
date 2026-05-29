@@ -1,3 +1,6 @@
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { CompileServerConfig } from "../config";
@@ -6,12 +9,15 @@ import { createApp } from "./createApp";
 function createConfig(
   overrides: Partial<CompileServerConfig> = {},
 ): CompileServerConfig {
+  const uploadDir = mkdtempSync(path.join(tmpdir(), "letrend-upload-test-"));
+
   return {
     port: 3030,
     publicBaseUrl: "http://localhost:3030",
     renderer: "placeholder",
     outputDir: ".compiled",
     tempDir: ".tmp",
+    uploadDir,
     ffmpegPath: "ffmpeg",
     ffprobePath: "ffprobe",
     renderTimeoutMs: 120000,
@@ -49,6 +55,29 @@ describe("createApp", () => {
     expect(response.body).toEqual({
       status: "ok",
     });
+  });
+
+  it("uploads a scene video", async () => {
+    const app = createApp(createConfig());
+
+    const response = await request(app)
+      .post("/assets/videos")
+      .attach("video", Buffer.from("fake-video"), {
+        filename: "clip.mp4",
+        contentType: "video/mp4",
+      })
+      .expect(201);
+
+    expect(response.body.fileName).toMatch(/\.mp4$/);
+    expect(response.body.assetUrl).toContain("/assets/videos/");
+  });
+
+  it("rejects missing scene video uploads", async () => {
+    const app = createApp(createConfig());
+
+    const response = await request(app).post("/assets/videos").expect(400);
+
+    expect(response.body.error).toBe("No video file was uploaded.");
   });
 
   it("compiles a valid payload", async () => {

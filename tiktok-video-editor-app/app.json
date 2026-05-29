@@ -37,6 +37,12 @@
           "savePhotosPermission": "Allow the app to save exported videos.",
           "granularPermissions": ["video"]
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow the app to choose videos for scenes."
+        }
       ]
     ]
   }

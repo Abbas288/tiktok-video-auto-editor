@@ -19,14 +19,11 @@ export interface FfmpegRenderResult {
   renderer: "ffmpeg";
 }
 
-/**
- * Renders a compile payload into an MP4 file using FFmpeg.
- *
- * @param payload Validated compile payload.
- * @param config Compile server configuration.
- * @param jobId Compile job id.
- * @returns Render result with public video URL.
- */
+interface PreparedSceneInput {
+  path: string;
+  sourceStartSeconds: number;
+}
+
 export async function renderWithFfmpeg(
   payload: CompilePayload,
   config: CompileServerConfig,
@@ -35,15 +32,14 @@ export async function renderWithFfmpeg(
   const jobDir = path.join(config.tempDir, jobId);
   const outputFileName = `${jobId}.mp4`;
   const outputPath = path.join(config.outputDir, outputFileName);
-  const sourcePath = path.join(jobDir, "source.mp4");
   const musicPath = payload.music ? path.join(jobDir, "music.mp3") : undefined;
 
   await mkdir(jobDir, { recursive: true });
   await mkdir(config.outputDir, { recursive: true });
-  await writeDebugFile(jobDir, "payload.json", JSON.stringify(payload, null, 2));
+  await writeFile(path.join(jobDir, "payload.json"), JSON.stringify(payload, null, 2));
 
   try {
-    await downloadMedia(payload.sourceVideoUrl, sourcePath);
+    const sceneInputs = await prepareSceneInputs(payload, jobDir);
 
     if (payload.music && musicPath) {
       await downloadMedia(payload.music.url, musicPath);
@@ -53,10 +49,11 @@ export async function renderWithFfmpeg(
     const sceneVideoPaths = await renderSceneVideos(
       payload,
       config,
-      sourcePath,
+      sceneInputs,
       jobDir,
       subtitleFiles,
     );
+
     const composedVideoPath = path.join(jobDir, "composed-video.mp4");
     const videoDurationSeconds = await composeSceneVideos(
       payload.scenes,
@@ -64,10 +61,11 @@ export async function renderWithFfmpeg(
       composedVideoPath,
       config,
     );
+
     const audioPath = await renderAudioTrack({
       payload,
       config,
-      sourcePath,
+      sceneInputs,
       musicPath,
       jobDir,
       outputDurationSeconds: videoDurationSeconds,
@@ -80,7 +78,9 @@ export async function renderWithFfmpeg(
     }
 
     return {
-      compiledVideoUrl: buildCompiledVideoUrl(config.publicBaseUrl, outputFileName),
+      compiledVideoUrl: `${config.publicBaseUrl.replace(/\/$/, "")}/compiled/${encodeURIComponent(
+        outputFileName,
+      )}`,
       outputPath,
       renderer: "ffmpeg",
     };
@@ -91,10 +91,40 @@ export async function renderWithFfmpeg(
   }
 }
 
+async function prepareSceneInputs(
+  payload: CompilePayload,
+  jobDir: string,
+): Promise<PreparedSceneInput[]> {
+  const cache = new Map<string, string>();
+  const inputs: PreparedSceneInput[] = [];
+
+  for (const [index, scene] of payload.scenes.entries()) {
+    const url = scene.videoSource?.url ?? payload.sourceVideoUrl;
+    const sourceStartSeconds = scene.videoSource
+      ? scene.videoSource.sourceStartSeconds
+      : scene.startSeconds;
+
+    let filePath = cache.get(url);
+
+    if (!filePath) {
+      filePath = path.join(jobDir, `source-${index}.mp4`);
+      await downloadMedia(url, filePath);
+      cache.set(url, filePath);
+    }
+
+    inputs.push({
+      path: filePath,
+      sourceStartSeconds,
+    });
+  }
+
+  return inputs;
+}
+
 async function renderSceneVideos(
   payload: CompilePayload,
   config: CompileServerConfig,
-  sourcePath: string,
+  sceneInputs: PreparedSceneInput[],
   jobDir: string,
   subtitleFiles: Map<string, string>,
 ): Promise<string[]> {
@@ -102,13 +132,12 @@ async function renderSceneVideos(
 
   for (const [index, scene] of payload.scenes.entries()) {
     const outputPath = path.join(jobDir, `scene-${index}.mp4`);
+    const input = sceneInputs[index];
     const filter = buildSceneVideoFilter({
       scene,
       orientation: payload.orientation,
       subtitleFilePath: subtitleFiles.get(scene.id),
     });
-
-    await writeDebugFile(jobDir, `scene-${index}-filter.txt`, filter);
 
     await runMediaProcess(
       config.ffmpegPath,
@@ -116,11 +145,11 @@ async function renderSceneVideos(
         "-hide_banner",
         "-y",
         "-ss",
-        formatSeconds(scene.startSeconds),
+        formatSeconds(input.sourceStartSeconds),
         "-t",
         formatSeconds(scene.durationSeconds),
         "-i",
-        sourcePath,
+        input.path,
         "-vf",
         filter,
         "-an",
@@ -158,37 +187,32 @@ async function composeSceneVideos(
   }
 
   const transitionGraph = buildVideoTransitionFilterGraph(scenes);
-  const args = [
-    "-hide_banner",
-    "-y",
-    ...sceneVideoPaths.flatMap((filePath) => ["-i", filePath]),
-    "-filter_complex",
-    transitionGraph.filterGraph,
-    "-map",
-    `[${transitionGraph.outputLabel}]`,
-    "-an",
-    "-c:v",
-    "libx264",
-    "-preset",
-    "veryfast",
-    "-crf",
-    "23",
-    "-pix_fmt",
-    "yuv420p",
-    "-movflags",
-    "+faststart",
-    outputPath,
-  ];
 
-  await writeDebugFile(
-    path.dirname(outputPath),
-    "transition-filter.txt",
-    transitionGraph.filterGraph,
+  await runMediaProcess(
+    config.ffmpegPath,
+    [
+      "-hide_banner",
+      "-y",
+      ...sceneVideoPaths.flatMap((filePath) => ["-i", filePath]),
+      "-filter_complex",
+      transitionGraph.filterGraph,
+      "-map",
+      `[${transitionGraph.outputLabel}]`,
+      "-an",
+      "-c:v",
+      "libx264",
+      "-preset",
+      "veryfast",
+      "-crf",
+      "23",
+      "-pix_fmt",
+      "yuv420p",
+      "-movflags",
+      "+faststart",
+      outputPath,
+    ],
+    { timeoutMs: config.renderTimeoutMs },
   );
-
-  await runMediaProcess(config.ffmpegPath, args, {
-    timeoutMs: config.renderTimeoutMs,
-  });
 
   return transitionGraph.outputDurationSeconds;
 }
@@ -196,20 +220,18 @@ async function composeSceneVideos(
 async function renderAudioTrack(options: {
   payload: CompilePayload;
   config: CompileServerConfig;
-  sourcePath: string;
+  sceneInputs: PreparedSceneInput[];
   musicPath: string | undefined;
   jobDir: string;
   outputDurationSeconds: number;
 }): Promise<string | null> {
-  const hasSourceAudio = await probeHasAudio(options.sourcePath, options.config);
-  const sourceAudioPath = hasSourceAudio
-    ? await renderSourceAudio(
-        options.payload,
-        options.config,
-        options.sourcePath,
-        options.jobDir,
-      )
-    : null;
+  const sourceAudioPath = await renderSourceAudio(
+    options.payload,
+    options.config,
+    options.sceneInputs,
+    options.jobDir,
+  );
+
   const musicAudioPath =
     options.payload.music && options.musicPath
       ? await renderMusicAudio(
@@ -255,36 +277,42 @@ async function renderAudioTrack(options: {
 async function renderSourceAudio(
   payload: CompilePayload,
   config: CompileServerConfig,
-  sourcePath: string,
+  sceneInputs: PreparedSceneInput[],
   jobDir: string,
 ): Promise<string> {
   const sceneAudioPaths: string[] = [];
 
   for (const [index, scene] of payload.scenes.entries()) {
+    const input = sceneInputs[index];
     const outputPath = path.join(jobDir, `scene-audio-${index}.m4a`);
+    const hasAudio = await probeHasAudio(input.path, config);
 
-    await runMediaProcess(
-      config.ffmpegPath,
-      [
-        "-hide_banner",
-        "-y",
-        "-ss",
-        formatSeconds(scene.startSeconds),
-        "-t",
-        formatSeconds(scene.durationSeconds),
-        "-i",
-        sourcePath,
-        "-vn",
-        "-filter:a",
-        `volume=${formatNumber(payload.originalVolume)}`,
-        "-c:a",
-        "aac",
-        "-b:a",
-        "128k",
-        outputPath,
-      ],
-      { timeoutMs: config.renderTimeoutMs },
-    );
+    if (hasAudio) {
+      await runMediaProcess(
+        config.ffmpegPath,
+        [
+          "-hide_banner",
+          "-y",
+          "-ss",
+          formatSeconds(input.sourceStartSeconds),
+          "-t",
+          formatSeconds(scene.durationSeconds),
+          "-i",
+          input.path,
+          "-vn",
+          "-filter:a",
+          `volume=${formatNumber(payload.originalVolume)}`,
+          "-c:a",
+          "aac",
+          "-b:a",
+          "128k",
+          outputPath,
+        ],
+        { timeoutMs: config.renderTimeoutMs },
+      );
+    } else {
+      await createSilentAudio(outputPath, scene.durationSeconds, config);
+    }
 
     sceneAudioPaths.push(outputPath);
   }
@@ -319,6 +347,32 @@ async function renderSourceAudio(
   );
 
   return outputPath;
+}
+
+async function createSilentAudio(
+  outputPath: string,
+  durationSeconds: number,
+  config: CompileServerConfig,
+): Promise<void> {
+  await runMediaProcess(
+    config.ffmpegPath,
+    [
+      "-hide_banner",
+      "-y",
+      "-f",
+      "lavfi",
+      "-i",
+      "anullsrc=channel_layout=stereo:sample_rate=48000",
+      "-t",
+      formatSeconds(durationSeconds),
+      "-c:a",
+      "aac",
+      "-b:a",
+      "128k",
+      outputPath,
+    ],
+    { timeoutMs: config.renderTimeoutMs },
+  );
 }
 
 async function renderMusicAudio(
@@ -441,20 +495,6 @@ async function downloadMedia(url: string, outputPath: string): Promise<void> {
   const buffer = Buffer.from(await response.arrayBuffer());
 
   await writeFile(outputPath, buffer);
-}
-
-async function writeDebugFile(
-  directoryPath: string,
-  fileName: string,
-  content: string,
-): Promise<void> {
-  await writeFile(path.join(directoryPath, fileName), content, "utf8");
-}
-
-function buildCompiledVideoUrl(publicBaseUrl: string, fileName: string): string {
-  return `${publicBaseUrl.replace(/\/$/, "")}/compiled/${encodeURIComponent(
-    fileName,
-  )}`;
 }
 
 function formatSeconds(value: number): string {
