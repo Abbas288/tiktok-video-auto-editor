@@ -1,4 +1,5 @@
 import { Template } from "../../types/template";
+import { MAX_TRANSITION_DURATION_SECONDS } from "../video/transitions";
 import { buildCompilePayload } from "./compilePayload";
 
 function createTemplateFixture(): Template {
@@ -79,7 +80,7 @@ describe("buildCompilePayload", () => {
           instruction: "First scene",
           transition: {
             type: "fade",
-            durationSeconds: 0.3,
+            durationSeconds: MAX_TRANSITION_DURATION_SECONDS,
           },
           textOverlays: [
             {

@@ -1,9 +1,6 @@
 import { Scene, Transition } from "../../types/template";
 import { getSceneTransition } from "./transitions";
 
-/**
- * Represents a transition preview state at the current playback time.
- */
 export interface TransitionSimulation {
   type: Exclude<Transition["type"], "cut">;
   direction: NonNullable<Transition["direction"]>;
@@ -14,15 +11,6 @@ export interface TransitionSimulation {
   transitionKey: string;
 }
 
-const FADE_PREVIEW_DURATION_SECONDS = 1.15;
-
-/**
- * Finds the active transition preview for the current playback time.
- *
- * @param scenes Ordered scene list.
- * @param currentTime Current playback time in seconds.
- * @returns Active transition preview state, or null when no transition is active.
- */
 export function getActiveTransitionSimulation(
   scenes: Scene[],
   currentTime: number,
@@ -40,28 +28,28 @@ export function getActiveTransitionSimulation(
       continue;
     }
 
-    const previewDurationSeconds = getPreviewDurationSeconds(transition);
+    const transitionDurationSeconds = transition.durationSeconds;
     const cutPoint = currentScene.startSeconds + currentScene.durationSeconds;
-    const transitionStart = cutPoint - previewDurationSeconds / 2;
-    const transitionEnd = cutPoint + previewDurationSeconds / 2;
+    const transitionStart = cutPoint - transitionDurationSeconds / 2;
+    const transitionEnd = cutPoint + transitionDurationSeconds / 2;
 
     if (currentTime < transitionStart || currentTime > transitionEnd) {
       continue;
     }
 
     const progress = clamp01(
-      (currentTime - transitionStart) / previewDurationSeconds,
+      (currentTime - transitionStart) / transitionDurationSeconds,
     );
 
     return {
       type: transition.type,
       direction: transition.direction ?? "left",
       progress,
-      easedProgress: smootherStep(progress),
+      easedProgress: easeInOutCubic(progress),
       intensity: getBellCurveIntensity(progress),
       previewTimeSeconds: getPreviewTimeSeconds(
         nextScene,
-        previewDurationSeconds,
+        transitionDurationSeconds,
         progress,
       ),
       transitionKey: `${currentScene.id}:${nextScene.id}:${transition.type}`,
@@ -71,37 +59,25 @@ export function getActiveTransitionSimulation(
   return null;
 }
 
-function getPreviewDurationSeconds(transition: Transition): number {
-  if (transition.type === "fade") {
-    return Math.max(transition.durationSeconds, FADE_PREVIEW_DURATION_SECONDS);
-  }
-
-  return transition.durationSeconds;
-}
-
 function getPreviewTimeSeconds(
   nextScene: Scene,
-  previewDurationSeconds: number,
+  transitionDurationSeconds: number,
   progress: number,
 ): number {
-  return nextScene.startSeconds + previewDurationSeconds * clamp01(progress);
+  return nextScene.startSeconds + transitionDurationSeconds * clamp01(progress);
 }
 
-function smootherStep(value: number): number {
-  const clampedValue = clamp01(value);
+function easeInOutCubic(value: number): number {
+  const t = clamp01(value);
 
-  return (
-    clampedValue *
-    clampedValue *
-    clampedValue *
-    (clampedValue * (clampedValue * 6 - 15) + 10)
-  );
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 function getBellCurveIntensity(value: number): number {
-  const clampedValue = clamp01(value);
+  const t = clamp01(value);
+  const linearBell = 1 - Math.abs(t * 2 - 1);
 
-  return 1 - Math.abs(clampedValue * 2 - 1);
+  return linearBell * linearBell * (3 - 2 * linearBell);
 }
 
 function clamp01(value: number): number {

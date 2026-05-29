@@ -60,6 +60,8 @@ function createCompileScene(
   scene: Scene,
   orientation: Orientation,
 ): CompileScene {
+  const videoSource = createCompileSceneVideoSource(scene.videoSource);
+
   return {
     id: scene.id,
     orderIndex: scene.orderIndex,
@@ -71,7 +73,7 @@ function createCompileScene(
       createCompileTextOverlay(overlay, orientation),
     ),
     effects: scene.effects.map((effect) => ({ ...effect })),
-    videoSource: createCompileSceneVideoSource(scene.videoSource),
+    ...(videoSource ? { videoSource } : {}),
   };
 }
 

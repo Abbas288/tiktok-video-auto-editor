@@ -1,18 +1,5 @@
-import { useCallback, useMemo, useRef, useState } from "react";
-import {
-  CompileOutputKind,
-  CompileStatus,
-  SaveCompiledVideoStatus,
-} from "../components/CompilePanel";
-import { SceneVideoTrimDraft } from "../components/SceneVideoPanel";
-import { buildCompilePayload } from "../domain/compile/compilePayload";
-import {
-  clampSceneVideoStart,
-  createSceneVideoDecision,
-} from "../domain/scene-video/sceneVideoSelection";
-import { getSceneVideoReadiness } from "../domain/scene-video/sceneVideoReadiness";
+import { useCallback, useMemo, useState } from "react";
 import { findTextOverlayById } from "../domain/video/findTextOverlay";
-import { getActiveSceneIdAtTime } from "../domain/video/getActiveSceneIdAtTime";
 import { NormalizedOverlayPosition } from "../domain/video/overlayPosition";
 import {
   EditableSceneEffectType,
@@ -21,28 +8,12 @@ import {
   ZoomFocusPosition,
 } from "../domain/video/sceneEffects";
 import { getSceneTransition } from "../domain/video/transitions";
-import {
-  compileService,
-  CompileRendererName,
-} from "../infrastructure/compileService";
-import {
-  pickSceneVideoCandidate,
-  uploadSceneVideoCandidate,
-} from "../infrastructure/sceneVideoAssetService";
-import { saveCompiledVideoToDevice } from "../infrastructure/saveCompiledVideo";
-import {
-  ensureVideoReferenceAvailable,
-  openVideoReference,
-  UNAVAILABLE_VIDEO_MESSAGE,
-} from "../infrastructure/videoReference";
 import { TextOverlayUpdate } from "../store/useEditSession";
-import {
-  Scene,
-  SceneVideoSource,
-  Template,
-  Transition,
-} from "../types/template";
+import { Scene, Template, Transition } from "../types/template";
+import { useEditorCompileController } from "./useEditorCompileController";
+import { useEditorTimelineController } from "./useEditorTimelineController";
 import { useInitializeEditor } from "./useInitializeEditor";
+import { useSceneVideoController } from "./useSceneVideoController";
 import { SeekRequest } from "./useVideoSync";
 
 interface UseEditorControllerProps {
@@ -68,14 +39,18 @@ interface EditorControllerResult {
   seekRequest: SeekRequest | undefined;
   currentTime: number;
   isDraggingOverlay: boolean;
-  compileStatus: CompileStatus;
+  compileStatus: ReturnType<typeof useEditorCompileController>["compileStatus"];
   compileMessage: string | null;
   compiledOutputUrl: string | null;
-  compiledOutputKind: CompileOutputKind;
-  saveStatus: SaveCompiledVideoStatus;
+  compiledOutputKind: ReturnType<
+    typeof useEditorCompileController
+  >["compiledOutputKind"];
+  saveStatus: ReturnType<typeof useEditorCompileController>["saveStatus"];
   saveMessage: string | null;
   sceneVideoMessage: string | null;
-  sceneVideoTrimDraft: SceneVideoTrimDraft | null;
+  sceneVideoTrimDraft: ReturnType<
+    typeof useSceneVideoController
+  >["sceneVideoTrimDraft"];
   isSceneVideoBusy: boolean;
   selectOverlay: (overlayId: string | null) => void;
   updateVolumes: (originalVolume: number, musicVolume?: number) => void;
@@ -107,32 +82,10 @@ interface EditorControllerResult {
   handleRemoveSceneVideo: (sceneId: string) => void;
 }
 
-const MANUAL_SEEK_GUARD_MS = 900;
-
 export function useEditorController({
   templateId,
   onExitEditor,
 }: UseEditorControllerProps): EditorControllerResult {
-  const manualSeekGuardUntilRef = useRef<number>(0);
-
-  const [seekRequest, setSeekRequest] = useState<SeekRequest>();
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [isDraggingOverlay, setIsDraggingOverlay] = useState<boolean>(false);
-  const [compileStatus, setCompileStatus] = useState<CompileStatus>("idle");
-  const [compileMessage, setCompileMessage] = useState<string | null>(null);
-  const [compiledOutputUrl, setCompiledOutputUrl] = useState<string | null>(
-    null,
-  );
-  const [compiledOutputKind, setCompiledOutputKind] =
-    useState<CompileOutputKind>("unknown");
-  const [saveStatus, setSaveStatus] = useState<SaveCompiledVideoStatus>("idle");
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
-  const [sceneVideoMessage, setSceneVideoMessage] = useState<string | null>(
-    null,
-  );
-  const [sceneVideoTrimDraft, setSceneVideoTrimDraft] =
-    useState<SceneVideoTrimDraft | null>(null);
-  const [isSceneVideoBusy, setIsSceneVideoBusy] = useState<boolean>(false);
   const [selectedTransitionSceneId, setSelectedTransitionSceneId] = useState<
     string | null
   >(null);
@@ -155,6 +108,24 @@ export function useEditorController({
     updateCompiledVideo,
     clearSession,
   } = useInitializeEditor(templateId);
+
+  const timelineController = useEditorTimelineController({
+    currentTemplate,
+    activeSceneId,
+    selectScene,
+  });
+
+  const compileController = useEditorCompileController({
+    currentTemplate,
+    selectScene,
+    updateCompiledVideo,
+  });
+
+  const sceneVideoController = useSceneVideoController({
+    currentTemplate,
+    updateSceneVideoSource,
+    resetFinishedOutput: compileController.resetFinishedOutput,
+  });
 
   const selectedOverlayResult = useMemo(
     () =>
@@ -196,18 +167,6 @@ export function useEditorController({
     [activeScene],
   );
 
-  const resetFinishedOutput = useCallback((): void => {
-    setCompiledOutputUrl(null);
-    setCompiledOutputKind("unknown");
-    setSaveStatus("idle");
-    setSaveMessage(null);
-
-    if (compileStatus !== "compiling") {
-      setCompileStatus("idle");
-      setCompileMessage(null);
-    }
-  }, [compileStatus]);
-
   const handleGoBack = useCallback((): void => {
     clearSession();
     onExitEditor();
@@ -215,56 +174,11 @@ export function useEditorController({
 
   const handleSceneClick = useCallback(
     (sceneId: string): void => {
-      const scene = currentTemplate?.scenes.find((item) => item.id === sceneId);
-
-      if (!scene) {
-        return;
-      }
-
-      manualSeekGuardUntilRef.current = Date.now() + MANUAL_SEEK_GUARD_MS;
-
       setSelectedTransitionSceneId(null);
-      setCurrentTime(scene.startSeconds);
-      selectScene(sceneId);
-      setSeekRequest({
-        time: scene.startSeconds,
-        timestamp: Date.now(),
-      });
+      timelineController.handleSceneClick(sceneId);
     },
-    [currentTemplate, selectScene],
+    [timelineController],
   );
-
-  const handleTimeUpdate = useCallback(
-    (time: number): void => {
-      if (Date.now() < manualSeekGuardUntilRef.current) {
-        return;
-      }
-
-      setCurrentTime(time);
-
-      if (!currentTemplate) {
-        return;
-      }
-
-      const matchedSceneId = getActiveSceneIdAtTime(
-        currentTemplate.scenes,
-        time,
-      );
-
-      if (matchedSceneId && matchedSceneId !== activeSceneId) {
-        selectScene(matchedSceneId);
-      }
-    },
-    [activeSceneId, currentTemplate, selectScene],
-  );
-
-  const handleDragStart = useCallback((): void => {
-    setIsDraggingOverlay(true);
-  }, []);
-
-  const handleDragEnd = useCallback((): void => {
-    setIsDraggingOverlay(false);
-  }, []);
 
   const handleCommitOverlayPosition = useCallback(
     (overlayId: string, position: NormalizedOverlayPosition): void => {
@@ -353,241 +267,6 @@ export function useEditorController({
     setSelectedTransitionSceneId(null);
   }, []);
 
-  const saveSceneVideoSource = useCallback(
-    async (options: {
-      sceneId: string;
-      candidate: SceneVideoTrimDraft["candidate"];
-      sourceStartSeconds: number;
-      durationSeconds: number;
-    }): Promise<void> => {
-      const upload = await uploadSceneVideoCandidate(options.candidate);
-      const source: SceneVideoSource = {
-        type: "user",
-        localUri: options.candidate.localUri,
-        uploadUrl: upload.uploadUrl,
-        fileName: upload.fileName,
-        originalDurationSeconds: options.candidate.durationSeconds,
-        sourceStartSeconds: options.sourceStartSeconds,
-        durationSeconds: options.durationSeconds,
-      };
-
-      updateSceneVideoSource(options.sceneId, source);
-      resetFinishedOutput();
-      setSceneVideoMessage("Video approved.");
-    },
-    [resetFinishedOutput, updateSceneVideoSource],
-  );
-
-  const handlePickSceneVideo = useCallback(
-    async (sceneId: string): Promise<void> => {
-      const scene = currentTemplate?.scenes.find((item) => item.id === sceneId);
-
-      if (!scene || isSceneVideoBusy) {
-        return;
-      }
-
-      try {
-        setIsSceneVideoBusy(true);
-        setSceneVideoMessage(null);
-        setSceneVideoTrimDraft(null);
-
-        const candidate = await pickSceneVideoCandidate();
-
-        if (!candidate) {
-          return;
-        }
-
-        const decision = createSceneVideoDecision(
-          candidate,
-          scene.durationSeconds,
-        );
-
-        if (decision.type === "too-short") {
-          setSceneVideoMessage(
-            `Video is too short. Required: ${decision.requiredDurationSeconds}s.`,
-          );
-          return;
-        }
-
-        if (decision.type === "needs-trim") {
-          setSceneVideoTrimDraft({
-            sceneId,
-            candidate: decision.candidate,
-            maxStartSeconds: decision.maxStartSeconds,
-            durationSeconds: decision.durationSeconds,
-          });
-          return;
-        }
-
-        await saveSceneVideoSource({
-          sceneId,
-          candidate: decision.candidate,
-          sourceStartSeconds: decision.sourceStartSeconds,
-          durationSeconds: decision.durationSeconds,
-        });
-      } catch (error) {
-        setSceneVideoMessage(
-          error instanceof Error ? error.message : "Could not select video.",
-        );
-      } finally {
-        setIsSceneVideoBusy(false);
-      }
-    },
-    [currentTemplate, isSceneVideoBusy, saveSceneVideoSource],
-  );
-
-  const handleConfirmSceneVideoTrim = useCallback(
-    async (startSeconds: number): Promise<void> => {
-      if (!sceneVideoTrimDraft || isSceneVideoBusy) {
-        return;
-      }
-
-      try {
-        setIsSceneVideoBusy(true);
-
-        await saveSceneVideoSource({
-          sceneId: sceneVideoTrimDraft.sceneId,
-          candidate: sceneVideoTrimDraft.candidate,
-          sourceStartSeconds: clampSceneVideoStart(
-            startSeconds,
-            sceneVideoTrimDraft.maxStartSeconds,
-          ),
-          durationSeconds: sceneVideoTrimDraft.durationSeconds,
-        });
-
-        setSceneVideoTrimDraft(null);
-      } catch (error) {
-        setSceneVideoMessage(
-          error instanceof Error ? error.message : "Could not save video.",
-        );
-      } finally {
-        setIsSceneVideoBusy(false);
-      }
-    },
-    [isSceneVideoBusy, saveSceneVideoSource, sceneVideoTrimDraft],
-  );
-
-  const handleCancelSceneVideoTrim = useCallback((): void => {
-    setSceneVideoTrimDraft(null);
-  }, []);
-
-  const handleRemoveSceneVideo = useCallback(
-    (sceneId: string): void => {
-      updateSceneVideoSource(sceneId, null);
-      resetFinishedOutput();
-      setSceneVideoTrimDraft(null);
-      setSceneVideoMessage("Video removed.");
-    },
-    [resetFinishedOutput, updateSceneVideoSource],
-  );
-
-  const handleCompileProject = useCallback(async (): Promise<void> => {
-    if (!currentTemplate || compileStatus === "compiling") {
-      return;
-    }
-
-    const readiness = getSceneVideoReadiness(currentTemplate.scenes);
-
-    if (!readiness.isReadyForCompile) {
-      if (readiness.firstMissingScene) {
-        selectScene(readiness.firstMissingScene.id);
-      }
-
-      setCompileStatus("error");
-      setCompileMessage("Add videos for all scenes first.");
-      return;
-    }
-
-    try {
-      setCompileStatus("compiling");
-      setCompileMessage("Compiling video...");
-      setCompiledOutputUrl(null);
-      setCompiledOutputKind("unknown");
-      setSaveStatus("idle");
-      setSaveMessage(null);
-
-      const payload = buildCompilePayload(currentTemplate);
-      const result = await compileService.compile(payload);
-      const outputKind = toCompileOutputKind(result.renderer);
-      const availableVideoUrl = await ensureVideoReferenceAvailable(
-        result.compiledVideoUrl,
-      );
-
-      updateCompiledVideo(availableVideoUrl);
-      setCompiledOutputUrl(availableVideoUrl);
-      setCompiledOutputKind(outputKind);
-      setCompileStatus("success");
-      setCompileMessage(
-        outputKind === "placeholder"
-          ? "Preview output is ready."
-          : "Rendered video is ready.",
-      );
-    } catch (error) {
-      setCompiledOutputUrl(null);
-      setCompiledOutputKind("unknown");
-      setCompileStatus("error");
-      setCompileMessage(
-        error instanceof Error
-          ? error.message
-          : "Compile failed. Please try again.",
-      );
-    }
-  }, [compileStatus, currentTemplate, selectScene, updateCompiledVideo]);
-
-  const handleSaveCompiledVideo = useCallback(async (): Promise<void> => {
-    if (!compiledOutputUrl || saveStatus === "saving") {
-      return;
-    }
-
-    try {
-      setSaveStatus("saving");
-      setSaveMessage("Preparing video...");
-
-      const result = await saveCompiledVideoToDevice(compiledOutputUrl);
-
-      setSaveStatus("success");
-      setSaveMessage(result.message);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "The video could not be saved.";
-
-      if (message === UNAVAILABLE_VIDEO_MESSAGE) {
-        setCompiledOutputUrl(null);
-        setCompiledOutputKind("unknown");
-      }
-
-      setSaveStatus("error");
-      setSaveMessage(message);
-    }
-  }, [compiledOutputUrl, saveStatus]);
-
-  const handleOpenCompiledVideo = useCallback(async (): Promise<void> => {
-    if (!compiledOutputUrl) {
-      return;
-    }
-
-    try {
-      setSaveStatus("idle");
-      setSaveMessage(null);
-      await openVideoReference(compiledOutputUrl);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "The video could not be opened.";
-
-      if (message === UNAVAILABLE_VIDEO_MESSAGE) {
-        setCompiledOutputUrl(null);
-        setCompiledOutputKind("unknown");
-      }
-
-      setSaveStatus("error");
-      setSaveMessage(message);
-    }
-  }, [compiledOutputUrl]);
-
   return {
     isLoading,
     error,
@@ -598,25 +277,25 @@ export function useEditorController({
     selectedOverlayResult,
     activeScene,
     activeSceneFilterValues,
-    seekRequest,
-    currentTime,
-    isDraggingOverlay,
-    compileStatus,
-    compileMessage,
-    compiledOutputUrl,
-    compiledOutputKind,
-    saveStatus,
-    saveMessage,
-    sceneVideoMessage,
-    sceneVideoTrimDraft,
-    isSceneVideoBusy,
+    seekRequest: timelineController.seekRequest,
+    currentTime: timelineController.currentTime,
+    isDraggingOverlay: timelineController.isDraggingOverlay,
+    compileStatus: compileController.compileStatus,
+    compileMessage: compileController.compileMessage,
+    compiledOutputUrl: compileController.compiledOutputUrl,
+    compiledOutputKind: compileController.compiledOutputKind,
+    saveStatus: compileController.saveStatus,
+    saveMessage: compileController.saveMessage,
+    sceneVideoMessage: sceneVideoController.sceneVideoMessage,
+    sceneVideoTrimDraft: sceneVideoController.sceneVideoTrimDraft,
+    isSceneVideoBusy: sceneVideoController.isSceneVideoBusy,
     selectOverlay,
     updateVolumes,
     handleGoBack,
     handleSceneClick,
-    handleTimeUpdate,
-    handleDragStart,
-    handleDragEnd,
+    handleTimeUpdate: timelineController.handleTimeUpdate,
+    handleDragStart: timelineController.handleDragStart,
+    handleDragEnd: timelineController.handleDragEnd,
     handleCommitOverlayPosition,
     handleChangeSelectedOverlay,
     handleChangeSceneEffect,
@@ -625,26 +304,13 @@ export function useEditorController({
     handleSelectTransition,
     handleChangeTransition,
     handleCloseTransitionPicker,
-    handleCompileProject,
-    handleSaveCompiledVideo,
-    handleOpenCompiledVideo,
-    handlePickSceneVideo,
-    handleConfirmSceneVideoTrim,
-    handleCancelSceneVideoTrim,
-    handleRemoveSceneVideo,
+    handleCompileProject: compileController.handleCompileProject,
+    handleSaveCompiledVideo: compileController.handleSaveCompiledVideo,
+    handleOpenCompiledVideo: compileController.handleOpenCompiledVideo,
+    handlePickSceneVideo: sceneVideoController.handlePickSceneVideo,
+    handleConfirmSceneVideoTrim:
+      sceneVideoController.handleConfirmSceneVideoTrim,
+    handleCancelSceneVideoTrim: sceneVideoController.handleCancelSceneVideoTrim,
+    handleRemoveSceneVideo: sceneVideoController.handleRemoveSceneVideo,
   };
-}
-
-function toCompileOutputKind(
-  renderer: CompileRendererName | undefined,
-): CompileOutputKind {
-  if (renderer === "placeholder") {
-    return "placeholder";
-  }
-
-  if (renderer === "ffmpeg") {
-    return "rendered";
-  }
-
-  return "unknown";
 }

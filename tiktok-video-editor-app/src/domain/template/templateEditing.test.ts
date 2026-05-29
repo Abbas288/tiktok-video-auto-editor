@@ -1,4 +1,5 @@
 import { Template } from "../../types/template";
+import { DEFAULT_TRANSITION_DURATION_SECONDS } from "../video/transitions";
 import {
   updateTemplateSceneTransition,
   updateTemplateTextOverlay,
@@ -116,7 +117,7 @@ describe("templateEditing", () => {
     expect(updatedTemplate.scenes[1]).toBe(template.scenes[1]);
     expect(updatedTemplate.scenes[0].transition).toEqual({
       type: "fade",
-      durationSeconds: 0.3,
+      durationSeconds: DEFAULT_TRANSITION_DURATION_SECONDS,
     });
     expect(template.scenes[0].transition).toBeUndefined();
   });
@@ -132,7 +133,7 @@ describe("templateEditing", () => {
 
     expect(updatedTemplate.scenes[0].transition).toEqual({
       type: "slide",
-      durationSeconds: 0.3,
+      durationSeconds: DEFAULT_TRANSITION_DURATION_SECONDS,
       direction: "left",
     });
   });

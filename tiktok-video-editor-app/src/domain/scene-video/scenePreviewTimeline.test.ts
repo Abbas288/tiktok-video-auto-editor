@@ -3,6 +3,7 @@ import {
   getSceneAtTimelineTime,
   getScenePreviewPlaybackSource,
   getTemplateDurationSeconds,
+  getTransitionPreviewPlaybackSource,
 } from "./scenePreviewTimeline";
 
 function createScene(id: string, index: number, hasVideo: boolean): Scene {
@@ -79,5 +80,63 @@ describe("scenePreviewTimeline", () => {
     expect(result?.videoUrl).toBe("file:///scene-2.mp4");
     expect(result?.sourceStartSeconds).toBe(1.5);
     expect(result?.sourceEndSeconds).toBe(7.5);
+  });
+
+  it("maps transition preview to the incoming scene selected clip", () => {
+    const template = createTemplate([
+      createScene("scene-1", 0, true),
+      createScene("scene-2", 1, true),
+    ]);
+
+    const result = getTransitionPreviewPlaybackSource(template, {
+      type: "slide",
+      direction: "left",
+      progress: 0.5,
+      easedProgress: 0.5,
+      intensity: 1,
+      previewTimeSeconds: 4.2,
+      transitionKey: "scene-1:scene-2:slide",
+    });
+
+    expect(result?.videoUrl).toBe("file:///scene-2.mp4");
+    expect(result?.sourcePreviewTimeSeconds).toBeCloseTo(1.7);
+  });
+
+  it("returns null for transition preview when incoming scene video is missing", () => {
+    const template = createTemplate([
+      createScene("scene-1", 0, true),
+      createScene("scene-2", 1, false),
+    ]);
+
+    const result = getTransitionPreviewPlaybackSource(template, {
+      type: "slide",
+      direction: "left",
+      progress: 0.5,
+      easedProgress: 0.5,
+      intensity: 1,
+      previewTimeSeconds: 4.2,
+      transitionKey: "scene-1:scene-2:slide",
+    });
+
+    expect(result).toBeNull();
+  });
+
+  it("returns null for transition preview when transition key does not match", () => {
+    const template = createTemplate([
+      createScene("scene-1", 0, true),
+      createScene("scene-2", 1, true),
+    ]);
+
+    const result = getTransitionPreviewPlaybackSource(template, {
+      type: "slide",
+      direction: "left",
+      progress: 0.5,
+      easedProgress: 0.5,
+      intensity: 1,
+      previewTimeSeconds: 4.2,
+      transitionKey: "missing:scene-2:slide",
+    });
+
+    expect(result).toBeNull();
   });
 });
