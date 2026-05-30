@@ -1,3 +1,4 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React from "react";
 import {
   Platform,
@@ -26,12 +27,6 @@ export interface CompilePanelProps {
   onOpenCompiledVideo?: () => void;
 }
 
-/**
- * Renders compile actions, compile status and actions for the finished output.
- *
- * @param props Compile state, output state and handlers.
- * @returns Compile panel element.
- */
 export function CompilePanel({
   status,
   message,
@@ -51,10 +46,8 @@ export function CompilePanel({
     <View style={styles.panel} testID="compile-panel">
       <View style={styles.headerRow}>
         <View style={styles.titleColumn}>
-          <Text style={styles.title}>Export video</Text>
-          <Text style={styles.description}>
-            Compile the current edit, then save or open the finished video.
-          </Text>
+          <Text style={styles.title}>Export</Text>
+          <Text style={styles.description}>Compile, then save.</Text>
         </View>
 
         <TouchableOpacity
@@ -63,8 +56,9 @@ export function CompilePanel({
           disabled={isCompiling}
           testID="compile-button"
         >
+          <MaterialIcons name="auto-awesome" size={17} color="#000000" />
           <Text style={styles.primaryButtonText}>
-            {isCompiling ? "Compiling..." : "Start compile"}
+            {isCompiling ? "Compiling" : "Compile"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -82,7 +76,7 @@ export function CompilePanel({
         <View style={styles.outputCard} testID="compiled-output-card">
           <View style={styles.outputHeaderRow}>
             <View style={styles.outputTitleColumn}>
-              <Text style={styles.outputTitle}>Finished video ready</Text>
+              <Text style={styles.outputTitle}>Ready</Text>
               <Text style={styles.outputDescription}>
                 {getOutputDescription(outputKind)}
               </Text>
@@ -103,8 +97,13 @@ export function CompilePanel({
               disabled={isSaving}
               testID="save-compiled-video-button"
             >
+              <MaterialIcons
+                name={Platform.OS === "web" ? "download" : "save-alt"}
+                size={17}
+                color="#000000"
+              />
               <Text style={styles.secondaryButtonText}>
-                {isSaving ? "Saving..." : getSaveButtonLabel()}
+                {isSaving ? "Saving" : getSaveButtonLabel()}
               </Text>
             </TouchableOpacity>
 
@@ -113,7 +112,8 @@ export function CompilePanel({
               onPress={onOpenCompiledVideo}
               testID="open-compiled-video-button"
             >
-              <Text style={styles.ghostButtonText}>Open video</Text>
+              <MaterialIcons name="open-in-new" size={17} color={colors.text} />
+              <Text style={styles.ghostButtonText}>Open</Text>
             </TouchableOpacity>
           </View>
 
@@ -157,7 +157,7 @@ function getCompileMessageStyle(status: CompileStatus): StyleProp<TextStyle> {
 }
 
 function getSaveButtonLabel(): string {
-  return Platform.OS === "web" ? "Download video" : "Save to gallery";
+  return Platform.OS === "web" ? "Download" : "Save";
 }
 
 function getOutputBadge(outputKind: CompileOutputKind): string {
@@ -174,14 +174,14 @@ function getOutputBadge(outputKind: CompileOutputKind): string {
 
 function getOutputDescription(outputKind: CompileOutputKind): string {
   if (outputKind === "placeholder") {
-    return "Development output is available. It can be opened or downloaded, but it may not contain all edits.";
+    return "Development output.";
   }
 
   if (outputKind === "rendered") {
-    return "The latest rendered output is available for saving or opening.";
+    return "Final render available.";
   }
 
-  return "The latest output is available for saving or opening.";
+  return "Output available.";
 }
 
 const styles = StyleSheet.create({
@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: colors.surface,
     borderRadius: 14,
-    padding: 16,
-    gap: 14,
+    padding: 12,
+    gap: 10,
   },
   headerRow: {
     flexDirection: "row",
@@ -205,14 +205,13 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 15,
+    fontWeight: "900",
   },
   description: {
     color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 4,
+    fontSize: 12,
+    marginTop: 2,
   },
   primaryButton: {
     minHeight: 40,
@@ -221,18 +220,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 14,
+    flexDirection: "row",
+    gap: 6,
   },
   primaryButtonText: {
     color: "#000000",
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: "900",
   },
   disabledButton: {
     opacity: 0.65,
   },
   message: {
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "800",
   },
   successText: {
     color: colors.accent,
@@ -244,12 +245,12 @@ const styles = StyleSheet.create({
     color: colors.error,
   },
   outputCard: {
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: "#2A2A2A",
     backgroundColor: colors.background,
-    padding: 14,
-    gap: 12,
+    padding: 12,
+    gap: 10,
   },
   outputHeaderRow: {
     flexDirection: "row",
@@ -262,30 +263,29 @@ const styles = StyleSheet.create({
   },
   outputTitle: {
     color: colors.text,
-    fontSize: 15,
-    fontWeight: "800",
+    fontSize: 14,
+    fontWeight: "900",
   },
   outputDescription: {
     color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 4,
+    fontSize: 12,
+    marginTop: 2,
   },
   badge: {
     borderRadius: 999,
     backgroundColor: "#1F2933",
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     paddingVertical: 5,
   },
   badgeText: {
     color: colors.accent,
-    fontSize: 12,
-    fontWeight: "800",
+    fontSize: 11,
+    fontWeight: "900",
   },
   outputButtonRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
+    gap: 8,
   },
   secondaryButton: {
     minHeight: 38,
@@ -294,11 +294,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 14,
+    flexDirection: "row",
+    gap: 6,
   },
   secondaryButtonText: {
     color: "#000000",
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: "900",
   },
   ghostButton: {
     minHeight: 38,
@@ -308,10 +310,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 14,
+    flexDirection: "row",
+    gap: 6,
   },
   ghostButtonText: {
     color: colors.text,
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: "900",
   },
 });

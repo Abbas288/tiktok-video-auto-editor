@@ -1,3 +1,4 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
@@ -13,6 +14,13 @@ export interface TransitionPickerPanelProps {
   onChangeTransition: (transitionType: Transition["type"]) => void;
   onClose: () => void;
 }
+
+const HIT_SLOP = {
+  top: 8,
+  right: 8,
+  bottom: 8,
+  left: 8,
+};
 
 /**
  * Renders transition choices for the selected timeline transition slot.
@@ -40,8 +48,15 @@ export function TransitionPickerPanel({
           </Text>
         </View>
 
-        <TouchableOpacity onPress={onClose}>
-          <Text style={styles.closeText}>Close</Text>
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={onClose}
+          hitSlop={HIT_SLOP}
+          testID="transition-picker-close"
+          accessibilityRole="button"
+          accessibilityLabel="Close transition picker"
+        >
+          <MaterialIcons name="close" size={19} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -59,6 +74,10 @@ export function TransitionPickerPanel({
               style={[styles.optionButton, isSelected && styles.activeOption]}
               onPress={() => onChangeTransition(transitionType)}
               testID={`transition-option-${transitionType}`}
+              accessibilityRole="button"
+              accessibilityLabel={`Select ${getTransitionLabel(
+                transitionType,
+              )} transition`}
             >
               <Text style={styles.optionText}>
                 {getTransitionLabel(transitionType)}
@@ -85,10 +104,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: 12,
   },
   titleColumn: {
     flex: 1,
-    paddingRight: 12,
+    minWidth: 0,
   },
   title: {
     color: colors.text,
@@ -100,10 +120,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 4,
   },
-  closeText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: "700",
+  closeButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: 1,
+    borderColor: "#2F3B45",
+    backgroundColor: colors.background,
+    alignItems: "center",
+    justifyContent: "center",
   },
   description: {
     color: colors.textSecondary,

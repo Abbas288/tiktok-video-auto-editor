@@ -9,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, useWindowDimensions, View } from "react-native";
 import { useBackgroundMusic } from "../../application/useBackgroundMusic";
 import { useTransitionPreviewPlayer } from "../../application/useTransitionPreviewPlayer";
 import { SeekRequest, useVideoSync } from "../../application/useVideoSync";
@@ -62,6 +62,7 @@ export interface VideoStageProps {
 type WebVideoElement = HTMLVideoElement;
 type WebVideoEvent = SyntheticEvent<WebVideoElement>;
 
+const DESKTOP_BREAKPOINT = 768;
 const WEB_SCENE_END_TOLERANCE_SECONDS = 0.05;
 const NATIVE_RESTART_PLAY_DELAY_MS = 120;
 
@@ -79,6 +80,9 @@ export function VideoStage({
   onCommitZoomFocus,
 }: VideoStageProps): React.JSX.Element {
   const isWeb = Platform.OS === "web";
+  const { width: windowWidth } = useWindowDimensions();
+  const isDesktop = windowWidth >= DESKTOP_BREAKPOINT;
+
   const stageRef = useRef<View | null>(null);
   const webVideoRef = useRef<WebVideoElement | null>(null);
   const shouldResumeWebPlaybackRef = useRef<boolean>(false);
@@ -101,10 +105,33 @@ export function VideoStage({
     [template.scenes],
   );
 
+  const isPreviewLocked = !readiness.isReadyForCompile;
+
   const playbackSource = useMemo(
     () => getScenePreviewPlaybackSource(template, currentTime),
     [currentTime, template],
   );
+
+  const transitionSimulation = useMemo(
+    () => getActiveTransitionSimulation(template.scenes, currentTime),
+    [currentTime, template.scenes],
+  );
+
+  const transitionPlaybackSource = useMemo(
+    () => getTransitionPreviewPlaybackSource(template, transitionSimulation),
+    [template, transitionSimulation],
+  );
+
+  const transitionPlayerSimulation = useMemo(() => {
+    if (!transitionSimulation || !transitionPlaybackSource) {
+      return null;
+    }
+
+    return {
+      ...transitionSimulation,
+      previewTimeSeconds: transitionPlaybackSource.sourcePreviewTimeSeconds,
+    };
+  }, [transitionPlaybackSource, transitionSimulation]);
 
   const playbackSceneId = playbackSource?.scene.id ?? null;
   const playbackVideoUrl = playbackSource?.videoUrl ?? null;
@@ -150,38 +177,14 @@ export function VideoStage({
   });
 
   const isPlaying = isWeb ? webIsPlaying : nativeIsPlaying;
-  const originalVolume = template.originalVolume ?? 1;
-
-  const transitionSimulation = useMemo(
-    () =>
-      readiness.isReadyForCompile
-        ? getActiveTransitionSimulation(template.scenes, currentTime)
-        : null,
-    [currentTime, readiness.isReadyForCompile, template.scenes],
-  );
-
-  const transitionPreviewSource = useMemo(
-    () => getTransitionPreviewPlaybackSource(template, transitionSimulation),
-    [template, transitionSimulation],
-  );
-
-  const transitionPlayerSimulation = useMemo(
-    () =>
-      transitionSimulation && transitionPreviewSource
-        ? {
-            ...transitionSimulation,
-            previewTimeSeconds:
-              transitionPreviewSource.sourcePreviewTimeSeconds,
-          }
-        : transitionSimulation,
-    [transitionPreviewSource, transitionSimulation],
-  );
 
   const transitionPreviewPlayer = useTransitionPreviewPlayer({
-    videoUrl: transitionPreviewSource?.videoUrl,
+    videoUrl: transitionPlaybackSource?.videoUrl,
     simulation: transitionPlayerSimulation,
-    isPlaying,
+    isPlaying: readiness.isReadyForCompile && isPlaying,
   });
+
+  const originalVolume = template.originalVolume ?? 1;
 
   useEffect(() => {
     if (isWeb) {
@@ -240,6 +243,20 @@ export function VideoStage({
     () => getContainedMediaRect(stageSize, canvas),
     [canvas, stageSize],
   );
+
+  const stageSizeStyle = useMemo(() => {
+    if (isFullscreen) {
+      return styles.stageFullscreen;
+    }
+
+    if (isPreviewLocked) {
+      return isDesktop ? styles.lockedStageDesktop : styles.lockedStageMobile;
+    }
+
+    return {
+      aspectRatio: canvas.width / canvas.height,
+    };
+  }, [canvas.height, canvas.width, isDesktop, isFullscreen, isPreviewLocked]);
 
   useEffect(() => {
     if (
@@ -413,14 +430,7 @@ export function VideoStage({
   return (
     <View
       ref={stageRef}
-      style={[
-        styles.stage,
-        isFullscreen
-          ? styles.stageFullscreen
-          : {
-              aspectRatio: canvas.width / canvas.height,
-            },
-      ]}
+      style={[styles.stage, stageSizeStyle]}
       onLayout={onLayout}
       testID="video-stage"
     >
@@ -471,9 +481,7 @@ export function VideoStage({
               <TransitionPreviewLayer
                 simulation={transitionSimulation}
                 mediaRect={mediaRect}
-                previewPlayer={
-                  transitionPreviewSource ? transitionPreviewPlayer : null
-                }
+                previewPlayer={transitionPreviewPlayer}
               />
 
               <OverlayWorld
@@ -619,6 +627,12 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "#000000",
     borderRadius: 14,
+  },
+  lockedStageMobile: {
+    height: 250,
+  },
+  lockedStageDesktop: {
+    height: 260,
   },
   stageFullscreen: {
     width: "100%",

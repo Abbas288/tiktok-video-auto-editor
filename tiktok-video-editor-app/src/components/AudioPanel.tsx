@@ -1,5 +1,6 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { useCallback } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   formatVolumePercent,
   stepVolume,
@@ -7,25 +8,23 @@ import {
   VOLUME_STEP,
 } from "../domain/audio/volume";
 import { colors } from "../styles/theme";
-import { ControlRow } from "./editor-panel/ControlRow";
 import { EditorPanel } from "./editor-panel/EditorPanel";
-import { PanelButton } from "./editor-panel/PanelButton";
 
-/**
- * Properties required for the AudioPanel component.
- */
 export interface AudioPanelProps {
   originalVolume: number;
   musicVolume: number | null;
   onChangeVolumes: (originalVolume: number, musicVolume?: number) => void;
 }
 
-/**
- * Renders editing controls for original audio and background music.
- *
- * @param props Component properties.
- * @returns Audio panel element.
- */
+type MaterialIconName = React.ComponentProps<typeof MaterialIcons>["name"];
+
+const HIT_SLOP = {
+  top: 8,
+  right: 8,
+  bottom: 8,
+  left: 8,
+};
+
 export function AudioPanel({
   originalVolume,
   musicVolume,
@@ -46,31 +45,34 @@ export function AudioPanel({
   );
 
   return (
-    <EditorPanel title="Audio Levels" testID="audio-effects-panel">
-      <VolumeControlRow
-        label="Original Audio"
-        value={originalVolume}
-        testIDPrefix="audio-original"
-        onChange={updateOriginal}
-      />
-
-      {musicVolume !== null ? (
+    <EditorPanel title="Audio" testID="audio-effects-panel">
+      <View style={styles.compactGrid}>
         <VolumeControlRow
-          label="Background Music"
-          value={musicVolume}
-          testIDPrefix="audio-music"
-          onChange={updateMusic}
+          icon="volume-up"
+          label="Original"
+          value={originalVolume}
+          testIDPrefix="audio-original"
+          onChange={updateOriginal}
         />
-      ) : (
-        <Text style={styles.emptyText}>
-          No background music in this template.
-        </Text>
-      )}
+
+        {musicVolume !== null ? (
+          <VolumeControlRow
+            icon="music-note"
+            label="Music"
+            value={musicVolume}
+            testIDPrefix="audio-music"
+            onChange={updateMusic}
+          />
+        ) : (
+          <Text style={styles.emptyText}>No music.</Text>
+        )}
+      </View>
     </EditorPanel>
   );
 }
 
 interface VolumeControlRowProps {
+  icon: MaterialIconName;
   label: string;
   value: number;
   testIDPrefix: string;
@@ -78,6 +80,7 @@ interface VolumeControlRowProps {
 }
 
 function VolumeControlRow({
+  icon,
   label,
   value,
   testIDPrefix,
@@ -86,30 +89,101 @@ function VolumeControlRow({
   const isMuted = value === 0;
 
   return (
-    <ControlRow label={label} value={formatVolumePercent(value)}>
-      <PanelButton
-        label="-"
-        testID={`${testIDPrefix}-decrease`}
-        onPress={() => onChange(stepVolume(value, -VOLUME_STEP))}
-      />
+    <View style={styles.volumeCard}>
+      <View style={styles.volumeHeader}>
+        <MaterialIcons name={icon} size={17} color={colors.primary} />
+        <Text style={styles.label}>{label}</Text>
+        <Text style={styles.value}>{formatVolumePercent(value)}</Text>
+      </View>
 
-      <PanelButton
-        label="+"
-        testID={`${testIDPrefix}-increase`}
-        onPress={() => onChange(stepVolume(value, VOLUME_STEP))}
-      />
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={styles.smallButton}
+          testID={`${testIDPrefix}-decrease`}
+          onPress={() => onChange(stepVolume(value, -VOLUME_STEP))}
+          hitSlop={HIT_SLOP}
+          accessibilityRole="button"
+          accessibilityLabel={`Decrease ${label} volume`}
+        >
+          <MaterialIcons name="remove" size={18} color={colors.text} />
+        </TouchableOpacity>
 
-      <PanelButton
-        label={isMuted ? "Unmute" : "Mute"}
-        testID={`${testIDPrefix}-mute`}
-        isActive={isMuted}
-        onPress={() => onChange(toggleMute(value))}
-      />
-    </ControlRow>
+        <TouchableOpacity
+          style={styles.smallButton}
+          testID={`${testIDPrefix}-increase`}
+          onPress={() => onChange(stepVolume(value, VOLUME_STEP))}
+          hitSlop={HIT_SLOP}
+          accessibilityRole="button"
+          accessibilityLabel={`Increase ${label} volume`}
+        >
+          <MaterialIcons name="add" size={18} color={colors.text} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.smallButton, isMuted && styles.activeButton]}
+          testID={`${testIDPrefix}-mute`}
+          onPress={() => onChange(toggleMute(value))}
+          hitSlop={HIT_SLOP}
+          accessibilityRole="button"
+          accessibilityLabel={isMuted ? `Unmute ${label}` : `Mute ${label}`}
+        >
+          <MaterialIcons
+            name={isMuted ? "volume-off" : "volume-up"}
+            size={18}
+            color={isMuted ? colors.primary : colors.text}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  compactGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  volumeCard: {
+    flexGrow: 1,
+    flexBasis: 180,
+    borderRadius: 12,
+    backgroundColor: colors.background,
+    padding: 10,
+    gap: 8,
+  },
+  volumeHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  label: {
+    flex: 1,
+    color: colors.text,
+    fontSize: 13,
+    fontWeight: "900",
+  },
+  value: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: "800",
+  },
+  buttonRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  smallButton: {
+    flex: 1,
+    minHeight: 32,
+    borderRadius: 999,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  activeButton: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
   emptyText: {
     color: colors.textSecondary,
     fontSize: 13,
