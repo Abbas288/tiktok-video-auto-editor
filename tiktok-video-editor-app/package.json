@@ -18,7 +18,9 @@
     "@expo/vector-icons": "^15.0.3",
     "expo": "~54.0.34",
     "expo-audio": "~1.1.1",
+    "expo-clipboard": "~8.0.8",
     "expo-constants": "~18.0.13",
+    "expo-document-picker": "~14.0.8",
     "expo-file-system": "~19.0.22",
     "expo-image-picker": "~17.0.8",
     "expo-linking": "~8.0.12",
@@ -48,8 +50,11 @@
     "react-test-renderer": "^19.1.0",
     "typescript": "~5.9.2"
   },
-  "jest": {
-    "preset": "jest-expo"
-  },
+"jest": {
+  "preset": "jest-expo",
+  "setupFilesAfterEnv": [
+    "<rootDir>/jest.setup.ts"
+  ]
+},
   "private": true
 }

@@ -1,63 +1,162 @@
 import { mockBunnyTemplate } from "../data/mockTemplate";
-import { parseTemplate } from "../domain/parseTemplate";
+import { parseImportedTemplate } from "../domain/template/templateImportValidation";
 import { Template } from "../types/template";
-/**
- * Interface defining the contract for template data retrieval.
- * Following the Dependency Inversion Principle, the application should rely on this abstraction.
- *
- * @interface ITemplateRepository
- */
-export interface ITemplateRepository {
-  /**
-   * Retrieves a template by its unique identifier.
-   *
-   * @param {string} id - The unique identifier of the template.
-   * @returns {Promise<Template | null>} A promise resolving to the validated Template, or null if not found.
-   */
-  getTemplateById(id: string): Promise<Template | null>;
 
-  /**
-   * Retrieves a list of all available templates.
-   *
-   * @returns {Promise<Template[]>} A promise resolving to an array of validated Templates.
-   */
+export interface ITemplateRepository {
+  getTemplateById(id: string): Promise<Template | null>;
   getAvailableTemplates(): Promise<Template[]>;
+  importTemplate(input: unknown): Promise<Template>;
 }
 
-/**
- * Concrete implementation of the template repository.
- * Currently uses local mock data, but is designed to be easily swapped for an API/Supabase implementation.
- *
- * @class TemplateRepository
- * @implements {ITemplateRepository}
- */
-class TemplateRepository implements ITemplateRepository {
-  public async getTemplateById(id: string): Promise<Template | null> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+export interface TemplateStorage {
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => void;
+  removeItem: (key: string) => void;
+}
 
-    if (id === mockBunnyTemplate.id) {
-      try {
-        return parseTemplate(mockBunnyTemplate);
-      } catch (error) {
-        console.error("Failed to parse template:", error);
-        throw new Error("Template data is corrupted or invalid.");
-      }
+type TemplatesById = Record<string, Template>;
+
+const IMPORTED_TEMPLATES_STORAGE_KEY =
+  "tiktok-video-editor-app:imported-templates:v1";
+
+export class TemplateRepository implements ITemplateRepository {
+  private readonly runtimeImportedTemplates = new Map<string, Template>();
+
+  public constructor(
+    private readonly storage: TemplateStorage | null = getBrowserStorage(),
+  ) {}
+
+  public async getTemplateById(id: string): Promise<Template | null> {
+    const normalizedId = id.trim();
+
+    if (!normalizedId) {
+      return null;
     }
 
-    return null;
+    const templates = await this.getAvailableTemplates();
+
+    return templates.find((template) => template.id === normalizedId) ?? null;
   }
 
   public async getAvailableTemplates(): Promise<Template[]> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    const templatesById = new Map<string, Template>();
+
+    for (const template of Object.values(this.readImportedTemplates())) {
+      templatesById.set(template.id, template);
+    }
+
+    for (const template of getSeedTemplates()) {
+      if (!templatesById.has(template.id)) {
+        templatesById.set(template.id, template);
+      }
+    }
+
+    return Array.from(templatesById.values());
+  }
+
+  public async importTemplate(input: unknown): Promise<Template> {
+    const template = parseImportedTemplate(input);
+    const importedTemplates = {
+      ...this.readImportedTemplates(),
+      [template.id]: template,
+    };
+
+    this.runtimeImportedTemplates.set(template.id, template);
+    this.writeImportedTemplates(importedTemplates);
+
+    return template;
+  }
+
+  private readImportedTemplates(): TemplatesById {
+    return {
+      ...this.readStoredTemplates(),
+      ...Object.fromEntries(this.runtimeImportedTemplates),
+    };
+  }
+
+  private readStoredTemplates(): TemplatesById {
+    if (!this.storage) {
+      return {};
+    }
 
     try {
-      const validTemplate = parseTemplate(mockBunnyTemplate);
-      return [validTemplate];
-    } catch (error) {
-      console.error("Failed to parse available templates:", error);
-      return [];
+      const rawValue = this.storage.getItem(IMPORTED_TEMPLATES_STORAGE_KEY);
+
+      if (!rawValue) {
+        return {};
+      }
+
+      const parsedValue: unknown = JSON.parse(rawValue);
+
+      if (!isRecord(parsedValue)) {
+        return {};
+      }
+
+      const templates: TemplatesById = {};
+
+      for (const value of Object.values(parsedValue)) {
+        const template = safeParseTemplate(value);
+
+        if (template) {
+          templates[template.id] = template;
+        }
+      }
+
+      return templates;
+    } catch {
+      return {};
+    }
+  }
+
+  private writeImportedTemplates(templates: TemplatesById): void {
+    if (!this.storage) {
+      return;
+    }
+
+    try {
+      this.storage.setItem(
+        IMPORTED_TEMPLATES_STORAGE_KEY,
+        JSON.stringify(templates),
+      );
+    } catch {
+      return;
     }
   }
 }
 
 export const templateRepository = new TemplateRepository();
+
+function getSeedTemplates(): Template[] {
+  const template = safeParseTemplate(mockBunnyTemplate);
+
+  return template ? [template] : [];
+}
+
+function safeParseTemplate(value: unknown): Template | null {
+  try {
+    return parseImportedTemplate(value);
+  } catch (error) {
+    console.error("Failed to parse template:", error);
+    return null;
+  }
+}
+
+function getBrowserStorage(): TemplateStorage | null {
+  if (typeof globalThis === "undefined") {
+    return null;
+  }
+
+  try {
+    const candidate = globalThis as typeof globalThis & {
+      localStorage?: TemplateStorage;
+    };
+
+    return candidate.localStorage ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
