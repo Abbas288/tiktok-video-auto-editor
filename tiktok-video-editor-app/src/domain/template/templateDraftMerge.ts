@@ -19,6 +19,7 @@ export function mergeTemplateWithDraft(
     ...sourceTemplate,
     ...draft,
     id: sourceTemplate.id,
+    title: sourceTemplate.title,
     sourceVideoUrl: draft.sourceVideoUrl || sourceTemplate.sourceVideoUrl,
     orientation: draft.orientation ?? sourceTemplate.orientation,
     originalVolume: draft.originalVolume ?? sourceTemplate.originalVolume,

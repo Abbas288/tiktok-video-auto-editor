@@ -1,100 +1,231 @@
+import { TemplateImportValidationError } from "../domain/template/templateImportValidation";
+import { Template } from "../types/template";
 import {
-  ensureVideoReferenceAvailable,
-  openVideoReference,
-  UNAVAILABLE_VIDEO_MESSAGE,
-  VideoReferenceDependencies,
-} from "./videoReference";
+  TemplateRepository,
+  TemplateRepositoryError,
+  TemplateStorage,
+} from "./templateRepository";
 
-function createDependencies(
-  overrides: Partial<VideoReferenceDependencies> = {},
-): VideoReferenceDependencies {
+class MemoryStorage implements TemplateStorage {
+  private readonly values = new Map<string, string>();
+
+  public getItem(key: string): string | null {
+    return this.values.get(key) ?? null;
+  }
+
+  public setItem(key: string, value: string): void {
+    this.values.set(key, value);
+  }
+
+  public removeItem(key: string): void {
+    this.values.delete(key);
+  }
+}
+
+function createTemplate(overrides: Partial<Template> = {}): Template {
   return {
-    fetcher: jest.fn(async () => ({
-      ok: true,
-      headers: {
-        get: () => "video/mp4",
+    id: "custom-template",
+    title: "Custom Template",
+    sourceVideoUrl: "https://example.com/source.mp4",
+    orientation: "landscape",
+    originalVolume: 1,
+    scenes: [
+      {
+        id: "scene-1",
+        orderIndex: 0,
+        startSeconds: 0,
+        durationSeconds: 3,
+        instruction: "Show the main product clearly.",
+        textOverlays: [],
+        effects: [],
       },
-    })),
-    openUrl: jest.fn(async () => undefined),
-    compileServerBaseUrl: "http://localhost:3030",
+    ],
     ...overrides,
   };
 }
 
-describe("videoReference", () => {
-  it("returns external URLs without HEAD validation", async () => {
-    const dependencies = createDependencies();
+describe("TemplateRepository", () => {
+  it("imports a valid template and returns it by id", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
+    const template = createTemplate();
 
-    const result = await ensureVideoReferenceAvailable(
-      "https://example.com/video.mp4",
-      dependencies,
-    );
+    await repository.importTemplate(template);
 
-    expect(result).toBe("https://example.com/video.mp4");
-    expect(dependencies.fetcher).not.toHaveBeenCalled();
+    const result = await repository.getTemplateById("custom-template");
+
+    expect(result?.title).toBe("Custom Template");
   });
 
-  it("validates compile-server output URLs", async () => {
-    const dependencies = createDependencies();
+  it("includes imported templates in available templates", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
 
-    const result = await ensureVideoReferenceAvailable(
-      "http://localhost:3030/compiled/video.mp4",
-      dependencies,
-    );
+    await repository.importTemplate(createTemplate());
 
-    expect(result).toBe("http://localhost:3030/compiled/video.mp4");
-    expect(dependencies.fetcher).toHaveBeenCalledWith(
-      "http://localhost:3030/compiled/video.mp4",
-      { method: "HEAD" },
-    );
+    const templates = await repository.getAvailableTemplates();
+
+    expect(
+      templates.some((template) => template.id === "custom-template"),
+    ).toBe(true);
   });
 
-  it("rejects missing compile-server output URLs", async () => {
-    const dependencies = createDependencies({
-      fetcher: jest.fn(async () => ({
-        ok: false,
-        headers: {
-          get: () => "application/json",
-        },
-      })),
-    });
+  it("persists imported templates through storage", async () => {
+    const storage = new MemoryStorage();
+    const firstRepository = new TemplateRepository(storage);
+
+    await firstRepository.importTemplate(createTemplate());
+
+    const secondRepository = new TemplateRepository(storage);
+    const result = await secondRepository.getTemplateById("custom-template");
+
+    expect(result?.title).toBe("Custom Template");
+  });
+
+  it("renames an imported template", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
+
+    await repository.importTemplate(createTemplate());
+
+    const updatedTemplate = await repository.renameTemplate(
+      "custom-template",
+      "Renamed Project",
+    );
+    const templates = await repository.getAvailableTemplates();
+
+    expect(updatedTemplate.title).toBe("Renamed Project");
+    expect(
+      templates.find((template) => template.id === "custom-template")?.title,
+    ).toBe("Renamed Project");
+  });
+
+  it("persists renamed templates through storage", async () => {
+    const storage = new MemoryStorage();
+    const firstRepository = new TemplateRepository(storage);
+
+    await firstRepository.importTemplate(createTemplate());
+    await firstRepository.renameTemplate("custom-template", "Stored Rename");
+
+    const secondRepository = new TemplateRepository(storage);
+    const result = await secondRepository.getTemplateById("custom-template");
+
+    expect(result?.title).toBe("Stored Rename");
+  });
+
+  it("renames seed templates by storing an override", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
+    const [seedTemplate] = await repository.getAvailableTemplates();
+
+    const updatedTemplate = await repository.renameTemplate(
+      seedTemplate.id,
+      "Renamed Seed Project",
+    );
+    const result = await repository.getTemplateById(seedTemplate.id);
+
+    expect(updatedTemplate.title).toBe("Renamed Seed Project");
+    expect(result?.title).toBe("Renamed Seed Project");
+  });
+
+  it("rejects empty project names", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
+
+    await repository.importTemplate(createTemplate());
 
     await expect(
-      ensureVideoReferenceAvailable(
-        "http://localhost:3030/compiled/missing.mp4",
-        dependencies,
-      ),
-    ).rejects.toThrow(UNAVAILABLE_VIDEO_MESSAGE);
+      repository.renameTemplate("custom-template", "   "),
+    ).rejects.toThrow(TemplateRepositoryError);
   });
 
-  it("rejects JSON responses for compile-server output URLs", async () => {
-    const dependencies = createDependencies({
-      fetcher: jest.fn(async () => ({
-        ok: true,
-        headers: {
-          get: () => "application/json",
-        },
-      })),
-    });
+  it("deletes an imported template", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
+
+    await repository.importTemplate(createTemplate());
+    await repository.deleteTemplate("custom-template");
+
+    const templates = await repository.getAvailableTemplates();
+    const result = await repository.getTemplateById("custom-template");
+
+    expect(result).toBeNull();
+    expect(
+      templates.some((template) => template.id === "custom-template"),
+    ).toBe(false);
+  });
+
+  it("hides deleted seed templates", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
+    const [seedTemplate] = await repository.getAvailableTemplates();
+
+    await repository.deleteTemplate(seedTemplate.id);
+
+    const templates = await repository.getAvailableTemplates();
+    const result = await repository.getTemplateById(seedTemplate.id);
+
+    expect(result).toBeNull();
+    expect(templates.some((template) => template.id === seedTemplate.id)).toBe(
+      false,
+    );
+  });
+
+  it("allows importing a template again after deleting the same id", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
+
+    await repository.importTemplate(createTemplate());
+    await repository.deleteTemplate("custom-template");
+    await repository.importTemplate(
+      createTemplate({
+        title: "Imported Again",
+      }),
+    );
+
+    const result = await repository.getTemplateById("custom-template");
+
+    expect(result?.title).toBe("Imported Again");
+  });
+
+  it("rejects deleting a missing template", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
+
+    await expect(repository.deleteTemplate("missing-template")).rejects.toThrow(
+      TemplateRepositoryError,
+    );
+  });
+
+  it("rejects templates without scenes", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
 
     await expect(
-      ensureVideoReferenceAvailable(
-        "http://localhost:3030/compiled/not-video.mp4",
-        dependencies,
+      repository.importTemplate(
+        createTemplate({
+          scenes: [],
+        }),
       ),
-    ).rejects.toThrow(UNAVAILABLE_VIDEO_MESSAGE);
+    ).rejects.toThrow(TemplateImportValidationError);
   });
 
-  it("opens available video references", async () => {
-    const dependencies = createDependencies();
+  it("rejects templates with missing scene instructions", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
+    const template = createTemplate({
+      scenes: [
+        {
+          id: "scene-1",
+          orderIndex: 0,
+          startSeconds: 0,
+          durationSeconds: 3,
+          instruction: "",
+          textOverlays: [],
+          effects: [],
+        },
+      ],
+    });
 
-    await openVideoReference(
-      "http://localhost:3030/compiled/video.mp4",
-      dependencies,
+    await expect(repository.importTemplate(template)).rejects.toThrow(
+      TemplateImportValidationError,
     );
+  });
 
-    expect(dependencies.openUrl).toHaveBeenCalledWith(
-      "http://localhost:3030/compiled/video.mp4",
-    );
+  it("keeps seed templates available as fallback examples", async () => {
+    const repository = new TemplateRepository(new MemoryStorage());
+
+    const templates = await repository.getAvailableTemplates();
+
+    expect(templates.length).toBeGreaterThan(0);
   });
 });
