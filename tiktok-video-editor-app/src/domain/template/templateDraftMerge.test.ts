@@ -36,6 +36,21 @@ describe("templateDraftMerge", () => {
     );
   });
 
+  it("uses the latest source title instead of an old draft title", () => {
+    const sourceTemplate = {
+      ...createSourceTemplate(),
+      title: "Renamed Project",
+    };
+    const draft: Template = {
+      ...sourceTemplate,
+      title: "Old Draft Title",
+    };
+
+    const result = mergeTemplateWithDraft(sourceTemplate, draft);
+
+    expect(result.title).toBe("Renamed Project");
+  });
+
   it("preserves draft volume changes while keeping source music url", () => {
     const sourceTemplate = createSourceTemplate();
     const draft: Template = {
