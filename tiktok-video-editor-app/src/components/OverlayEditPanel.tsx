@@ -1,3 +1,4 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { useCallback } from "react";
 import {
   StyleSheet,
@@ -9,9 +10,7 @@ import {
 import { TextOverlayUpdate } from "../store/useEditSession";
 import { colors } from "../styles/theme";
 import { TextOverlay } from "../types/template";
-import { ControlRow } from "./editor-panel/ControlRow";
 import { EditorPanel } from "./editor-panel/EditorPanel";
-import { PanelButton } from "./editor-panel/PanelButton";
 
 export interface OverlayEditPanelProps {
   overlay: TextOverlay | null;
@@ -19,17 +18,20 @@ export interface OverlayEditPanelProps {
   onClose: () => void;
 }
 
+type MaterialIconName = React.ComponentProps<typeof MaterialIcons>["name"];
+
 const COLOR_OPTIONS = ["#00D6F9", "#FFFFFF", "#FF0000", "#00FF00", "#FFD400"];
 const MIN_FONT_SIZE = 10;
 const MAX_FONT_SIZE = 96;
 const FONT_SIZE_STEP = 2;
 
-/**
- * Renders editing controls for the selected text overlay.
- *
- * @param props Selected overlay and edit handlers.
- * @returns Overlay editing panel, or null when no overlay is selected.
- */
+const HIT_SLOP = {
+  top: 8,
+  right: 8,
+  bottom: 8,
+  left: 8,
+};
+
 export function OverlayEditPanel({
   overlay,
   onChange,
@@ -75,31 +77,79 @@ export function OverlayEditPanel({
         testID="overlay-text-input"
       />
 
-      <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Color</Text>
+      <View style={styles.controlsRow}>
+        <View style={styles.colorGroup}>
+          <Text style={styles.label}>Color</Text>
 
-        <View style={styles.colorRow}>
-          {COLOR_OPTIONS.map((color) => (
-            <TouchableOpacity
-              key={color}
-              style={[
-                styles.colorButton,
-                { backgroundColor: color },
-                overlay.color === color && styles.selectedColorButton,
-              ]}
-              onPress={() => onChange({ color })}
-              testID={`overlay-color-${color}`}
+          <View style={styles.colorRow}>
+            {COLOR_OPTIONS.map((color) => (
+              <TouchableOpacity
+                key={color}
+                style={[
+                  styles.colorButton,
+                  { backgroundColor: color },
+                  overlay.color === color && styles.selectedColorButton,
+                ]}
+                onPress={() => onChange({ color })}
+                hitSlop={HIT_SLOP}
+                testID={`overlay-color-${color}`}
+                accessibilityRole="button"
+                accessibilityLabel={`Set text color ${color}`}
+              />
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.fontGroup}>
+          <Text style={styles.label}>Font size</Text>
+
+          <View style={styles.fontControl}>
+            <IconButton
+              icon="remove"
+              onPress={decreaseFontSize}
+              testID="overlay-font-decrease"
+              accessibilityLabel="Decrease font size"
             />
-          ))}
+
+            <Text style={styles.fontValue}>{overlay.fontSizePt} pt</Text>
+
+            <IconButton
+              icon="add"
+              onPress={increaseFontSize}
+              testID="overlay-font-increase"
+              accessibilityLabel="Increase font size"
+            />
+          </View>
         </View>
       </View>
-
-      <ControlRow label="Font size" value={`${overlay.fontSizePt} pt`}>
-        <PanelButton label="Smaller" minWidth={72} onPress={decreaseFontSize} />
-
-        <PanelButton label="Larger" minWidth={72} onPress={increaseFontSize} />
-      </ControlRow>
     </EditorPanel>
+  );
+}
+
+interface IconButtonProps {
+  icon: MaterialIconName;
+  onPress: () => void;
+  testID: string;
+  accessibilityLabel: string;
+}
+
+function IconButton({
+  icon,
+  onPress,
+  testID,
+  accessibilityLabel,
+}: IconButtonProps): React.JSX.Element {
+  return (
+    <TouchableOpacity
+      style={styles.iconButton}
+      onPress={onPress}
+      hitSlop={HIT_SLOP}
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+    >
+      <MaterialIcons name={icon} size={18} color={colors.text} />
+    </TouchableOpacity>
   );
 }
 
@@ -113,16 +163,28 @@ const styles = StyleSheet.create({
     color: colors.text,
     backgroundColor: colors.background,
   },
-  fieldGroup: {
-    gap: 10,
+  controlsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 14,
+    alignItems: "flex-end",
+  },
+  colorGroup: {
+    flexGrow: 1,
+    gap: 9,
+    minWidth: 220,
+  },
+  fontGroup: {
+    gap: 9,
   },
   label: {
     color: colors.textSecondary,
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "800",
   },
   colorRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   colorButton: {
@@ -134,5 +196,29 @@ const styles = StyleSheet.create({
   },
   selectedColorButton: {
     borderColor: colors.primary,
+  },
+  fontControl: {
+    minHeight: 34,
+    borderRadius: 999,
+    backgroundColor: colors.background,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 8,
+  },
+  iconButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  fontValue: {
+    minWidth: 46,
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: "900",
+    textAlign: "center",
   },
 });

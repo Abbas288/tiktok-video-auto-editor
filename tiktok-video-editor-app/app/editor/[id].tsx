@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -12,6 +12,10 @@ import { useEditorController } from "../../src/application/useEditorController";
 import { AudioPanel } from "../../src/components/AudioPanel";
 import { CompilePanel } from "../../src/components/CompilePanel";
 import { EditorHeader } from "../../src/components/EditorHeader";
+import {
+  EditorToolKey,
+  EditorToolTabs,
+} from "../../src/components/EditorToolTabs";
 import { OverlayEditPanel } from "../../src/components/OverlayEditPanel";
 import { SceneEffectsPanel } from "../../src/components/SceneEffectsPanel";
 import { SceneVideoChecklist } from "../../src/components/SceneVideoChecklist";
@@ -26,6 +30,7 @@ export default function EditorScreen(): React.JSX.Element {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
   const templateId = normalizeRouteParam(id);
+  const [activeTool, setActiveTool] = useState<EditorToolKey>("scene");
 
   const handleExitEditor = useCallback((): void => {
     if (router.canGoBack()) {
@@ -40,6 +45,18 @@ export default function EditorScreen(): React.JSX.Element {
     templateId,
     onExitEditor: handleExitEditor,
   });
+
+  useEffect(() => {
+    if (controller.selectedOverlayId) {
+      setActiveTool("text");
+    }
+  }, [controller.selectedOverlayId]);
+
+  useEffect(() => {
+    if (controller.selectedTransition) {
+      setActiveTool("timeline");
+    }
+  }, [controller.selectedTransition]);
 
   if (controller.isLoading) {
     return (
@@ -61,6 +78,11 @@ export default function EditorScreen(): React.JSX.Element {
       </View>
     );
   }
+
+  const handleSelectTransition = (sceneId: string): void => {
+    setActiveTool("timeline");
+    controller.handleSelectTransition(sceneId);
+  };
 
   return (
     <View style={styles.container}>
@@ -96,16 +118,75 @@ export default function EditorScreen(): React.JSX.Element {
           onSelectScene={controller.handleSceneClick}
         />
 
-        <SceneVideoPanel
-          scene={controller.activeScene}
-          message={controller.sceneVideoMessage}
-          trimDraft={controller.sceneVideoTrimDraft}
-          isBusy={controller.isSceneVideoBusy}
-          onPickVideo={controller.handlePickSceneVideo}
-          onConfirmTrim={controller.handleConfirmSceneVideoTrim}
-          onCancelTrim={controller.handleCancelSceneVideoTrim}
-          onRemoveVideo={controller.handleRemoveSceneVideo}
-        />
+        <EditorToolTabs activeTool={activeTool} onChangeTool={setActiveTool} />
+
+        <View style={styles.toolShell}>
+          {activeTool === "scene" ? (
+            <SceneVideoPanel
+              scene={controller.activeScene}
+              message={controller.sceneVideoMessage}
+              trimDraft={controller.sceneVideoTrimDraft}
+              isBusy={controller.isSceneVideoBusy}
+              onPickVideo={controller.handlePickSceneVideo}
+              onConfirmTrim={controller.handleConfirmSceneVideoTrim}
+              onCancelTrim={controller.handleCancelSceneVideoTrim}
+              onRemoveVideo={controller.handleRemoveSceneVideo}
+            />
+          ) : null}
+
+          {activeTool === "text" ? (
+            controller.selectedOverlayResult?.overlay ? (
+              <OverlayEditPanel
+                overlay={controller.selectedOverlayResult.overlay}
+                onChange={controller.handleChangeSelectedOverlay}
+                onClose={() => controller.selectOverlay(null)}
+              />
+            ) : (
+              <ToolHint message="Select text in preview." />
+            )
+          ) : null}
+
+          {activeTool === "filters" ? (
+            <SceneEffectsPanel
+              sceneTitle={controller.activeScene?.instruction ?? null}
+              values={controller.activeSceneFilterValues}
+              onChange={controller.handleChangeSceneEffect}
+              onReset={controller.handleResetSceneEffects}
+            />
+          ) : null}
+
+          {activeTool === "audio" ? (
+            <AudioPanel
+              originalVolume={controller.currentTemplate.originalVolume ?? 1}
+              musicVolume={
+                controller.currentTemplate.music
+                  ? controller.currentTemplate.music.volume
+                  : null
+              }
+              onChangeVolumes={controller.updateVolumes}
+            />
+          ) : null}
+
+          {activeTool === "timeline" ? (
+            <>
+              <Timeline
+                scenes={controller.currentTemplate.scenes}
+                activeSceneId={controller.activeSceneId}
+                onSelectScene={controller.handleSceneClick}
+                onSelectTransition={handleSelectTransition}
+              />
+
+              <TransitionPickerPanel
+                scene={controller.selectedTransition?.scene ?? null}
+                selectedTransition={
+                  controller.selectedTransition?.transition ?? null
+                }
+                onChangeTransition={controller.handleChangeTransition}
+                onClose={controller.handleCloseTransitionPicker}
+              />
+            </>
+          ) : null}
+        </View>
 
         <CompilePanel
           status={controller.compileStatus}
@@ -118,48 +199,15 @@ export default function EditorScreen(): React.JSX.Element {
           onSaveCompiledVideo={controller.handleSaveCompiledVideo}
           onOpenCompiledVideo={controller.handleOpenCompiledVideo}
         />
-
-        <OverlayEditPanel
-          overlay={controller.selectedOverlayResult?.overlay ?? null}
-          onChange={controller.handleChangeSelectedOverlay}
-          onClose={() => controller.selectOverlay(null)}
-        />
-
-        {!controller.selectedOverlayId && (
-          <>
-            <SceneEffectsPanel
-              sceneTitle={controller.activeScene?.instruction ?? null}
-              values={controller.activeSceneFilterValues}
-              onChange={controller.handleChangeSceneEffect}
-              onReset={controller.handleResetSceneEffects}
-            />
-
-            <AudioPanel
-              originalVolume={controller.currentTemplate.originalVolume ?? 1}
-              musicVolume={
-                controller.currentTemplate.music
-                  ? controller.currentTemplate.music.volume
-                  : null
-              }
-              onChangeVolumes={controller.updateVolumes}
-            />
-          </>
-        )}
-
-        <Timeline
-          scenes={controller.currentTemplate.scenes}
-          activeSceneId={controller.activeSceneId}
-          onSelectScene={controller.handleSceneClick}
-          onSelectTransition={controller.handleSelectTransition}
-        />
-
-        <TransitionPickerPanel
-          scene={controller.selectedTransition?.scene ?? null}
-          selectedTransition={controller.selectedTransition?.transition ?? null}
-          onChangeTransition={controller.handleChangeTransition}
-          onClose={controller.handleCloseTransitionPicker}
-        />
       </ScrollView>
+    </View>
+  );
+}
+
+function ToolHint({ message }: { message: string }): React.JSX.Element {
+  return (
+    <View style={styles.toolHint}>
+      <Text style={styles.toolHintText}>{message}</Text>
     </View>
   );
 }
@@ -173,13 +221,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
-    gap: 24,
+    padding: 14,
+    gap: 12,
   },
   stageShell: {
     width: "100%",
     maxWidth: 960,
     alignSelf: "center",
+  },
+  toolShell: {
+    width: "100%",
+    maxWidth: 960,
+    alignSelf: "center",
+    gap: 12,
+  },
+  toolHint: {
+    width: "100%",
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    alignItems: "center",
+  },
+  toolHintText: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: "800",
   },
   center: {
     flex: 1,
