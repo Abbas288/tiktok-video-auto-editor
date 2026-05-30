@@ -50,11 +50,11 @@
     "react-test-renderer": "^19.1.0",
     "typescript": "~5.9.2"
   },
-"jest": {
-  "preset": "jest-expo",
-  "setupFilesAfterEnv": [
-    "<rootDir>/jest.setup.ts"
-  ]
-},
+  "jest": {
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.ts"
+    ]
+  },
   "private": true
 }
