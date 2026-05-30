@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { AppNavbar } from "../../src/components/AppNavbar";
 import { createGoogleAiStudioTemplatePrompt } from "../../src/domain/template/templateAiPrompt";
 import {
   getTemplateImportErrorMessage,
@@ -132,142 +133,146 @@ export default function HomeScreen(): React.JSX.Element {
   }, []);
 
   return (
-    <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.content}
-      testID="home-screen"
-    >
-      <View style={styles.heroCard}>
-        <View style={styles.heroHeader}>
-          <View style={styles.heroIconBadge}>
-            <MaterialIcons
-              name="movie-creation"
-              size={24}
-              color={colors.primary}
-            />
-          </View>
+    <View style={styles.container}>
+      <AppNavbar />
 
-          <View style={styles.heroTextColumn}>
-            <Text style={styles.title}>Projects</Text>
-            <Text style={styles.subtitle}>
-              Create a project from a JSON template or open an existing one.
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.actionRow}>
-          <HomeActionButton
-            icon="add-circle-outline"
-            label="Create project"
-            variant="primary"
-            disabled={isImporting}
-            onPress={() =>
-              setIsCreatePanelOpen((currentValue) => !currentValue)
-            }
-            testID="create-project-button"
-          />
-
-          <HomeActionButton
-            icon="content-copy"
-            label="Copy AI prompt"
-            variant="ghost"
-            disabled={isImporting}
-            onPress={handleCopyPrompt}
-            testID="copy-template-prompt-button"
-          />
-        </View>
-      </View>
-
-      {feedback ? <FeedbackBanner feedback={feedback} /> : null}
-
-      {isCreatePanelOpen ? (
-        <View style={styles.createPanel} testID="create-project-panel">
-          <View style={styles.createHeader}>
-            <View style={styles.createTextColumn}>
-              <Text style={styles.panelTitle}>Create from template</Text>
-              <Text style={styles.panelDescription}>
-                Upload a .txt or .json file containing the editor template.
-              </Text>
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={styles.content}
+        testID="home-screen"
+      >
+        <View style={styles.heroCard}>
+          <View style={styles.heroHeader}>
+            <View style={styles.heroIconBadge}>
+              <MaterialIcons
+                name="movie-creation"
+                size={24}
+                color={colors.primary}
+              />
             </View>
 
-            <MaterialIcons
-              name="data-object"
-              size={22}
-              color={colors.primary}
-            />
+            <View style={styles.heroTextColumn}>
+              <Text style={styles.title}>Projects</Text>
+              <Text style={styles.subtitle}>
+                Create a project from a JSON template or open an existing one.
+              </Text>
+            </View>
           </View>
 
-          <HomeActionButton
-            icon="upload-file"
-            label={isImporting ? "Importing" : "Add JSON template"}
-            variant="primary"
-            disabled={isImporting}
-            onPress={handleImportTemplate}
-            testID="add-json-template-button"
-          />
+          <View style={styles.actionRow}>
+            <HomeActionButton
+              icon="add-circle-outline"
+              label="Create project"
+              variant="primary"
+              disabled={isImporting}
+              onPress={() =>
+                setIsCreatePanelOpen((currentValue) => !currentValue)
+              }
+              testID="create-project-button"
+            />
+
+            <HomeActionButton
+              icon="content-copy"
+              label="Copy AI prompt"
+              variant="ghost"
+              disabled={isImporting}
+              onPress={handleCopyPrompt}
+              testID="copy-template-prompt-button"
+            />
+          </View>
         </View>
-      ) : null}
 
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Available templates</Text>
-        <Text style={styles.sectionCount}>{templates.length}</Text>
-      </View>
+        {feedback ? <FeedbackBanner feedback={feedback} /> : null}
 
-      {isLoading ? (
-        <View style={styles.centerCard}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      ) : templates.length === 0 ? (
-        <View style={styles.emptyCard}>
-          <MaterialIcons
-            name="folder-open"
-            size={28}
-            color={colors.textSecondary}
-          />
-          <Text style={styles.emptyTitle}>No templates yet.</Text>
-          <Text style={styles.emptyText}>
-            Create a project and import a JSON template to get started.
-          </Text>
-        </View>
-      ) : (
-        <View style={styles.templateList}>
-          {templates.map((template) => (
-            <TouchableOpacity
-              key={template.id}
-              style={styles.templateCard}
-              onPress={() => handleOpenProject(template.id)}
-              testID={`template-card-${template.id}`}
-              accessibilityRole="button"
-              accessibilityLabel={`Open ${template.title}`}
-            >
-              <View style={styles.templateIconBadge}>
-                <MaterialIcons
-                  name="movie-filter"
-                  size={20}
-                  color={colors.primary}
-                />
-              </View>
-
-              <View style={styles.templateTextColumn}>
-                <Text style={styles.cardTitle} numberOfLines={1}>
-                  {template.title}
-                </Text>
-
-                <Text style={styles.cardMeta}>
-                  {template.scenes.length} scenes · {template.orientation}
+        {isCreatePanelOpen ? (
+          <View style={styles.createPanel} testID="create-project-panel">
+            <View style={styles.createHeader}>
+              <View style={styles.createTextColumn}>
+                <Text style={styles.panelTitle}>Create from template</Text>
+                <Text style={styles.panelDescription}>
+                  Upload a .txt or .json file containing the editor template.
                 </Text>
               </View>
 
               <MaterialIcons
-                name="chevron-right"
-                size={24}
-                color={colors.textSecondary}
+                name="data-object"
+                size={22}
+                color={colors.primary}
               />
-            </TouchableOpacity>
-          ))}
+            </View>
+
+            <HomeActionButton
+              icon="upload-file"
+              label={isImporting ? "Importing" : "Add JSON template"}
+              variant="primary"
+              disabled={isImporting}
+              onPress={handleImportTemplate}
+              testID="add-json-template-button"
+            />
+          </View>
+        ) : null}
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Projects</Text>
+          <Text style={styles.sectionCount}>{templates.length}</Text>
         </View>
-      )}
-    </ScrollView>
+
+        {isLoading ? (
+          <View style={styles.centerCard}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        ) : templates.length === 0 ? (
+          <View style={styles.emptyCard}>
+            <MaterialIcons
+              name="folder-open"
+              size={28}
+              color={colors.textSecondary}
+            />
+            <Text style={styles.emptyTitle}>No projects yet.</Text>
+            <Text style={styles.emptyText}>
+              Create a project and import a JSON template to get started.
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.templateList}>
+            {templates.map((template) => (
+              <TouchableOpacity
+                key={template.id}
+                style={styles.templateCard}
+                onPress={() => handleOpenProject(template.id)}
+                testID={`template-card-${template.id}`}
+                accessibilityRole="button"
+                accessibilityLabel={`Open ${template.title}`}
+              >
+                <View style={styles.templateIconBadge}>
+                  <MaterialIcons
+                    name="movie-filter"
+                    size={20}
+                    color={colors.primary}
+                  />
+                </View>
+
+                <View style={styles.templateTextColumn}>
+                  <Text style={styles.cardTitle} numberOfLines={1}>
+                    {template.title}
+                  </Text>
+
+                  <Text style={styles.cardMeta}>
+                    {template.scenes.length} scenes · {template.orientation}
+                  </Text>
+                </View>
+
+                <MaterialIcons
+                  name="chevron-right"
+                  size={24}
+                  color={colors.textSecondary}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -355,6 +360,10 @@ function FeedbackBanner({
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   screen: {
     flex: 1,
     backgroundColor: colors.background,
