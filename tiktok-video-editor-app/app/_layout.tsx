@@ -9,9 +9,12 @@ export default function RootLayout(): React.JSX.Element {
       screenOptions={{
         headerStyle: { backgroundColor: "#000000" },
         headerTintColor: "#FFFFFF",
+        headerTitleStyle: {
+          fontWeight: "900",
+        },
       }}
     >
-      <Stack.Screen name="(home)/index" options={{ title: "My Projects" }} />
+      <Stack.Screen name="(home)/index" options={{ headerShown: false }} />
       <Stack.Screen
         name="editor/[id]"
         options={{ title: "Editor", headerShown: false }}
