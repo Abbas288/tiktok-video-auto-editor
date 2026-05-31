@@ -30,6 +30,7 @@ export interface ProjectOverviewController {
   busyProjectId: string | null;
   setRenameDraft: (value: string) => void;
   toggleCreatePanel: () => void;
+  handleOpenTemplateGuide: () => void;
   handleOpenProject: (id: string) => Promise<void>;
   handleImportTemplate: () => Promise<void>;
   handleCopyPrompt: () => Promise<void>;
@@ -98,6 +99,10 @@ export function useProjectOverviewController(): ProjectOverviewController {
   const toggleCreatePanel = useCallback((): void => {
     setIsCreatePanelOpen((currentValue) => !currentValue);
   }, []);
+
+  const handleOpenTemplateGuide = useCallback((): void => {
+    router.push("/template-guide");
+  }, [router]);
 
   const handleOpenProject = useCallback(
     async (id: string): Promise<void> => {
@@ -305,6 +310,7 @@ export function useProjectOverviewController(): ProjectOverviewController {
     busyProjectId,
     setRenameDraft,
     toggleCreatePanel,
+    handleOpenTemplateGuide,
     handleOpenProject,
     handleImportTemplate,
     handleCopyPrompt,
