@@ -69,6 +69,15 @@ export function ProjectOverviewScreen(): React.JSX.Element {
               }}
               testID="copy-template-prompt-button"
             />
+
+            <HomeActionButton
+              icon="info-outline"
+              label="Guide"
+              variant="ghost"
+              disabled={controller.isImporting}
+              onPress={controller.handleOpenTemplateGuide}
+              testID="template-guide-button"
+            />
           </View>
         </View>
 
