@@ -1,125 +1,61 @@
 # Kapitel 25: Configuration Management
 
-## 1. Kärna i kapitlet
+## Kärna
 
-Kapitel 25 handlar om configuration management, alltså hur man hanterar ändringar, versioner, konfigurationer och releases i mjukvaruprojekt. När ett system växer måste det gå att veta vad som ändrats, varför det ändrats, vilken version som testats och vilka filer som hör ihop.
+Configuration management handlar om att veta vad som ändrats, varför, i vilken version och hur ändringen kan byggas eller återställas.
 
-Configuration management är extra viktigt när flera filer, beroenden, dokumentation och testfall förändras samtidigt.
+## Viktiga begrepp
 
-## 2. Viktiga begrepp
+* configuration item
+* version control
+* branch
+* commit
+* merge
+* baseline
+* system building
+* release management
+* change management
+* traceability
 
-- Configuration item: något som versionshanteras, till exempel kod, dokumentation, testfall eller konfiguration.
-- Version control: hantera historik av ändringar.
-- Baseline: känd version som används som referens.
-- Change management: hantera föreslagna och genomförda ändringar.
-- System building: bygga systemet från rätt filer och beroenden.
-- Release management: paketera och leverera versioner.
-- Branch: separat utvecklingslinje.
-- Merge: föra samman ändringar.
-- Commit: sparad ändring med historik.
-- Traceability: kunna följa ändring från krav till kod och test.
+## Relevans för 1DV613
 
-## 3. Relevans för 1DV613
+GitLab, issues, branches, commits, MR, testfall, Wiki och CI/CD är bevis på process.
 
-Kursen använder GitLab, issues, Wiki, milestones, iterations och commits som bevis på utvecklingsprocess. Abbas måste kunna visa vad som ändrats över tid och varför.
+## Relevans för Abbas projekt
 
-Configuration management kopplar ihop:
+Configuration items:
 
-- Git
-- GitLab issues
-- branches
-- merge requests
-- commits
-- Wiki
-- testfall
-- releases
-- tidsloggning
+* appkod
+* compile-server
+* package-lock
+* testfall
+* ai-context
+* GEMINI.md
+* Wiki
+* CI/CD-filer
+* Dockerfiler när deployment används
 
-## 4. Relevans för Abbas projekt
+## Fast regel
 
-Abbas projekt har många configuration items:
-
-- appkod
-- Template-JSON-typer
-- mockTemplate
-- Zustand store
-- routes
-- theme
-- testfall
-- ai-context
-- Wiki
-- README
-- package.json
-- package-lock.json
-- `.gitignore`
-
-Eftersom Gemini kan skapa många filer snabbt måste Abbas vara extra noga med `git status`, `git diff` och små commits.
-
-## 5. När Gemini ska använda kapitlet
-
-Använd detta kapitel när Gemini ska:
-
-- hjälpa med git status och diff
-- föreslå commit
-- skapa branch-namn
-- förklara staged och unstaged changes
-- bedöma om filer ska committas
-- skriva release notes
-- koppla ändring till issue
-- hantera package-lock och package.json
-- undvika att skräpfiler kommer med
-
-## 6. Vad som måste synas i wiki, rapport, testning eller presentation
-
-Wiki och rapport ska visa:
-
-- hur Abbas använder GitLab
-- hur issues kopplas till commits
-- hur testad version identifieras
-- hur ändringar spåras
-- hur branches eller commits används
-- hur tidsloggning används
-
-Presentation kan säga:
-
-"Jag använder GitLab och Git för spårbarhet. Varje större ändring ska kopplas till issue, testfall och commit, så att det går att följa projektets utveckling från krav till verifierad kod."
-
-## 7. Praktisk koppling till projektet
-
-Gemini ska alltid föreslå dessa kontroller före commit:
+Nytt arbete ska börja från uppdaterad main:
 
 ```bash
 git status
-git diff
-npm run lint
-npx tsc --noEmit
+git switch main
+git pull
+git switch -c <issue-number-short-branch-name>
 ```
 
-Om filer är staged:
+## CI/CD-koppling
 
-```bash
-git diff --staged
-```
+CI/CD ska ses som automatiserad configuration management. Pipeline verifierar att rätt filer och beroenden fungerar tillsammans.
 
-Rekommenderad commit-disciplin:
+## Praktisk regel för Gemini
 
-- en feature per commit
-- tydligt prefix
-- inget blandat scope
-- inga debug-filer
-- inga miljövariabler
-- inga otestade stora ändringar
+När Gemini föreslår commit ska den först be om:
 
-Bra commit:
+* `git status`
+* `git diff`
+* relevant verifiering
 
-```bash
-git commit -m "feat: setup Expo Router foundation"
-```
-
-Dålig commit:
-
-```bash
-git commit -m "fix stuff"
-```
-
-Configuration management för Abbas betyder att projektet ska gå att förstå i efterhand: vad byggdes, varför byggdes det, hur testades det och vilken version gäller?
+Gemini ska inte föreslå att dokumentation, kod och deploy blandas i samma MR om de inte hör till samma issue.
