@@ -1,403 +1,144 @@
-# Arkitektur (04_architecture.md)
+# Arkitektur
 
 ## Syfte
 
-Denna fil beskriver Abbas arkitektur och ansvarsfördelning mellan mobilapp, upstream AI/API, Template-JSON, EditSession, backend/compile-server och FFmpeg.
+Denna fil beskriver ansvarsfördelning och dataflöde i Abbas projekt. Använd den vid kod, refactor, testning, rapport, Wiki och presentation.
 
-Gemini ska använda denna fil när den:
-- föreslår kodstruktur
-- skriver Wiki eller rapport om arkitektur
-- förklarar dataflöde
-- separerar frontend, backend och externa services
-- granskar om kod hamnar i rätt lager
-- planerar tester för Domain, Application eller Infrastructure
-- beskriver Docker, deployment eller runtime-miljö
+## Huvudflöde
 
-## Övergripande dataflöde
+TikTok URL -> upstream AI/API -> Template-JSON -> parse/validation -> EditSession -> Editor UI -> Preview -> CompilePayload -> compile-server -> FFmpeg -> export.
 
-Appen följer detta huvudflöde:
+## Lager
 
-TikTok URL -> AI/API video analysis -> Template-JSON -> EditSession -> Editor UI -> Preview/Timeline -> Compile-payload -> backend/compile-server -> Rendered video via FFmpeg
+### Presentation
 
-## Ansvarsfördelning
+Innehåller:
 
-### Upstream AI/API
-
-Ansvar:
-- tar emot eller arbetar utifrån en specifik TikTok-URL
-- analyserar den specifika videons redigeringsmönster
-- extraherar struktur, timing, scener, overlays, stil och effekter
-- returnerar strukturerad JSON-data
-
-Detta sker utanför mobilappen.
-
-### Mobilappen
-
-Ansvar:
-- konsumera Template-JSON
-- validera och normalisera data
-- bygga EditSession
-- visa home, editor och preview
-- hantera timeline och scenval
-- hantera text overlays, transitions, effects och audio
-- skapa compile-payload
-- kommunicera med backend/compile-server
-
-Mobilappen ska inte:
-- analysera TikTok-videor i frontend
-- köra FFmpeg lokalt
-- generera Supabase/GCS-data
-- fungera som generell trendcrawler
-- anta att mockTemplate är samma sak som verklig API-data
-
-### Backend/compile-server
-
-Ansvar:
-- ta emot compile-payload
-- hämta eller ta emot relevant media
-- köra FFmpeg
-- skapa färdig MP4
-- returnera renderad video eller video-URL
-
-### FFmpeg
-
-Ansvar:
-- faktisk videoprocessering
-- klippning enligt redigeringsbeskrivning
-- overlays
-- transitions
-- effekter
-- ljudmix
-- exportformat
-
-## Lagerarkitektur
-
-Appen delas upp i fyra logiska lager.
-
-## 1. Presentation Layer
-
-Teknik:
-- React Native
-- Expo Router
-- UI-komponenter
-
-Ansvar:
-- visa screens
-- hantera användarinteraktion
-- visa timeline
-- visa preview
-- visa editor controls
-- navigera mellan routes
-
-Mappar:
-- `app/`
-- `src/components/`
+* Expo Router routes
+* screens
+* React Native-komponenter
+* UI-state som bara gäller rendering
 
 Exempel:
-- `app/(home)/index.tsx`
-- `app/(editor)/[id].tsx`
-- `app/(preview)/[id].tsx`
-- `app/_layout.tsx`
 
-Regel:
+* `app/(home)/index.tsx`
+* `app/editor/[id].tsx`
+* `app/preview/[id].tsx`
+* `app/template-guide.tsx`
+* `src/components/project-overview/*`
+* `src/components/video-stage/*`
+* `src/components/CompilePanel.tsx`
 
-Presentation-lagret får inte innehålla tung affärslogik eller känna till detaljer om API-format utöver det som behövs för rendering.
+Presentation ska inte äga domänregler.
 
-## 2. Application Layer
+### Application
 
-Teknik:
-- Zustand
-- application services
-
-Ansvar:
-- hålla EditSession
-- hantera selected scene
-- orkestrera flödet mellan UI och domain
-- hantera state transitions
-- hålla användarens ändringar innan compile
-
-Mappar:
-- `src/store/`
-- framtida `src/application/`
+Innehåller orchestration och hooks som kopplar UI till domain och infrastructure.
 
 Exempel:
-- `src/store/useEditSession.ts`
-- `src/application/useInitializeEditor.ts`
 
-Regel:
+* `useProjectOverviewController`
+* `useEditorController`
+* `useEditorCompileController`
+* `useSceneVideoController`
+* `sceneVideoSourceFactory`
 
-Application-lagret får samordna, men ska inte blanda in UI-rendering eller låg nivå nätverkskod.
+Application får använda domain och infrastructure men ska hålla UI-komponenter tunna.
 
-## 3. Domain Layer
+### Domain
 
-Teknik:
-- TypeScript
-- rena funktioner
-- schemas och types
-
-Ansvar:
-- definiera Template-JSON-kontrakt
-- definiera Scene, TextOverlay, Transition, Effect, Music
-- definiera EditSession
-- validera Template-JSON
-- bygga EditSession från Template
-- bygga compile-payload från EditSession
-
-Mappar:
-- `src/types/`
-- framtida `src/domain/`
+Innehåller ren logik och regler.
 
 Exempel:
-- `src/types/template.ts`
-- `src/domain/parseTemplate.ts`
-- framtida `buildEditSession`
-- framtida `buildCompilePayload`
 
-Regel:
+* template parsing och validation
+* compile-payload builder
+* scene video readiness
+* scene preview timeline
+* transitions
+* scene effects
+* overlay position
+* zoom/pan
+* audio volume
+* template guide content
 
-Domain-lagret ska vara så oberoende som möjligt från React Native och Expo.
+Domain ska vara testbar utan Expo runtime.
 
-## 4. Infrastructure Layer
+### Infrastructure
 
-Teknik:
-- API-klienter
-- nätverk
-- Supabase
-- GCS
-- compile-server
-- filsystem
-
-Ansvar:
-- hämta templates
-- hämta signerade media-URL:er
-- skicka compile-payload
-- ta emot renderingsresultat
-- kapsla externa beroenden
-
-Mappar:
-- `src/infrastructure/`
-- framtida `src/services/`
+Innehåller externa system, repositories och platform APIs.
 
 Exempel:
-- `src/infrastructure/templateRepository.ts`
-- framtida `TemplateApiClient`
-- framtida `RenderApiClient`
-- framtida `GcsMediaResolver`
 
-Regel:
+* `templateRepository`
+* `templateImportService`
+* `compileService`
+* `saveCompiledVideo`
+* `videoReference`
+* Expo FileSystem, MediaLibrary, DocumentPicker, ImagePicker, Clipboard
 
-Infrastructure ska kunna mockas så att tester inte kräver riktiga API-anrop.
+Infrastructure ska kapsla plattformsspecifika detaljer.
 
-## 5. Deployment Layer
+### Compile-server
 
-Deployment är inte ett nytt produktlager i editorlogiken, men det är en del av systemets leveransform.
-
-Teknik:
-- Expo Web-export
-- Docker
-- Docker Compose
-- Nginx som statisk webbserver
-- Caddy eller Nginx som reverse proxy
-- Cumulus som kursens deploymentmiljö
+Compile-servern är separat backend.
 
 Ansvar:
-- bygga appen till statisk Expo Web-output
-- paketera webbappen reproducerbart
-- servera statiska filer
-- hantera portpublicering och intern containerkommunikation
-- möjliggöra demo och leverans i kursmiljö
 
-Regler:
-- Expo Web-deployment är inte samma sak som färdig native mobilrelease.
-- Docker ska inte användas som argument för att köra FFmpeg i mobilappen.
-- Backend/compile-server kan senare containeriseras separat.
-- Production ska inte bygga på lokala dev-volymer eller hot reload.
-- Secrets, `.env`, privata nycklar och certifikat får inte versionshanteras eller byggas in i image.
+* validera compile-payload
+* hantera upload och `/compiled`
+* stödja placeholder-läge
+* rendera i FFmpeg-läge
+* använda scenvisa videokällor
+* skapa ASS-subtitles för textoverlay
+* applicera scene effects och transitions
+* hantera originalVolume och music.volume
+* skapa användbar outputreferens
 
-Exempel på deploymentflöde:
+## Viktiga kontrakt
 
-```text
-Expo source -> expo export --platform web -> static dist -> Nginx container -> Caddy/reverse proxy -> Cumulus demo
-```
+### Template
 
-För framtida backend:
-
-```text
-Compile-payload -> backend/compile-server container -> FFmpeg -> rendered video
-```
-
-## Viktiga arkitekturkomponenter
-
-### Template-JSON
-
-Extern redigeringsbeskrivning från upstream AI/API.
+Template är projektets inputmodell. Den ska valideras innan editorflödet använder den.
 
 ### EditSession
 
-Internt state för användarens redigeringsarbete.
+EditSession är appens aktiva redigeringsstate.
 
-### Timeline
+### Scene video source
 
-UI-representation av scener och timing.
+Egen användarvideo per scen ska kopplas till rätt scen. Om videon är längre än scenen ska trimintervall användas. Om den är kortare ska användaren meddelas.
 
-### Preview
+### CompilePayload
 
-Visuell kontroll av hur redigeringen ser ut innan rendering.
+CompilePayload är kontraktet mellan app och compile-server. Det ska innehålla mallens stylingdata och scenvisa videokällor där sådana finns.
 
-### CompilePayloadFactory
+## Preview-regel
 
-Framtida domain/application-komponent som översätter EditSession till backendens format.
+När godkända scenkällor saknas ska editorn inte spela upp gamla placeholder-klipp. Den ska visa ett tydligt empty/incomplete state.
 
-### RenderApiClient
+När alla scenkällor är godkända får preview kännas som en sammanhängande video, men faktisk slutrendering sker i compile-servern.
 
-Framtida infrastructure-komponent som skickar payload till backend/compile-server.
+## Export-regel
 
-### Deploymentkonfiguration
+Open och download/save är olika actions.
 
-Dockerfile, Docker Compose, `.dockerignore`, Nginx-konfiguration och Caddyfile är configuration items. De ska granskas och testas som en del av systemet, men de ska inte blandas ihop med editorlogiken.
+* Open öppnar färdig video för uppspelning.
+* Download på webben försöker starta browser-download.
+* Save på mobil använder enhetens media library där plattformen stödjer det.
 
-## Viktiga runtime-flöden
+## Deployment-regel
 
-### Template-laddning
+Deployment är separat från editorlogik. Docker, Cumulus, Nginx, Caddy och GitLab Runner ska bara påverka deployment-issues.
 
-`Template source -> parseTemplate -> Template -> buildEditSession -> useEditSession -> Editor UI`
+## Arkitekturrisker
 
-Risker:
-- trasig JSON
-- saknade scener
-- negativ duration
-- överlappande tider
-- saknad `sourceVideoUrl`
-- GCS-länk utan signerad URL
+Gemini ska vara extra försiktig med:
 
-### Scenbaserad editor
-
-`EditSession -> activeScene -> VideoPreview seek(startSeconds) -> SceneTimeline -> användarändring -> store update`
-
-Risker:
-- scen-ID saknas
-- navigation öppnas med fel template-ID
-- UI visar scen men store saknar aktiv session
-- preview och timeline hamnar ur synk
-
-### Route-baserad sessionstart
-
-`Expo Router param -> normalizeRouteParam -> useInitializeEditor -> templateRepository -> useEditSession`
-
-Risker:
-- `id` saknas
-- `id` är `string[]`
-- ogiltigt template-id
-- tidigare session ligger kvar efter ogiltig route
-- loading state fastnar
-
-Regel:
-
-Route-parametrar ska normaliseras innan de används för template-laddning. Ogiltigt eller saknat id ska ge error state och rensa gammal editorstate.
-
-### Text overlay
-
-`Scene.textOverlays -> render overlays by timing -> edit overlay -> update EditSession -> preview updated`
-
-Risker:
-- overlay visas utanför sin tidsperiod
-- position hamnar utanför skärm
-- färg eller fontstorlek saknar validering
-- ändring sparas i UI men inte i store
-
-### Compile och export
-
-`EditSession -> buildCompileRequest -> compileApi.post -> backend/compile-server -> FFmpeg -> MP4 -> preview/export`
-
-Risker:
-- payload matchar inte serverns format
-- upload misslyckas
-- servern saknar FFmpeg
-- lång kompilering saknar progress
-- fel videoformat vid export
-
-### Deployment
-
-`Expo Web build -> Docker image -> Docker Compose service -> Nginx/Caddy -> Cumulus`
-
-Risker:
-- lokal build fungerar men container saknar filer
-- `dist` hanteras fel
-- `.env` eller secrets hamnar i image
-- portar exponeras fel
-- Caddy/Nginx proxyar fel service
-- HTTPS fungerar inte på Cumulus
-- deployment dokumenteras inte
-
-## Route-struktur
-
-Aktuell eller planerad Expo Router-struktur:
-
-```text
-app/
-  _layout.tsx
-  (home)/
-    index.tsx
-  (editor)/
-    [id].tsx
-  (preview)/
-    [id].tsx
-```
-
-Route-regler:
-- Home ska lista templates eller mockade projekt.
-- Editor ska läsa route-param `id` och försöka ladda motsvarande template/session.
-- Preview ska visa aktuell session eller färdig renderad video beroende på feature-steg.
-- Felaktigt `id` ska ge tydligt error state, inte krasch.
-- Home ska visa empty state om inga templates finns.
-
-## State-principer
-
-`useEditSession` ska vara den centrala platsen för aktiv editorstate.
-
-Bör innehålla eller senare kunna innehålla:
-- `currentTemplate`
-- `currentSession`
-- `activeSceneId`
-- `isDirty`
-- `loadTemplate(template)`
-- `selectScene(sceneId)`
-- `updateTextOverlay(sceneId, overlayId, patch)`
-- `updateSceneEffect(sceneId, effectPatch)`
-- `resetSession()` eller `clearSession()`
-
-Regler:
-- Store ska inte själv hämta all extern data om det gör testning svår.
-- Store-actions ska vara små och begripliga.
-- Kritiska stateövergångar ska kunna testas.
-- Ogiltig template-laddning ska kunna rensa state.
-
-## Beslutsregel för framtida implementation
-
-När en ny feature ska byggas, välj lösningen som:
-1. stöder MVP-flödet
-2. kan testas isolerat
-3. inte blandar frontend med backendansvar
-4. går att förklara i kursens Wiki eller presentation
-5. minskar risken för dolda AI-fel
-
-## Arkitekturella principer
-
-- Separation of Concerns: varje lager har eget ansvar.
-- Testability: domain och application ska kunna testas utan UI.
-- Mockability: externa beroenden ska kunna ersättas i test.
-- Template-driven: editorflödet styrs av Template-JSON och EditSession.
-- Verifiering före volym: bygg hellre liten testbar arkitektur än stor osäker demo.
-- Ingen lokal FFmpeg i mobilappen.
-- Ingen TikTok-analys i frontend.
-- Deployment är leveransform, inte ett argument för att flytta backendansvar till mobilen.
-
-## Risker
-
-- Om UI direkt tolkar rå JSON blir appen svårtestad.
-- Om EditSession saknar tydligt schema blir compile-payload osäker.
-- Om backendformat antas utan test kan rendering fallera sent.
-- Om mockTemplate skiljer sig från riktig API-data kan appen ge falsk trygghet.
-- Om AI skapar för mycket kod utan arkitekturlager blir vidareutveckling dyr.
-- Om deployment blandas med editorfeatures blir commits svåra att granska.
-- Om Expo Web-deployment misstolkas som native mobilrelease blir dokumentationen missvisande.
+* stora komponentfiler
+* state och UI blandat i samma fil
+* editorlogik i infrastructure
+* plattformsdetaljer i domain
+* dolda antaganden om media-URL:er
+* AI-genererad kod utan tester
+* compile-server och appkontrakt som glider isär

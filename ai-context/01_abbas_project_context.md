@@ -1,213 +1,108 @@
-# Abbas Projektkontext (01_abbas_project_context.md)
+# Abbas projektkontext
 
 ## Syfte
 
-Denna fil beskriver Abbas projekt som Gemini alltid ska utgå från. Den ska användas för att undvika att projektet glider mot fel scope eller blandas ihop med referensprojekt.
+Denna fil beskriver vad Abbas bygger och vad Gemini inte får anta. Använd den vid krav, kod, testfall, Wiki, MR och presentation.
 
-Gemini ska använda denna fil när den:
-- skriver krav
-- föreslår kod
-- skriver Wiki eller rapport
-- förklarar arkitektur
-- skapar testfall
-- bedömer om en feature tillhör MVP
-- jämför Abbas projekt med hagen-auto-edit, Ida eller Wasim
+## Produkt
 
-## Vision: The TikTok Catalyst (LeTrend Mobile)
-
-En smart mobilapp för automatisk videoredigering i CapCut-stil som agerar digital TikTok-manager för serviceverksamheter, särskilt restauranger, caféer och barer.
-
-## Problemet
-
-Serviceverksamheter har ofta bra råmaterial, till exempel matlagning, produkter, lokaler och personal. Problemet är inte att de saknar innehåll. Problemet är att de saknar tid, redigeringskunskap och förståelse för TikTok-kultur.
-
-De behöver innehåll som känns snabbt, trendigt, engagerande och anpassat till plattformens tempo. Vanliga redigeringsverktyg som CapCut är kraftfulla men kräver manuell kompetens och tid.
-
-Bra råmaterial tappar värde om det klipps för långsamt, saknar hook eller inte följer plattformens rytm. Målet är därför ett återkommande arbetsflöde, inte bara enstaka manuella experiment.
+LeTrend Mobile är en mobilapp för template-baserad videoredigering. Appen ska hjälpa serviceverksamheter skapa TikTok-anpassade videos genom att använda en JSON-template som beskriver scenstruktur, timing, text, effekter, transitions och ljud.
 
 ## Målgrupp
 
-Primär målgrupp:
-- restauranger
-- caféer
-- barer
-- andra serviceverksamheter som vill växa på TikTok
+Primärt:
 
-Målgruppen har ofta:
-- råmaterial som kan bli bra content
-- låg tid för manuell redigering
-- begränsad teknisk redigeringskunskap
-- behov av snabb produktion
-- affärsmål kopplade till synlighet, kunder och försäljning
+* restauranger
+* caféer
+* barer
+* serviceverksamheter med råmaterial men begränsad tid för redigering
 
-## Lösningen och USP
+## Problem
 
-Appens USP är att den kan härma redigeringsmönster, struktur och stil från en specifik trendig TikTok-video och använda detta som mall för en ny video.
+Målgruppen har ofta material men saknar tid och redigeringskompetens. Vanliga editorer kräver för mycket manuellt arbete. Appen ska göra redigeringsflödet mer styrt och snabbare.
 
-Appen minskar behovet av manuell redigering genom ett mallbaserat arbetsflöde där `Template-JSON` fungerar som redigeringsbeskrivning.
+## MVP-idé
 
-Värdet är:
-- snabbare produktion av TikTok-anpassat material
-- mindre krav på teknisk redigeringskunskap
-- tydligare koppling mellan trend och ny video
-- mer konsekvent redigeringsformat
-- bättre möjlighet för verksamheter att skapa engagerande innehåll
+MVP:n ska visa ett fungerande flöde:
 
-## AI/API-flöde
+1. användaren skapar eller importerar ett projekt från JSON-template
+2. template valideras
+3. användaren lägger in egna MP4-klipp per scen
+4. appen visar scenmetadata och readiness
+5. användaren kan previewa och justera text, effects, transitions och ljud
+6. appen skapar compile-payload
+7. compile-server renderar eller returnerar output beroende på läge
+8. användaren kan öppna eller ladda ner/spara färdig video
 
-Projektets kärnidé är att användaren kan utgå från en specifik TikTok-video som stilreferens.
+## Aktuell funktionalitet
 
-Flödet är:
+Projektet har nu stöd för:
 
-TikTok URL -> AI/API video analysis -> Template-JSON -> EditSession -> Editor UI -> Preview/Timeline -> Compile-payload -> backend/compile-server -> Rendered video via FFmpeg
+* projektöversikt från startsidan
+* import av JSON-template via fil
+* kopierbar AI-prompt för template-generering
+* separat template-guide med code snippet-ruta
+* rename och delete av projekt
+* scenvisa användarvideor
+* readiness innan preview/compile
+* preview-flöde utan gamla placeholders när scenkällor saknas
+* textöverlägg, scene effects, transitions och audio-inställningar
+* compile-server med placeholder- och FFmpeg-läge
+* exportpanel med separat open och download/save
+* skydd mot trasiga exportreferenser
+* testsviter för domain, application, infrastructure och UI-komponenter
 
-Användaren eller systemet matar in en URL till en TikTok-video. En AI/API analyserar videon och returnerar strukturerad JSON-data om videons redigeringsmönster, till exempel:
-- scener
-- duration
-- timing
-- textoverlays
-- klippstruktur
-- effekter
-- stilinformation
-- musik eller ljudstruktur om tillgängligt
+## Upstream AI/API
 
-Mobilappen ansvarar inte för att analysera TikTok-videon direkt. Mobilappen ansvarar för att konsumera Template-JSON, bygga en EditSession, visa editorflödet och senare skapa en compile-payload.
+Upstream AI/API ansvarar för analys av videoreferens och generering av Template-JSON. Mobilappen ska inte göra denna analys själv.
 
-Mobilappen skapar alltså en redigeringsbeskrivning, medan backend/compile-server ansvarar för den faktiska renderingen via FFmpeg.
+Gemini ska inte anta att:
 
-Syftet är att kunna härma en trendig videos redigeringsformat och stil, inte att kopiera originalvideons innehåll rakt av.
+* TikTok-parsning sker i mobilappen
+* Vertex AI eller hagen backend finns i Abbas repo
+* appen laddar ner eller kopierar TikTok-videos juridiskt
+* hagen-auto-edit är en kravkälla
 
 ## Template-JSON
 
-Template-JSON är bryggan mellan upstream AI/API och mobilappen.
+Template-JSON är kontraktet mellan upstream analys och editorn. Den beskriver:
 
-Template-JSON beskriver:
-- vilken video som används
-- scenernas ordning
-- starttider
-- duration
-- instruktioner
-- text overlays
-- transitions
-- effects
-- musik och ljud
-- metadata som behövs för editor och rendering
+* projektets titel
+* orientation
+* source video reference
+* scener
+* start och duration
+* scene instruction eller description
+* text overlays
+* effects
+* transitions
+* originalVolume
+* music
 
-Viktig princip:
+När användaren lägger in egna klipp ska de egna klippen ersätta standardkällan per scen där de finns.
 
-Appen splittrar inte videofilen själv. Källvideon ligger hel i GCS eller motsvarande lagring. JSON-filen beskriver var varje scen börjar och slutar samt vilka overlays, effekter och övergångar som ska användas.
+## Begränsningar
 
-## EditSession
+MVP:n behöver inte vara pixel-perfect mot editor-preview. Det viktiga är att centrala ändringar syns och att flödet är begripligt, testbart och demonstrerbart.
 
-EditSession är appens interna arbetsformat.
+Utanför scope om issue inte uttryckligen säger annat:
 
-Template-JSON kommer från upstream AI/API. EditSession är det interaktiva state som användaren arbetar med i appen.
+* native release till App Store eller Google Play
+* full trendcrawler
+* full AI-backend
+* full videoeditor som CapCut
+* pixel-perfect FFmpeg-matchning
+* multi-user auth
+* betalning
 
-EditSession ska senare kunna innehålla:
-- vald template
-- scener
-- selected scene
-- text edits
-- transition edits
-- effect edits
-- audio settings
-- preview state
-- data för compile-payload
+## För presentation och rapport
 
-## Vad ingår i Abbas scope
+Lyft fram:
 
-Appens huvudansvar är editorflödet:
-- ladda Template-JSON
-- hämta eller använda videoreferens
-- bygga EditSession
-- visa projekt eller templates på home
-- navigera till editor
-- visa scener och timing
-- hantera timeline
-- hantera preview
-- hantera text overlays
-- hantera transitions och effects
-- hantera musik och ljud
-- skapa compile-payload
-- skicka payload till backend/compile-server
-- visa eller spara renderad video när backend returnerar resultat
-
-## Vad ingår inte just nu
-
-Detta ska inte implementeras i mobilappen just nu:
-- analys av TikTok-video i frontend
-- Vertex AI eller hagen AI-backend
-- automatisk trendcrawler
-- Supabase-datagenerering
-- GCS-synk som projektägaren ansvarar för
-- direktpublicering till TikTok
-- avancerad auto-undertextning om det inte senare blir uttalat sträckmål
-- beat detection om det inte senare blir uttalat sträckmål
-- lokal FFmpeg-rendering i mobilappen
-
-## Teknikstack
-
-Nuvarande och planerad stack:
-- React Native
-- Expo
-- TypeScript
-- Expo Router
-- Zustand
-- expo-video
-- senare eventuellt TanStack Query
-- senare eventuellt expo-file-system
-- senare eventuellt expo-media-library
-- backend/compile-server med FFmpeg
-- Supabase och GCS som externa resurser om projektägaren tillhandahåller dem
-
-## Kravmodell
-
-Projektet dokumenterar krav för hög spårbarhet och verifierbarhet.
-
-Krav delas in i:
-- användarkrav
-- systemkrav
-- funktionella krav
-- icke-funktionella krav
-
-Varje krav bör ha:
-- ID
-- namn
-- beskrivning
-- prioritet
-- status
-- beroenden
-- acceptanskriterier
-- spårbarhet till issue
-- spårbarhet till testfall
-- spårbarhet till implementation
-
-## Prioriterad MVP
-
-MVP ska prioritera ett fungerande kärnflöde före stora extra features.
-
-Viktigaste kärnflödet:
-1. Visa templates eller projekt.
-2. Välj template.
-3. Ladda Template-JSON eller mockTemplate.
-4. Bygg EditSession.
-5. Visa editor-route.
-6. Visa scener.
-7. Navigera mellan scener.
-8. Visa preview-grund.
-9. Förbered compile-payload.
-10. Dokumentera testning och risker.
-
-## Viktigaste risker
-
-- AI-genererad kod kan ge falsk trygghet.
-- Template-JSON från mockdata kan skilja sig från riktig API-data.
-- Videouppspelning i Expo kan bli central teknisk risk.
-- GCS kräver signerade URL:er.
-- Compile-payload kan inte matcha backendens förväntade format.
-- Scope creep kan göra appen bred men instabil.
-- För lite testning kan göra att appen ser klar ut men inte håller.
-
-## Projektprincip
-
-En liten, stabil och testad editor är mer värdefull än en stor demo med många halvfärdiga funktioner.
+* Template-JSON som kontrakt
+* lagerarkitektur
+* validering som skydd mot AI-data
+* testning som Definition of Done
+* CI/CD och verifiering som kvalitetssäkring
+* etiskt ansvar: inte lita blint på AI eller osäker kod
+* MVP-avgränsning: liten men verifierbar produkt

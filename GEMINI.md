@@ -2,197 +2,196 @@
 
 ## Syfte
 
-Denna fil är huvudstyrningen för Gemini CLI i Abbas projekt. Den ska läsas före större originalfiler och före kodändringar.
-
-Gemini ska använda filen när den:
-- ska skriva eller ändra kod
-- ska skapa dokumentation
-- ska föreslå tester
-- ska hjälpa med GitLab
-- ska avgöra om en feature kan committas
-- behöver förstå projektets tekniska scope
+Denna fil är huvudstyrning för Gemini i Abbas 1DV613-projekt. Läs den före kodändringar, dokumentation och större beslut.
 
 ## Projektidentitet
 
-- Huvudprojekt: Abbas projekt "LeTrend Mobile" eller "The TikTok Catalyst".
-- Produkt: mobilapp för automatisk videoredigering i CapCut-stil.
-- Målgrupp: serviceverksamheter, särskilt restauranger, caféer och barer.
-- Kärnvärde: spara tid och hjälpa verksamheter skapa TikTok-anpassat videoinnehåll utan tung manuell redigering.
-- Språk: all dokumentation, projektkontext, testfall och Wiki-text ska skrivas på svenska.
-- Tekniska termer får behållas på engelska när det är naturligt: Template-JSON, EditSession, Expo Router, Zustand, FFmpeg, Supabase, GCS, CI/CD och TypeScript.
+* Projekt: LeTrend Mobile, även kallat The TikTok Catalyst.
+* Produkt: React Native och Expo-app för videoredigering i CapCut-liknande flöde.
+* Målgrupp: restauranger, caféer, barer och andra serviceverksamheter.
+* Kärnvärde: användaren ska kunna skapa TikTok-anpassade videos snabbare genom template-baserad redigering.
+* Språk: svenska i issues, testfall, Wiki, MR-beskrivningar och ai-context. Engelska tekniska termer får användas när de är naturliga.
 
-## Viktigaste produktflödet
+## Viktigaste systemflöde
 
-TikTok URL -> AI/API video analysis -> Template-JSON -> EditSession -> Editor UI -> Preview/Timeline -> Compile-payload -> backend/compile-server -> Rendered video via FFmpeg
+TikTok URL -> upstream AI/API -> Template-JSON -> EditSession -> Editor UI -> Preview -> Compile-payload -> compile-server -> FFmpeg-renderad video -> export/save/open.
 
-## AI/API-scope
+## Scope
 
-- AI/API-flödet är upstream från mobilappen.
-- Användaren eller systemet matar in en specifik TikTok-URL.
-- En AI/API analyserar den specifika videons redigeringsmönster.
-- API:t returnerar strukturerad JSON-data.
-- Mobilappen analyserar inte TikTok-videon direkt.
-- Mobilappen konsumerar Template-JSON, bygger EditSession och visar editorflödet.
-- Mobilappen skapar compile-payload.
-- Backend/compile-server utför faktisk rendering via FFmpeg.
-- Syftet är att härma redigeringsformat, struktur och stil, inte att kopiera originalvideons innehåll rakt av.
+Mobilappen ska:
 
-## Deployment-scope
+* importera och validera JSON-templates
+* visa projektöversikt
+* hantera projektnamn och radering
+* låta användaren välja egna MP4-klipp per scen
+* kräva godkända scenklipp innan preview och compile där detta gäller
+* visa och redigera text, effekter, transitions och ljudvärden från templaten
+* skapa compile-payload
+* visa exportstatus och actions för save/download/open
 
-Docker, Docker Compose, Nginx, Caddy, Expo Web-export och Cumulus gäller bara när aktuell issue uttryckligen handlar om deployment eller release, till exempel `#35` eller `#40`.
+Mobilappen ska inte:
 
-Vid vanlig apputveckling ska Gemini inte föreslå Docker-kommandon, Expo Web-export eller deployment-testning om issue inte kräver det.
+* analysera TikTok-videos själv
+* köra FFmpeg lokalt
+* bygga hagen AI-backend
+* anta att `gs://` kan spelas direkt
+* blanda deploymentarbete med editorlogik
 
-Deployment i Abbas projekt betyder webbdeployment eller framtida backend/compile-server. Det betyder inte native mobilrelease och det får inte ändra mobilappens kärnansvar.
+Compile-servern ska:
 
-## Kärnmandat
+* ta emot compile-payload
+* validera payload
+* stödja placeholder-läge för snabb testning
+* stödja FFmpeg-läge för renderad output
+* använda scenvisa videokällor där de finns
+* hantera text, scene effects, transitions, originalvolym och musik så långt MVP:n stödjer
+* returnera en användbar referens till färdig video
 
-1. Bygg strikt en feature i taget.
-2. Koppla varje feature till krav, acceptanskriterier och testfall.
-3. Ingen feature är klar utan verifiering.
-4. AI-genererad kod får aldrig antas fungera.
-5. Kontrollera edge cases, felhantering och affärslogik.
-6. Läs `ai-context/` före stora originalfiler.
-7. Ida, Wasim och `hagen-auto-edit` är inspiration, inte kravkälla för Abbas implementation.
-8. Implementera inte ny feature när uppgiften bara gäller dokumentation.
-9. Föreslå inte commit innan testning och diff-granskning är gjord.
+## Aktuell teknik
 
-## Kravmodell
+* App: React Native, Expo, TypeScript, Expo Router.
+* State: Zustand.
+* Video: `expo-video`.
+* Media: `expo-image-picker`, `expo-media-library`, `expo-file-system`, `expo-document-picker`.
+* Clipboard: `expo-clipboard`.
+* Ikoner: `@expo/vector-icons`.
+* Backend: Node, Express, TypeScript, Zod, FFmpeg.
+* Test: Jest, jest-expo, React Native Testing Library, Vitest för compile-server.
+* Arkitektur: Presentation, Application, Domain, Infrastructure.
 
-Projektet skiljer mellan:
-- användarkrav
-- systemkrav
-- funktionella krav
-- icke-funktionella krav
 
-Krav ska vara:
-- testbara
-- verifierbara
-- validerbara
-- spårbara till issue
-- spårbara till testfall
-- spårbara till implementation
+## Wiki och dokumentationsstil
 
-## Teknisk standard
+GitLab Wiki är en primär källa för Abbas process, stil och dokumentationsmönster. När uppgiften gäller Wiki, rapport, reflektion, demo, post mortem, testrapport eller ai-context ska Gemini läsa:
 
-- App: React Native, Expo, TypeScript, Expo Router.
-- State: Zustand.
-- Video: `expo-video`.
-- Backend och rendering: backend/compile-server med FFmpeg.
-- Data: Template-JSON från upstream AI/API och eventuellt Supabase/GCS.
-- Arkitektur: Presentation, Application, Domain, Infrastructure.
-- JSDoc krävs för:
-  1. exporterade funktioner
-  2. viktiga typer och interface
-  3. Zustand stores
-  4. parserfunktioner
-  5. builderfunktioner
-  6. komplex logik
-  7. kod som är svår att förstå vid snabb läsning
-- JSDoc krävs inte för:
-  1. triviala komponenter
-  2. självförklarande lokala variabler
-  3. små interna hjälpfunktioner
-- TypeScript: undvik `any`. Använd `unknown` för okänd input och validera innan användning.
-- Tamagui används inte. Presentation-lagret består av React Native-komponenter, screens och Expo Router-routes.
-- `gs://`-adresser kan normalt inte spelas direkt i mobilen. Använd signerad eller servergenererad URL när video ska spelas i appen.
-- FFmpeg ska inte köras i mobilappen. Tung rendering sker i backend/compile-server.
+1. `ai-context/12_wiki_context.md`
+2. `ai-context/wiki/wiki_source_summary.md`
+3. relevant weekly- eller transcript-fil
+4. originalkällan `mina_wikisidor_samlade(2).txt` endast vid behov
 
-## Navigering i kodbas
+Ny Wiki-text ska vara kort, konkret och ärlig. Den ska koppla arbete till krav, testning, risker och lärdomar. Abbas stil är personlig i reflektioner och mer neutral i tekniska sidor.
 
-- Appkod: `./tiktok-video-editor-app/`
-- Routes: `app/(home)`, `app/(editor)`, `app/(preview)`
-- Root layout: `app/_layout.tsx`
-- Theme: `src/styles/theme.ts`
-- Template-typer: `src/types/template.ts`
-- Mockdata: `src/data/mockTemplate.ts`
-- Session-state: `src/store/useEditSession.ts`
+## Fast Git-arbetsflöde
 
-## Arbetsordning för kod
-
-1. Läs relevant ai-context-fil.
-2. Identifiera aktuell issue eller feature.
-3. Kontrollera krav och acceptanskriterier.
-4. Implementera minsta möjliga ändring.
-5. Testa enligt issue och testfall.
-6. Vid vanlig Expo-verifiering används `npm start`.
-7. Uppdatera relevant ai-context eller Wiki vid behov.
-8. Kör `git status` och `git diff`.
-9. Föreslå commit först när verifiering är gjord.
-
-## Verifiering
-
-Standardkontroller före commit:
+Innan ny implementation eller dokumentationsuppgift:
 
 ```bash
-npm run lint
-npx tsc --noEmit
+git status
+git switch main
+git pull
+git switch -c <issue-number-short-branch-name>
+```
+
+Efter ändring:
+
+```bash
 git status
 git diff
 ```
 
-Om UI eller appstruktur påverkas:
+För appen:
 
 ```bash
-npm start
+cd tiktok-video-editor-app
+npm run lint:fix
+npm run verify
 ```
 
-Om aktuell issue eller testfall kräver automatiska tester, eller om testkod ändras:
+För compile-server:
 
 ```bash
-npm test
+cd compile-server
+npm run lint:fix
+npm run verify
 ```
 
-Om aktuell issue uttryckligen gäller Expo Web eller deployment, till exempel `#35` eller `#40`:
+Föreslå inte commit innan status, diff och relevant verifiering är gjorda.
+
+## Branch, commit och MR
+
+Standardkedja:
+
+Issue -> Branch -> Implementation -> Verification -> Commit -> Push -> MR -> Merge -> main pull.
+
+Commit-exempel:
 
 ```bash
-npx expo export --platform web
-docker compose build
-docker compose up --build -d
+feat: add template guide page
+fix: separate export download and open actions
+refactor: split project overview
+docs: update ai context
 ```
 
-Om filer redan är staged:
+MR-beskrivningar ska vara korta:
 
-```bash
-git diff --staged
+```text
+## Sammanfattning
+Kort beskrivning av vad MR ändrar och vilket beteende som bevaras.
+
+## Kopplade issues
+**Docs:** Closes #X
 ```
 
-## Commit-standard
+## Kodstandard
 
-Använd tydliga commits:
+* Skriv komplett ersättningskod när Abbas ber om kod.
+* Bevara befintliga kontrakt, exports och tester.
+* Undvik implementation som låser issues till onödigt specifika interna lösningar.
+* Använd `unknown` för okänd input och validera innan användning.
+* Undvik `any`.
+* Håll SoC och DRY.
+* Flytta domänlogik från UI när filer blir stora.
+* Lägg JSDoc på exporterade funktioner, viktiga typer, parserfunktioner, builderfunktioner, stores och komplex logik.
+* Skriv inte JSDoc på triviala lokala detaljer.
 
-```bash
-feat: setup Expo Router foundation
-fix: handle missing template id
-test: add manual test cases for template loading
-docs: update current feature context
-refactor: separate template parsing from UI
-style: adjust editor screen spacing
-```
+## Teststandard
+
+`npm run verify` är grundnivå för appen och betyder:
+
+* lint
+* typecheck
+* test
+
+Testa särskilt:
+
+* Template-JSON-validering
+* route-parametrar
+* EditSession-state
+* scene video readiness
+* compile-payload
+* save/download/open-export
+* felhantering
+* edge cases
+
+## AI-regler
+
+* AI-genererad kod måste granskas skeptiskt.
+* Gemini får inte anta att kod fungerar för att den ser rimlig ut.
+* Gemini ska prioritera liten verifierad MVP före stor osäker lösning.
+* Gemini ska inte läsa stora originalfiler om en kompakt ai-context-fil räcker.
+* Gemini ska inte blanda Abbas projekt med Ida, Wasim eller hagen-auto-edit.
+* Hagen-auto-edit är inspiration, inte kravkälla.
 
 ## Kontextprioritet
 
-När Gemini behöver projektkontext ska den läsa i denna ordning:
+Läs i denna ordning:
 
 1. `GEMINI.md`
-2. relevanta filer i `ai-context/`
-3. relevant teorifil i `ai-context/theory/`
-4. relevant veckofil i `ai-context/weekly/`
-5. relevant kompakt transkript i `ai-context/transcripts/`
-6. originalkällor via riktad sökning
+2. `ai-context/00_project_rules.md`
+3. `ai-context/01_abbas_project_context.md`
+4. `ai-context/04_architecture.md`
+5. relevant fil i `ai-context/weekly/`
+6. relevant fil i `ai-context/theory/`
+7. `ai-context/08_study_guide_context.md` när uppgiften gäller kurskrav, betyg eller VG
+8. relevant kompakt transkript
+9. originalkälla via riktad sökning
 
-Gemini ska inte läsa stora originalfiler som permanent arbetskontext om en kompakt ai-context-fil räcker.
+## Viktiga filer
 
-## Förbud
-
-Gemini får inte:
-- implementera ny feature när uppgiften bara gäller dokumentation
-- ändra appkod utan uttrycklig instruktion
-- skapa stora sammanfattningsfiler
-- läsa in alla originalfiler som permanent arbetskontext
-- blanda ihop Abbas projekt med Ida eller Wasim
-- påstå att något är klart utan testning
-- föreslå commit utan att först kontrollera test och diff
-- skriva att appen kopierar TikTok-videos i juridisk mening
-- lägga secrets, tokens, Supabase-nycklar, API-nycklar, `.env` eller privata signerade länkar i repo
-- blanda deploymentarbete med editorlogik om de inte hör till samma issue
+* `ai-context/08_study_guide_context.md`: komprimerad studieguidemappning mot G och VG.
+* `ai-context/11_mvp_requirements.md`: MVP-krav och spårbarhet.
+* `ai-context/12_wiki_context.md`: Wiki-stil, dokumentationsmönster och rapportlogik.
+* `ai-context/10_source_map.md`: källor och när de ska användas.
+* `ai-context/weekly/week_7_context.md`: CI/CD och QA-start.
+* `ai-context/weekly/week_8_context.md`: automatiserad testning.
+* `ai-context/weekly/week_9_10_context.md`: slutleverans, etik, presentation och överlämning.
