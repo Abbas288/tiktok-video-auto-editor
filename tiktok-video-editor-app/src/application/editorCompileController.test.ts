@@ -18,8 +18,12 @@ describe("editorCompileController", () => {
   });
 
   it("returns compact success message for rendered output", () => {
-    expect(createSuccessfulCompileMessage("rendered")).toBe(
-      "Rendered video is ready.",
+    expect(createSuccessfulCompileMessage("rendered")).toBe("Ready.");
+  });
+
+  it("returns compact success message for placeholder output", () => {
+    expect(createSuccessfulCompileMessage("placeholder")).toBe(
+      "Preview ready.",
     );
   });
 

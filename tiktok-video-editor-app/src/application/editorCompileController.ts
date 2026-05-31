@@ -19,10 +19,10 @@ export function createSuccessfulCompileMessage(
   outputKind: CompileOutputKind,
 ): string {
   if (outputKind === "placeholder") {
-    return "Preview output is ready.";
+    return "Preview ready.";
   }
 
-  return "Rendered video is ready.";
+  return "Ready.";
 }
 
 export function createMissingSceneVideosMessage(): string {

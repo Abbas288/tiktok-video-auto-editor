@@ -27,6 +27,8 @@ export interface CompilePanelProps {
   onOpenCompiledVideo?: () => void;
 }
 
+type MaterialIconName = React.ComponentProps<typeof MaterialIcons>["name"];
+
 export function CompilePanel({
   status,
   message,
@@ -41,13 +43,15 @@ export function CompilePanel({
   const isCompiling = status === "compiling";
   const isSaving = saveStatus === "saving";
   const hasFinishedVideo = status === "success" && Boolean(compiledVideoUrl);
+  const shouldShowCompileMessage =
+    Boolean(message) && !(status === "success" && hasFinishedVideo);
 
   return (
     <View style={styles.panel} testID="compile-panel">
       <View style={styles.headerRow}>
         <View style={styles.titleColumn}>
           <Text style={styles.title}>Export</Text>
-          <Text style={styles.description}>Compile, then save.</Text>
+          <Text style={styles.description}>Compile and save.</Text>
         </View>
 
         <TouchableOpacity
@@ -55,6 +59,8 @@ export function CompilePanel({
           onPress={onCompile}
           disabled={isCompiling}
           testID="compile-button"
+          accessibilityRole="button"
+          accessibilityLabel={isCompiling ? "Compiling video" : "Compile video"}
         >
           <MaterialIcons name="auto-awesome" size={17} color="#000000" />
           <Text style={styles.primaryButtonText}>
@@ -63,7 +69,7 @@ export function CompilePanel({
         </TouchableOpacity>
       </View>
 
-      {message ? (
+      {shouldShowCompileMessage ? (
         <Text
           style={[styles.message, getCompileMessageStyle(status)]}
           testID="compile-message"
@@ -75,15 +81,22 @@ export function CompilePanel({
       {hasFinishedVideo ? (
         <View style={styles.outputCard} testID="compiled-output-card">
           <View style={styles.outputHeaderRow}>
-            <View style={styles.outputTitleColumn}>
-              <Text style={styles.outputTitle}>Ready</Text>
-              <Text style={styles.outputDescription}>
-                {getOutputDescription(outputKind)}
+            <View style={styles.outputReadyRow}>
+              <View style={styles.outputIconBadge}>
+                <MaterialIcons
+                  name={getOutputIcon(outputKind)}
+                  size={18}
+                  color={colors.accent}
+                />
+              </View>
+
+              <Text style={styles.outputTitle}>
+                {getOutputTitle(outputKind)}
               </Text>
             </View>
 
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{getOutputBadge(outputKind)}</Text>
+            <View style={styles.formatBadge}>
+              <Text style={styles.formatBadgeText}>MP4</Text>
             </View>
           </View>
 
@@ -96,6 +109,8 @@ export function CompilePanel({
               onPress={onSaveCompiledVideo}
               disabled={isSaving}
               testID="save-compiled-video-button"
+              accessibilityRole="button"
+              accessibilityLabel={getSaveButtonAccessibilityLabel()}
             >
               <MaterialIcons
                 name={Platform.OS === "web" ? "download" : "save-alt"}
@@ -111,6 +126,8 @@ export function CompilePanel({
               style={styles.ghostButton}
               onPress={onOpenCompiledVideo}
               testID="open-compiled-video-button"
+              accessibilityRole="button"
+              accessibilityLabel="Open video"
             >
               <MaterialIcons name="open-in-new" size={17} color={colors.text} />
               <Text style={styles.ghostButtonText}>Open</Text>
@@ -160,28 +177,28 @@ function getSaveButtonLabel(): string {
   return Platform.OS === "web" ? "Download" : "Save";
 }
 
-function getOutputBadge(outputKind: CompileOutputKind): string {
+function getSaveButtonAccessibilityLabel(): string {
+  return Platform.OS === "web" ? "Download video" : "Save video";
+}
+
+function getOutputIcon(outputKind: CompileOutputKind): MaterialIconName {
   if (outputKind === "placeholder") {
-    return "Preview";
+    return "science";
   }
 
   if (outputKind === "rendered") {
-    return "Rendered";
+    return "task-alt";
+  }
+
+  return "check-circle";
+}
+
+function getOutputTitle(outputKind: CompileOutputKind): string {
+  if (outputKind === "placeholder") {
+    return "Preview ready";
   }
 
   return "Ready";
-}
-
-function getOutputDescription(outputKind: CompileOutputKind): string {
-  if (outputKind === "placeholder") {
-    return "Development output.";
-  }
-
-  if (outputKind === "rendered") {
-    return "Final render available.";
-  }
-
-  return "Output available.";
 }
 
 const styles = StyleSheet.create({
@@ -254,30 +271,39 @@ const styles = StyleSheet.create({
   },
   outputHeaderRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "space-between",
     gap: 12,
   },
-  outputTitleColumn: {
+  outputReadyRow: {
     flex: 1,
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  outputIconBadge: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "rgba(0, 255, 208, 0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(0, 255, 208, 0.32)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   outputTitle: {
     color: colors.text,
     fontSize: 14,
     fontWeight: "900",
   },
-  outputDescription: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    marginTop: 2,
-  },
-  badge: {
+  formatBadge: {
     borderRadius: 999,
     backgroundColor: "#1F2933",
     paddingHorizontal: 9,
     paddingVertical: 5,
   },
-  badgeText: {
+  formatBadgeText: {
     color: colors.accent,
     fontSize: 11,
     fontWeight: "900",
