@@ -8,7 +8,6 @@ function createDependencies(
 ): SaveCompiledVideoDependencies {
   return {
     platform: "ios",
-    openUrl: jest.fn(async () => undefined),
     requestPermission: jest.fn(async () => ({ granted: true })),
     downloadVideo: jest.fn(async () => ({
       exists: true,
@@ -16,6 +15,7 @@ function createDependencies(
     })),
     saveToLibrary: jest.fn(async () => undefined),
     prepareVideoReference: jest.fn(async (url: string) => url),
+    triggerWebDownload: jest.fn(async () => undefined),
     ...overrides,
   };
 }
@@ -39,7 +39,9 @@ describe("saveCompiledVideoToDevice", () => {
     expect(dependencies.saveToLibrary).toHaveBeenCalledWith(
       "file:///cache/letrend-export.mp4",
     );
+    expect(dependencies.triggerWebDownload).not.toHaveBeenCalled();
     expect(result.kind).toBe("saved");
+    expect(result.message).toBe("Saved to gallery.");
   });
 
   it("saves an existing local file without downloading it again", async () => {
@@ -56,22 +58,44 @@ describe("saveCompiledVideoToDevice", () => {
     );
   });
 
-  it("opens the video URL on web instead of requesting media-library permission", async () => {
+  it("triggers a browser download on web instead of opening the video", async () => {
     const dependencies = createDependencies({
       platform: "web",
     });
 
     const result = await saveCompiledVideoToDevice(
-      "https://example.com/video.mp4",
+      "https://example.com/compiled.mp4",
       dependencies,
     );
 
-    expect(dependencies.openUrl).toHaveBeenCalledWith(
-      "https://example.com/video.mp4",
+    expect(dependencies.prepareVideoReference).toHaveBeenCalledWith(
+      "https://example.com/compiled.mp4",
+    );
+    expect(dependencies.triggerWebDownload).toHaveBeenCalledWith(
+      "https://example.com/compiled.mp4",
+      "compiled.mp4",
     );
     expect(dependencies.requestPermission).not.toHaveBeenCalled();
+    expect(dependencies.downloadVideo).not.toHaveBeenCalled();
     expect(dependencies.saveToLibrary).not.toHaveBeenCalled();
-    expect(result.kind).toBe("opened");
+    expect(result.kind).toBe("downloaded");
+    expect(result.message).toBe("Download started.");
+  });
+
+  it("uses a safe fallback filename when the URL has no mp4 filename", async () => {
+    const dependencies = createDependencies({
+      platform: "web",
+    });
+
+    await saveCompiledVideoToDevice(
+      "https://example.com/render?id=123",
+      dependencies,
+    );
+
+    expect(dependencies.triggerWebDownload).toHaveBeenCalledWith(
+      "https://example.com/render?id=123",
+      "letrend-export.mp4",
+    );
   });
 
   it("throws a clear error when permission is denied", async () => {
@@ -113,6 +137,7 @@ describe("saveCompiledVideoToDevice", () => {
     );
 
     expect(dependencies.downloadVideo).not.toHaveBeenCalled();
+    expect(dependencies.triggerWebDownload).not.toHaveBeenCalled();
   });
 
   it("throws a clear error when the downloaded video is not a local file", async () => {
@@ -126,5 +151,18 @@ describe("saveCompiledVideoToDevice", () => {
     await expect(
       saveCompiledVideoToDevice("https://example.com/video.mp4", dependencies),
     ).rejects.toThrow("The video could not be prepared for saving.");
+  });
+
+  it("throws a clear error when browser download is unavailable", async () => {
+    const dependencies = createDependencies({
+      platform: "web",
+      triggerWebDownload: jest.fn(async () => {
+        throw new Error("Browser download is not available.");
+      }),
+    });
+
+    await expect(
+      saveCompiledVideoToDevice("https://example.com/video.mp4", dependencies),
+    ).rejects.toThrow("Browser download is not available.");
   });
 });

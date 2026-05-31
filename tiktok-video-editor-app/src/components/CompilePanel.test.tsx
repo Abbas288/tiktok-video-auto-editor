@@ -92,8 +92,8 @@ describe("CompilePanel", () => {
     expect(queryByTestId("compiled-output-card")).toBeNull();
   });
 
-  it("renders export actions when a finished video exists after success", () => {
-    const { getByTestId } = render(
+  it("renders compact export actions when a finished video exists after success", () => {
+    const { getByTestId, getByText, queryByText } = render(
       <CompilePanel
         status="success"
         message="Rendered video is ready."
@@ -106,8 +106,29 @@ describe("CompilePanel", () => {
     );
 
     expect(getByTestId("compiled-output-card")).toBeTruthy();
+    expect(getByText("Ready")).toBeTruthy();
+    expect(getByText("MP4")).toBeTruthy();
+    expect(queryByText("Rendered video is ready.")).toBeNull();
+    expect(queryByText("Final render available.")).toBeNull();
+    expect(queryByText("Rendered")).toBeNull();
     expect(getByTestId("save-compiled-video-button")).toBeTruthy();
     expect(getByTestId("open-compiled-video-button")).toBeTruthy();
+  });
+
+  it("renders preview title for placeholder output", () => {
+    const { getByText } = render(
+      <CompilePanel
+        status="success"
+        message="Preview ready."
+        compiledVideoUrl="https://example.com/placeholder.mp4"
+        outputKind="placeholder"
+        onCompile={jest.fn()}
+        onSaveCompiledVideo={jest.fn()}
+        onOpenCompiledVideo={jest.fn()}
+      />,
+    );
+
+    expect(getByText("Preview ready")).toBeTruthy();
   });
 
   it("calls onSaveCompiledVideo when save button is pressed", () => {
@@ -175,14 +196,31 @@ describe("CompilePanel", () => {
         message="Rendered video is ready."
         compiledVideoUrl="https://example.com/compiled.mp4"
         saveStatus="success"
-        saveMessage="Video saved to your gallery."
+        saveMessage="Saved to gallery."
         onCompile={jest.fn()}
         onSaveCompiledVideo={jest.fn()}
         onOpenCompiledVideo={jest.fn()}
       />,
     );
 
-    expect(getByText("Video saved to your gallery.")).toBeTruthy();
+    expect(getByText("Saved to gallery.")).toBeTruthy();
+  });
+
+  it("renders web download feedback", () => {
+    const { getByText } = render(
+      <CompilePanel
+        status="success"
+        message="Rendered video is ready."
+        compiledVideoUrl="https://example.com/compiled.mp4"
+        saveStatus="success"
+        saveMessage="Download started."
+        onCompile={jest.fn()}
+        onSaveCompiledVideo={jest.fn()}
+        onOpenCompiledVideo={jest.fn()}
+      />,
+    );
+
+    expect(getByText("Download started.")).toBeTruthy();
   });
 
   it("renders save error feedback even when output actions are hidden", () => {
