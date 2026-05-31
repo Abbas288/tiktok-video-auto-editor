@@ -20,7 +20,6 @@ export default function RootLayout(): React.JSX.Element {
         name="editor/[id]"
         options={{ title: "Editor", headerShown: false }}
       />
-      <Stack.Screen name="preview/[id]" options={{ title: "Preview" }} />
     </Stack>
   );
 }
