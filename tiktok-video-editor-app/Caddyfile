@@ -1,4 +1,4 @@
-{$SITE_ADDRESS:cu1223.camp.lnu.se} {
+{$SITE_ADDRESS:localhost} {
     tls {
         ca https://ca.camp.lnu.se:9000/acme/acme/directory
         ca_root /etc/ssl/certs/LNU_FTK_Campus_Root_CA_2025.pem
@@ -6,5 +6,11 @@
 
     encode gzip zstd
 
-    reverse_proxy web:80
+    handle_path /api/* {
+        reverse_proxy compile-server:3030
+    }
+
+    handle {
+        reverse_proxy web:80
+    }
 }

@@ -2,6 +2,9 @@ FROM node:22-bookworm-slim AS build
 
 WORKDIR /app
 
+ARG EXPO_PUBLIC_COMPILE_SERVER_URL=/api
+ENV EXPO_PUBLIC_COMPILE_SERVER_URL=$EXPO_PUBLIC_COMPILE_SERVER_URL
+
 COPY package.json package-lock.json ./
 RUN npm ci
 
