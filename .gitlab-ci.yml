@@ -9,36 +9,89 @@ stages:
 
 variables:
   APP_DIR: "tiktok-video-editor-app"
+  COMPILE_SERVER_DIR: "compile-server"
   NODE_IMAGE: "node:22-alpine"
   DOCKER_TLS_CERTDIR: ""
+  WEB_IMAGE_NAME: "$CI_REGISTRY_IMAGE/web"
+  COMPILE_SERVER_IMAGE_NAME: "$CI_REGISTRY_IMAGE/compile-server"
+  CADDY_IMAGE_NAME: "$CI_REGISTRY_IMAGE/caddy"
 
-verify_app:
+.app_verify_job:
   stage: verify
   image: $NODE_IMAGE
   cache:
     key:
       files:
-        - $APP_DIR/package-lock.json
+        - tiktok-video-editor-app/package-lock.json
     paths:
       - $APP_DIR/.npm/
   before_script:
     - cd "$APP_DIR"
     - npm ci --cache .npm --prefer-offline
-  script:
-    - npm run lint
-    - npm run typecheck
-    - npm test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
 
-build_container:
+.compile_server_verify_job:
+  stage: verify
+  image: $NODE_IMAGE
+  cache:
+    key:
+      files:
+        - compile-server/package-lock.json
+    paths:
+      - $COMPILE_SERVER_DIR/.npm/
+  before_script:
+    - cd "$COMPILE_SERVER_DIR"
+    - npm ci --cache .npm --prefer-offline
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+lint_app:
+  extends: .app_verify_job
+  script:
+    - npm run lint
+
+typecheck_app:
+  extends: .app_verify_job
+  script:
+    - npm run typecheck
+
+test_app:
+  extends: .app_verify_job
+  script:
+    - npm test
+
+lint_compile_server:
+  extends: .compile_server_verify_job
+  script:
+    - npm run lint
+
+typecheck_compile_server:
+  extends: .compile_server_verify_job
+  script:
+    - npm run typecheck
+
+test_compile_server:
+  extends: .compile_server_verify_job
+  script:
+    - npm test
+
+build_web_container:
   stage: build
   image:
     name: gcr.io/kaniko-project/executor:v1.23.2-debug
     entrypoint: [""]
   needs:
-    - verify_app
+    - lint_app
+    - typecheck_app
+    - test_app
+    - lint_compile_server
+    - typecheck_compile_server
+    - test_compile_server
   retry:
     max: 2
     when:
@@ -52,9 +105,73 @@ build_container:
       --context "$CI_PROJECT_DIR/$APP_DIR"
       --dockerfile "$CI_PROJECT_DIR/$APP_DIR/Dockerfile"
       --target production
+      --build-arg EXPO_PUBLIC_COMPILE_SERVER_URL="${EXPO_PUBLIC_COMPILE_SERVER_URL:-/api}"
       --cache=true
-      --destination "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-      --destination "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+      --destination "$WEB_IMAGE_NAME:$CI_COMMIT_SHA"
+      --destination "$WEB_IMAGE_NAME:$CI_COMMIT_REF_SLUG"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG
+
+build_compile_server_container:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  needs:
+    - lint_app
+    - typecheck_app
+    - test_app
+    - lint_compile_server
+    - typecheck_compile_server
+    - test_compile_server
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - script_failure
+  script:
+    - mkdir -p /kaniko/.docker
+    - |
+      echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(printf "%s:%s" "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "$CI_PROJECT_DIR/$COMPILE_SERVER_DIR"
+      --dockerfile "$CI_PROJECT_DIR/$COMPILE_SERVER_DIR/Dockerfile"
+      --target production
+      --cache=true
+      --destination "$COMPILE_SERVER_IMAGE_NAME:$CI_COMMIT_SHA"
+      --destination "$COMPILE_SERVER_IMAGE_NAME:$CI_COMMIT_REF_SLUG"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG
+
+build_caddy_container:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  needs:
+    - lint_app
+    - typecheck_app
+    - test_app
+    - lint_compile_server
+    - typecheck_compile_server
+    - test_compile_server
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - script_failure
+  script:
+    - mkdir -p /kaniko/.docker
+    - |
+      echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(printf "%s:%s" "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "$CI_PROJECT_DIR/$APP_DIR"
+      --dockerfile "$CI_PROJECT_DIR/$APP_DIR/Dockerfile.caddy"
+      --cache=true
+      --destination "$CADDY_IMAGE_NAME:$CI_COMMIT_SHA"
+      --destination "$CADDY_IMAGE_NAME:$CI_COMMIT_REF_SLUG"
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_TAG
@@ -63,7 +180,9 @@ deploy_production:
   stage: deploy
   image: docker:27-cli
   needs:
-    - build_container
+    - build_web_container
+    - build_compile_server_container
+    - build_caddy_container
   before_script:
     - apk add --no-cache openssh-client
     - eval $(ssh-agent -s)
@@ -80,14 +199,26 @@ deploy_production:
     - docker context create production --docker "host=ssh://$SERVER_USER@$SERVER_HOST"
     - docker context use production
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - export APP_IMAGE="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-    - export WEB_PORT="${WEB_PORT:-8080}"
-    - docker compose -f "$APP_DIR/docker-compose.yml" pull web
-    - docker compose -f "$APP_DIR/docker-compose.yml" up -d --no-build --remove-orphans web
+    - export APP_IMAGE="$WEB_IMAGE_NAME:$CI_COMMIT_SHA"
+    - export COMPILE_SERVER_IMAGE="$COMPILE_SERVER_IMAGE_NAME:$CI_COMMIT_SHA"
+    - export CADDY_IMAGE="$CADDY_IMAGE_NAME:$CI_COMMIT_SHA"
+    - export SITE_ADDRESS="${SITE_ADDRESS:-$SERVER_HOST}"
+    - export EXPO_PUBLIC_COMPILE_SERVER_URL="${EXPO_PUBLIC_COMPILE_SERVER_URL:-/api}"
+    - export COMPILE_PUBLIC_BASE_URL="${COMPILE_PUBLIC_BASE_URL:-https://$SITE_ADDRESS/api}"
+    - export COMPILE_RENDERER="${COMPILE_RENDERER:-ffmpeg}"
+    - export COMPILE_OUTPUT_DIR="${COMPILE_OUTPUT_DIR:-/data/compiled}"
+    - export COMPILE_TEMP_DIR="${COMPILE_TEMP_DIR:-/data/tmp}"
+    - export COMPILE_UPLOAD_DIR="${COMPILE_UPLOAD_DIR:-/data/uploads}"
+    - export COMPILE_FFMPEG_PATH="${COMPILE_FFMPEG_PATH:-ffmpeg}"
+    - export COMPILE_FFPROBE_PATH="${COMPILE_FFPROBE_PATH:-ffprobe}"
+    - export COMPILE_RENDER_TIMEOUT_MS="${COMPILE_RENDER_TIMEOUT_MS:-120000}"
+    - export COMPILE_CLEANUP_TEMP_FILES="${COMPILE_CLEANUP_TEMP_FILES:-false}"
+    - docker compose -f "$APP_DIR/docker-compose.yml" --profile production pull web compile-server caddy
+    - docker compose -f "$APP_DIR/docker-compose.yml" --profile production up -d --no-build --remove-orphans web compile-server caddy
     - docker system prune -f
   environment:
     name: production
-    url: https://cu3133.camp.lnu.se
+    url: https://$SITE_ADDRESS
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
