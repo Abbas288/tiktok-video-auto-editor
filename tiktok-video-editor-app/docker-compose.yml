@@ -5,8 +5,35 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
+      args:
+        EXPO_PUBLIC_COMPILE_SERVER_URL: ${EXPO_PUBLIC_COMPILE_SERVER_URL:-/api}
     ports:
       - "${WEB_PORT:-8080}:80"
+    restart: unless-stopped
+
+  compile-server:
+    image: ${COMPILE_SERVER_IMAGE:-letrend-compile-server:local}
+    build:
+      context: ../compile-server
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      PORT: ${COMPILE_PORT:-3030}
+      COMPILE_PUBLIC_BASE_URL: ${COMPILE_PUBLIC_BASE_URL:-http://localhost:3030}
+      COMPILE_RENDERER: ${COMPILE_RENDERER:-ffmpeg}
+      COMPILE_PLACEHOLDER_VIDEO_URL: ${COMPILE_PLACEHOLDER_VIDEO_URL:-}
+      COMPILE_OUTPUT_DIR: ${COMPILE_OUTPUT_DIR:-/data/compiled}
+      COMPILE_TEMP_DIR: ${COMPILE_TEMP_DIR:-/data/tmp}
+      COMPILE_UPLOAD_DIR: ${COMPILE_UPLOAD_DIR:-/data/uploads}
+      COMPILE_FFMPEG_PATH: ${COMPILE_FFMPEG_PATH:-ffmpeg}
+      COMPILE_FFPROBE_PATH: ${COMPILE_FFPROBE_PATH:-ffprobe}
+      COMPILE_RENDER_TIMEOUT_MS: ${COMPILE_RENDER_TIMEOUT_MS:-120000}
+      COMPILE_FONT_FILE: ${COMPILE_FONT_FILE:-}
+      COMPILE_CLEANUP_TEMP_FILES: ${COMPILE_CLEANUP_TEMP_FILES:-false}
+    volumes:
+      - compile_uploads:/data/uploads
+      - compile_compiled:/data/compiled
+      - compile_tmp:/data/tmp
     restart: unless-stopped
 
   caddy:
@@ -24,11 +51,15 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     environment:
-      - SITE_ADDRESS=${SITE_ADDRESS:-cu1223.camp.lnu.se}
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
     depends_on:
       - web
+      - compile-server
     restart: unless-stopped
 
 volumes:
   caddy_data:
   caddy_config:
+  compile_uploads:
+  compile_compiled:
+  compile_tmp:
