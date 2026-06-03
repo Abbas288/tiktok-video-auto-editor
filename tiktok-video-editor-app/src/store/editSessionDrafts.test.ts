@@ -12,6 +12,8 @@ interface MemoryStorage {
   removeItem: jest.Mock<void, [string]>;
 }
 
+const DRAFTS_STORAGE_KEY = "tiktok-video-editor-app:edited-template-drafts:v2";
+
 function createMemoryStorage(): MemoryStorage {
   const values = new Map<string, string>();
 
@@ -38,6 +40,43 @@ function createDraftFixture(): EditedTemplatesById {
   };
 }
 
+function createDraftWithSessionMedia(): EditedTemplatesById {
+  return {
+    "bunny-intro-2026": {
+      id: "bunny-intro-2026",
+      title: "The Bunny and the Butterfly",
+      sourceVideoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+      orientation: "landscape",
+      compiledVideoUrl: "https://example.com/compiled/old-output.mp4",
+      scenes: [
+        {
+          id: "scene-1",
+          orderIndex: 0,
+          startSeconds: 0,
+          durationSeconds: 4,
+          instruction: "Scene with stale video",
+          textOverlays: [],
+          effects: [
+            {
+              type: "contrast",
+              value: 1.1,
+            },
+          ],
+          videoSource: {
+            type: "user",
+            localUri: "blob:http://localhost/stale-video",
+            uploadUrl: "https://example.com/api/assets/videos/stale.mp4",
+            fileName: "stale.mp4",
+            originalDurationSeconds: 8,
+            sourceStartSeconds: 0,
+            durationSeconds: 4,
+          },
+        },
+      ],
+    },
+  };
+}
+
 describe("editSessionDrafts", () => {
   it("saves and loads edited template drafts", () => {
     const storage = createMemoryStorage();
@@ -48,6 +87,48 @@ describe("editSessionDrafts", () => {
     expect(loadEditedTemplateDrafts(storage)).toEqual(drafts);
   });
 
+  it("removes session-bound media references when drafts are restored", () => {
+    const storage = createMemoryStorage();
+
+    storage.setItem(
+      DRAFTS_STORAGE_KEY,
+      JSON.stringify(createDraftWithSessionMedia()),
+    );
+
+    const loadedDrafts = loadEditedTemplateDrafts(storage);
+    const loadedTemplate = loadedDrafts["bunny-intro-2026"];
+
+    expect(loadedTemplate.compiledVideoUrl).toBeUndefined();
+    expect(loadedTemplate.scenes[0].videoSource).toBeUndefined();
+    expect(loadedTemplate.scenes[0].effects).toEqual([
+      {
+        type: "contrast",
+        value: 1.1,
+      },
+    ]);
+  });
+
+  it("rewrites stored drafts after session-bound media references are removed", () => {
+    const storage = createMemoryStorage();
+
+    storage.setItem(
+      DRAFTS_STORAGE_KEY,
+      JSON.stringify(createDraftWithSessionMedia()),
+    );
+
+    loadEditedTemplateDrafts(storage);
+
+    const storedValue = storage.getItem(DRAFTS_STORAGE_KEY);
+
+    expect(storedValue).not.toBeNull();
+
+    const storedDrafts = JSON.parse(storedValue ?? "{}") as EditedTemplatesById;
+    const storedTemplate = storedDrafts["bunny-intro-2026"];
+
+    expect(storedTemplate.compiledVideoUrl).toBeUndefined();
+    expect(storedTemplate.scenes[0].videoSource).toBeUndefined();
+  });
+
   it("returns an empty object when storage is unavailable", () => {
     expect(loadEditedTemplateDrafts(null)).toEqual({});
   });
@@ -55,7 +136,7 @@ describe("editSessionDrafts", () => {
   it("returns an empty object when stored JSON is invalid", () => {
     const storage = createMemoryStorage();
 
-    storage.setItem("tiktok-video-editor-app:edited-template-drafts:v2", "{");
+    storage.setItem(DRAFTS_STORAGE_KEY, "{");
 
     expect(loadEditedTemplateDrafts(storage)).toEqual({});
   });
@@ -64,7 +145,7 @@ describe("editSessionDrafts", () => {
     const storage = createMemoryStorage();
 
     storage.setItem(
-      "tiktok-video-editor-app:edited-template-drafts:v2",
+      DRAFTS_STORAGE_KEY,
       JSON.stringify({
         broken: {
           id: "missing-fields",
@@ -79,7 +160,7 @@ describe("editSessionDrafts", () => {
     const storage = createMemoryStorage();
 
     storage.setItem(
-      "tiktok-video-editor-app:edited-template-drafts:v2",
+      DRAFTS_STORAGE_KEY,
       JSON.stringify({
         "bunny-intro-2026": {
           id: "bunny-intro-2026",

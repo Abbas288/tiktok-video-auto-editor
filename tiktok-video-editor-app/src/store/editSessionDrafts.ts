@@ -1,3 +1,4 @@
+import { removeSessionBoundSceneMedia } from "../domain/scene-video/sceneVideoDraftSanitizer";
 import { Template } from "../types/template";
 
 export type EditedTemplatesById = Record<string, Template>;
@@ -12,6 +13,10 @@ const DRAFTS_STORAGE_KEY = "tiktok-video-editor-app:edited-template-drafts:v2";
 
 /**
  * Loads edited template drafts from browser storage.
+ *
+ * Runtime media references are removed when drafts are restored. This prevents
+ * old local file/blob URLs and old upload URLs from being treated as valid
+ * scene videos in a later browser or server session.
  *
  * @param storage Optional storage adapter used for tests.
  * @returns Previously saved template drafts, or an empty object when storage is unavailable.
@@ -32,7 +37,17 @@ export function loadEditedTemplateDrafts(
 
     const parsedValue: unknown = JSON.parse(rawValue);
 
-    return isEditedTemplatesById(parsedValue) ? parsedValue : {};
+    if (!isEditedTemplatesById(parsedValue)) {
+      return {};
+    }
+
+    const { drafts, didChange } = sanitizeEditedTemplateDrafts(parsedValue);
+
+    if (didChange) {
+      saveEditedTemplateDrafts(drafts, storage);
+    }
+
+    return drafts;
   } catch {
     return {};
   }
@@ -76,6 +91,29 @@ export function clearEditedTemplateDraftsStorage(
   } catch {
     return;
   }
+}
+
+function sanitizeEditedTemplateDrafts(drafts: EditedTemplatesById): {
+  drafts: EditedTemplatesById;
+  didChange: boolean;
+} {
+  let didChange = false;
+  const sanitizedDrafts: EditedTemplatesById = {};
+
+  for (const [templateId, template] of Object.entries(drafts)) {
+    const sanitizedTemplate = removeSessionBoundSceneMedia(template);
+
+    if (sanitizedTemplate !== template) {
+      didChange = true;
+    }
+
+    sanitizedDrafts[templateId] = sanitizedTemplate;
+  }
+
+  return {
+    drafts: sanitizedDrafts,
+    didChange,
+  };
 }
 
 function getBrowserStorage(): DraftStorage | null {
