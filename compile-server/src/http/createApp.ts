@@ -148,8 +148,23 @@ export function createApp(config: CompileServerConfig): Express {
         return;
       }
 
+      const details = createErrorDetails(error);
+
+      console.error(
+        "[compile-server] Request failed",
+        JSON.stringify(
+          {
+            error: message,
+            details,
+          },
+          null,
+          2,
+        ),
+      );
+
       response.status(500).json({
         error: message,
+        details,
       });
     },
   );
@@ -281,6 +296,49 @@ function createCompiledVideoNotFoundHtml(filename: string): string {
   </main>
 </body>
 </html>`;
+}
+
+function createErrorDetails(error: unknown): string[] {
+  const details: string[] = [];
+  let currentError: unknown = error;
+
+  while (currentError instanceof Error) {
+    if (currentError.stack) {
+      details.push(currentError.stack);
+    } else {
+      details.push(currentError.message);
+    }
+
+    const stderr = readStringProperty(currentError, "stderr");
+
+    if (stderr) {
+      details.push(stderr);
+    }
+
+    currentError = readUnknownProperty(currentError, "cause");
+  }
+
+  if (details.length === 0 && error !== undefined && error !== null) {
+    details.push(String(error));
+  }
+
+  return details.slice(0, 6);
+}
+
+function readStringProperty(
+  value: object,
+  key: string,
+): string | undefined {
+  const record = value as Record<string, unknown>;
+  const property = record[key];
+
+  return typeof property === "string" && property.trim().length > 0
+    ? property
+    : undefined;
+}
+
+function readUnknownProperty(value: object, key: string): unknown {
+  return (value as Record<string, unknown>)[key];
 }
 
 function normalizeExtension(fileName: string): string {

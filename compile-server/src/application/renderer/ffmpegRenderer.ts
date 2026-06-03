@@ -12,6 +12,7 @@ import {
   createAssSubtitleFileContent,
 } from "./ffmpegRenderPlan";
 import { runMediaProcess } from "./ffmpegProcess";
+import { materializeMediaSource } from "./mediaSourceResolver";
 
 export interface FfmpegRenderResult {
   compiledVideoUrl: string;
@@ -24,6 +25,18 @@ interface PreparedSceneInput {
   sourceStartSeconds: number;
 }
 
+export class FfmpegRenderError extends Error {
+  public readonly step: string;
+  public readonly cause: unknown;
+
+  public constructor(step: string, cause: unknown) {
+    super(`FFmpeg render failed during ${step}: ${getErrorMessage(cause)}`);
+    this.name = "FfmpegRenderError";
+    this.step = step;
+    this.cause = cause;
+  }
+}
+
 export async function renderWithFfmpeg(
   payload: CompilePayload,
   config: CompileServerConfig,
@@ -32,50 +45,68 @@ export async function renderWithFfmpeg(
   const jobDir = path.join(config.tempDir, jobId);
   const outputFileName = `${jobId}.mp4`;
   const outputPath = path.join(config.outputDir, outputFileName);
-  const musicPath = payload.music ? path.join(jobDir, "music.mp3") : undefined;
+  const music = payload.music;
+  const musicPath = music ? path.join(jobDir, "music.mp3") : undefined;
 
   await mkdir(jobDir, { recursive: true });
   await mkdir(config.outputDir, { recursive: true });
-  await writeFile(path.join(jobDir, "payload.json"), JSON.stringify(payload, null, 2));
+  await writeFile(
+    path.join(jobDir, "payload.json"),
+    JSON.stringify(payload, null, 2),
+  );
 
   try {
-    const sceneInputs = await prepareSceneInputs(payload, jobDir);
+    const sceneInputs = await runRenderStep("scene media preparation", () =>
+      prepareSceneInputs(payload, config, jobDir),
+    );
 
-    if (payload.music && musicPath) {
-      await downloadMedia(payload.music.url, musicPath);
+    if (music && musicPath) {
+      await runRenderStep("music media preparation", () =>
+        materializeMediaSource({
+          url: music.url,
+          outputPath: musicPath,
+          config,
+          label: "background music",
+        }),
+      );
     }
 
-    const subtitleFiles = await createSubtitleFiles(payload, jobDir);
-    const sceneVideoPaths = await renderSceneVideos(
-      payload,
-      config,
-      sceneInputs,
-      jobDir,
-      subtitleFiles,
+    const subtitleFiles = await runRenderStep("subtitle generation", () =>
+      createSubtitleFiles(payload, jobDir),
+    );
+
+    const sceneVideoPaths = await runRenderStep("scene video rendering", () =>
+      renderSceneVideos(payload, config, sceneInputs, jobDir, subtitleFiles),
     );
 
     const composedVideoPath = path.join(jobDir, "composed-video.mp4");
-    const videoDurationSeconds = await composeSceneVideos(
-      payload.scenes,
-      sceneVideoPaths,
-      composedVideoPath,
-      config,
+    const videoDurationSeconds = await runRenderStep("scene composition", () =>
+      composeSceneVideos(
+        payload.scenes,
+        sceneVideoPaths,
+        composedVideoPath,
+        config,
+      ),
     );
 
-    const audioPath = await renderAudioTrack({
-      payload,
-      config,
-      sceneInputs,
-      musicPath,
-      jobDir,
-      outputDurationSeconds: videoDurationSeconds,
-    });
+    const audioPath = await runRenderStep("audio rendering", () =>
+      renderAudioTrack({
+        payload,
+        config,
+        sceneInputs,
+        musicPath,
+        jobDir,
+        outputDurationSeconds: videoDurationSeconds,
+      }),
+    );
 
-    if (audioPath) {
-      await muxVideoAndAudio(composedVideoPath, audioPath, outputPath, config);
-    } else {
-      await copyFile(composedVideoPath, outputPath);
-    }
+    await runRenderStep("final mux", async () => {
+      if (audioPath) {
+        await muxVideoAndAudio(composedVideoPath, audioPath, outputPath, config);
+      } else {
+        await copyFile(composedVideoPath, outputPath);
+      }
+    });
 
     return {
       compiledVideoUrl: `${config.publicBaseUrl.replace(/\/$/, "")}/compiled/${encodeURIComponent(
@@ -91,8 +122,24 @@ export async function renderWithFfmpeg(
   }
 }
 
+async function runRenderStep<T>(
+  step: string,
+  action: () => Promise<T>,
+): Promise<T> {
+  try {
+    return await action();
+  } catch (error) {
+    if (error instanceof FfmpegRenderError) {
+      throw error;
+    }
+
+    throw new FfmpegRenderError(step, error);
+  }
+}
+
 async function prepareSceneInputs(
   payload: CompilePayload,
+  config: CompileServerConfig,
   jobDir: string,
 ): Promise<PreparedSceneInput[]> {
   const cache = new Map<string, string>();
@@ -108,7 +155,14 @@ async function prepareSceneInputs(
 
     if (!filePath) {
       filePath = path.join(jobDir, `source-${index}.mp4`);
-      await downloadMedia(url, filePath);
+
+      await materializeMediaSource({
+        url,
+        outputPath: filePath,
+        config,
+        label: `scene ${index + 1}`,
+      });
+
       cache.set(url, filePath);
     }
 
@@ -485,16 +539,12 @@ async function createSubtitleFiles(
   return files;
 }
 
-async function downloadMedia(url: string, outputPath: string): Promise<void> {
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`Could not download media from ${url}.`);
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
   }
 
-  const buffer = Buffer.from(await response.arrayBuffer());
-
-  await writeFile(outputPath, buffer);
+  return "Unexpected render error.";
 }
 
 function formatSeconds(value: number): string {
