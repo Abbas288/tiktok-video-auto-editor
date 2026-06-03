@@ -19,6 +19,14 @@ export function getCompileServerBaseUrl(): string | undefined {
   return compileServerUrl?.trim() || undefined;
 }
 
+export function createCompileService(
+  baseUrl: string | undefined = getCompileServerBaseUrl(),
+): CompileClient {
+  return baseUrl
+    ? new HttpCompileClient(baseUrl)
+    : new LocalPreviewCompileClient();
+}
+
 class HttpCompileClient implements CompileClient {
   private readonly endpointUrl: string;
 
@@ -36,7 +44,7 @@ class HttpCompileClient implements CompileClient {
     });
 
     if (!response.ok) {
-      throw new Error(`Compile request failed with status ${response.status}.`);
+      throw new Error(await createCompileErrorMessage(response));
     }
 
     return parseCompileResponse(await response.json());
@@ -54,9 +62,49 @@ class LocalPreviewCompileClient implements CompileClient {
   }
 }
 
-export const compileService: CompileClient = compileServerUrl
-  ? new HttpCompileClient(compileServerUrl)
-  : new LocalPreviewCompileClient();
+export const compileService: CompileClient =
+  createCompileService(compileServerUrl);
+
+async function createCompileErrorMessage(response: Response): Promise<string> {
+  const fallbackMessage = `Compile request failed with status ${response.status}.`;
+
+  try {
+    const responseBody = await response.text();
+
+    if (responseBody.trim().length === 0) {
+      return fallbackMessage;
+    }
+
+    const parsedBody = JSON.parse(responseBody);
+
+    if (!isObject(parsedBody)) {
+      return fallbackMessage;
+    }
+
+    const serverError =
+      typeof parsedBody.error === "string" && parsedBody.error.trim().length > 0
+        ? parsedBody.error.trim()
+        : undefined;
+
+    const serverDetails = Array.isArray(parsedBody.details)
+      ? parsedBody.details
+          .filter((detail): detail is string => typeof detail === "string")
+          .map((detail) => detail.trim())
+          .filter(Boolean)
+          .slice(0, 2)
+      : [];
+
+    if (!serverError && serverDetails.length === 0) {
+      return fallbackMessage;
+    }
+
+    return [fallbackMessage.replace(/\.$/, ""), serverError, ...serverDetails]
+      .filter(Boolean)
+      .join(": ");
+  } catch {
+    return fallbackMessage;
+  }
+}
 
 function parseCompileResponse(data: unknown): CompileResult {
   if (!isObject(data)) {
