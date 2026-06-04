@@ -18,7 +18,7 @@ Abbas projekt är The TikTok Catalyst / LeTrend Mobile. Projektet ska hjälpa se
 Kärnflöde:
 `TikTok URL -> AI/API video analysis -> Template-JSON -> EditSession -> Editor UI -> Preview/Timeline -> Compile-payload -> backend/compile-server -> Rendered video via FFmpeg`
 
-## Vad Gemini ska prioritera
+## Vad AI ska prioritera
 - Hjälpa till att formulera problem och värde före teknik.
 - Hålla visionen tydlig och avgränsad.
 - Förhindra scope creep.
@@ -40,4 +40,4 @@ Kärnflöde:
 - Dokumentationen skrivs men används inte.
 
 ## Praktisk koppling till kod
-I denna fas ska Gemini inte pressa fram stora implementationer. Kodarbete ska endast stödja projektstart, till exempel repo, Expo-grund, README och tidig struktur.
+I denna fas ska AI inte pressa fram stora implementationer. Kodarbete ska endast stödja projektstart, till exempel repo, Expo-grund, README och tidig struktur.

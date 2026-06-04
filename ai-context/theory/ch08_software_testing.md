@@ -60,9 +60,9 @@ Abbas app har flera testkritiska delar:
 
 Eftersom AI används för kodstöd blir testning extra viktig. AI kan skapa kod som ser rätt ut men bara fungerar i normalfallet.
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - skriva testplan
 - skriva testfall i TC-format
@@ -96,7 +96,7 @@ Presentation bör visa:
 
 ## 7. Praktisk koppling till projektet
 
-Gemini ska använda följande teststruktur:
+AI ska använda följande teststruktur:
 
 ```md
 ### TCx.y Titel
@@ -128,7 +128,7 @@ Viktiga testfall för Abbas:
 - TC4.1 Preview seeks to scene startSeconds.
 - TC5.1 Compile-payload contains edited scene data.
 
-Gemini ska inte skriva generiska teststeg som "ange ett namn" eller "välj ett projekt". Testdata ska vara konkret, exempelvis `pizza-launch-2026` eller `missing-template-id`.
+AI ska inte skriva generiska teststeg som "ange ett namn" eller "välj ett projekt". Testdata ska vara konkret, exempelvis `pizza-launch-2026` eller `missing-template-id`.
 
 Minimikontroll före commit:
 

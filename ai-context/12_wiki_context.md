@@ -17,7 +17,7 @@ Wikin är organiserad i följande huvuddelar:
 * Sprints: iterationsrapporter vecka för vecka.
 * Delivery: demo och post mortem.
 
-När Gemini skapar ny dokumentation ska den följa samma logik:
+När AI skapar ny dokumentation ska den följa samma logik:
 
 1. Vad byggs?
 2. Varför byggs det?
@@ -77,7 +77,7 @@ Det betyder:
 * iterationsrapporter ska visa progression
 * ai-context ska hjälpa AI förstå projektet utan att gissa
 
-När Gemini hjälper med ny dokumentation ska den därför alltid fråga sig:
+När AI hjälper med ny dokumentation ska den därför alltid fråga sig:
 
 * Vilken del av projektets historia kompletterar detta?
 * Gör texten det lättare att förstå varför en ändring gjordes?
@@ -95,7 +95,7 @@ Princip:
 * Abbas styr arkitektur, scope, kvalitet och verifiering.
 * Kod har inget värde förrän den är förstådd, verifierad och dokumenterad.
 
-Gemini ska därför inte behandla AI-genererad kod som automatiskt korrekt. Den ska hjälpa Abbas minska tillitsgapet.
+AI ska därför inte behandla AI-genererad kod som automatiskt korrekt. Den ska hjälpa Abbas minska tillitsgapet.
 
 ## Riskbild
 
@@ -116,7 +116,7 @@ Senare huvudrisk:
 * dokumentation som halkar efter
 * features som inte är verifierade
 
-Gemini ska därför prioritera:
+AI ska därför prioritera:
 
 * små issues
 * tydliga acceptanskriterier
@@ -175,7 +175,7 @@ Vilka tester kördes och vilka testfall/rapporter täcker arbetet.
 Kvarstående problem, ändrad riskbild och beslut inför nästa iteration.
 ```
 
-När Gemini skriver iterationsrapport ska texten vara konkret och ärlig. Det är bättre att säga att något tog längre tid eller inte blev färdigt än att låtsas att allt gick enligt plan.
+När AI skriver iterationsrapport ska texten vara konkret och ärlig. Det är bättre att säga att något tog längre tid eller inte blev färdigt än att låtsas att allt gick enligt plan.
 
 ## Testrapportmönster
 
@@ -223,7 +223,7 @@ git switch -c <issue-number-short-branch-name>
 
 ## Wiki som källa för framtida AI-svar
 
-Gemini ska använda wikin när den hjälper Abbas med:
+AI ska använda wikin när den hjälper Abbas med:
 
 * ny wiki-text
 * iterationsrapport
@@ -236,4 +236,4 @@ Gemini ska använda wikin när den hjälper Abbas med:
 * motivering av AI-arbetssätt
 * kurskoppling
 
-Om användaren ber om text som ska in i GitLab Wiki ska Gemini emulera wiki-stilen i denna fil.
+Om användaren ber om text som ska in i GitLab Wiki ska AI emulera wiki-stilen i denna fil.

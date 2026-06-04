@@ -29,7 +29,7 @@ Viktigt:
 
 ## Git-arbetsflöde
 
-Gemini ska använda denna mentala modell:
+AI ska använda denna mentala modell:
 
 `working directory -> staging area -> local repository -> remote repository`
 
@@ -105,7 +105,7 @@ Risker:
 
 ## Configuration management
 
-Gemini ska tänka på:
+AI ska tänka på:
 - vilka filer hör till koden
 - vilka filer är miljö, cache eller byggartefakter
 - vilka konfigurationsfiler behövs
@@ -125,7 +125,7 @@ För Abbas projekt gäller:
 
 Abbas app kommer förändras när Template-JSON, AI/API och compile-servern utvecklas.
 
-Gemini ska därför:
+AI ska därför:
 - undvika hårdkodade antaganden om JSON som kan ändras
 - isolera API-format och parsning
 - föreslå adapters eller repositories när externa format ändras
@@ -194,7 +194,7 @@ Material till presentation kan innehålla:
 
 ## Praktisk koppling till kod
 
-När Gemini föreslår ändring ska den också föreslå:
+När AI föreslår ändring ska den också föreslå:
 - vilken issue ändringen hör till
 - vilka filer som påverkas
 - vilka tester som ska köras

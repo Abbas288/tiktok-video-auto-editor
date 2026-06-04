@@ -56,7 +56,7 @@
 * Krav: testfall ska dokumentera lokal build, lokal körning, Cumulus-deployment och säkerhetskontroll.
 * Krav: arkitektursidan ska förklara var deployment passar in i Abbas system.
 
-## Saker Gemini ska komma ihåg vid kodarbete
+## Saker AI ska komma ihåg vid kodarbete
 * För Abbas app är Docker främst relevant för Expo Web-deployment och framtida compile-server, inte för FFmpeg i mobilen.
 * När Docker skapas, föreslå `.dockerignore`, `Dockerfile`, `docker-compose.yml`, eventuell `nginx.conf` eller `Caddyfile`.
 * Föreslå testfall som TC-D1, TC-D2, TC-D3, TC-D4 och TC-D5 när deployment påverkas.

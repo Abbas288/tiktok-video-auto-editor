@@ -1,6 +1,8 @@
 {
   "name": "tiktok-video-editor-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "private": true,
+  "license": "UNLICENSED",
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
@@ -55,6 +57,5 @@
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.ts"
     ]
-  },
-  "private": true
+  }
 }

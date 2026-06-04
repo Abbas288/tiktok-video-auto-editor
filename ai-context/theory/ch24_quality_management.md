@@ -40,9 +40,9 @@ Kvalitet betyder:
 * refactor görs när filer blir svåra att förstå
 * AI-kontext hålls uppdaterad
 
-## Praktisk regel för Gemini
+## Praktisk regel för AI
 
-Gemini ska alltid fråga:
+AI ska alltid fråga:
 
 * Vilket krav verifieras?
 * Vilket test skyddar beteendet?

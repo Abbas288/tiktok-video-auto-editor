@@ -43,9 +43,9 @@ Abbas projekt passar bäst som incremental development. Det är inte realistiskt
 
 Varje steg måste testas innan nästa byggs. Detta minskar risken att ett stort AI-genererat kodblock ser korrekt ut men är svårt att verifiera.
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - hjälpa Abbas planera iterationer
 - motivera incremental development
@@ -73,7 +73,7 @@ Presentation bör visa:
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini kodar eller planerar ska kapitel 2 leda till:
+När AI kodar eller planerar ska kapitel 2 leda till:
 
 - små commits
 - små issues

@@ -47,9 +47,9 @@ Den ska skicka:
 - compile-payload
 - eventuellt redigerad session eller metadata
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - skriva om AI/API-flödet
 - skapa RenderApiClient
@@ -82,7 +82,7 @@ Presentation bör tydligt säga:
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini kodar mot tjänster ska den:
+När AI kodar mot tjänster ska den:
 
 - kapsla API-anrop i infrastructure
 - skapa tydliga request/response-typer

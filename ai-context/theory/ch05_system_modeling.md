@@ -4,7 +4,7 @@
 
 Kapitel 5 handlar om system modeling, alltså att skapa abstrakta modeller av ett system för att förstå, diskutera och dokumentera det. Modeller hjälper utvecklare, kunder och andra intressenter att se systemets struktur, beteende, data och interaktioner utan att behöva läsa all kod.
 
-Modeller är förenklingar. De visar vissa aspekter och döljer andra. Därför måste Gemini välja modelltyp efter syfte.
+Modeller är förenklingar. De visar vissa aspekter och döljer andra. Därför måste AI välja modelltyp efter syfte.
 
 ## 2. Viktiga begrepp
 
@@ -72,9 +72,9 @@ Visar användarflöde:
 6. användaren gör ändringar
 7. appen skapar compile-payload
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - skapa Mermaid-diagram
 - förklara arkitektur i Wiki
@@ -102,13 +102,13 @@ Presentation bör visa ett förenklat diagram, inte en jättestor teknisk karta.
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini hjälper med diagram ska det hålla rätt detaljnivå:
+När AI hjälper med diagram ska det hålla rätt detaljnivå:
 
 - För slides: få komponenter, tydliga pilar, brett och läsbart.
 - För Wiki: mer detaljerat med ansvar per lager.
 - För kodarbete: fokusera på typer och dataflöde.
 
-Exempel på Mermaid-flöde Gemini kan använda:
+Exempel på Mermaid-flöde AI kan använda:
 
 ```mermaid
 flowchart LR

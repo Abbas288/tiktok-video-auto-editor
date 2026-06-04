@@ -49,9 +49,9 @@ Prioriterad ordning:
 
 AI kan skapa mycket kod snabbt, men agil disciplin kräver att varje steg testas innan nästa tas.
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - skriva user stories
 - bryta ner en stor feature
@@ -84,7 +84,7 @@ Det ska framgå att AI inte gör processen mindre viktig. AI gör snarare behove
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini hjälper med kod ska det agila arbetssättet märkas genom:
+När AI hjälper med kod ska det agila arbetssättet märkas genom:
 
 - en feature per ändring
 - issue-koppling

@@ -2,7 +2,7 @@
 
 ## Syfte
 
-Denna fil används för att Gemini snabbt ska förstå vilka wiki-sidor som redan finns och vad de bidrar med. Den ersätter inte GitLab Wiki, men minskar risken att Gemini skriver ny dokumentation som bryter mot befintlig stil.
+Denna fil används för att AI snabbt ska förstå vilka wiki-sidor som redan finns och vad de bidrar med. Den ersätter inte GitLab Wiki, men minskar risken att AI bryter mot befintlig stil.
 
 ## Home och navigering
 
@@ -47,7 +47,7 @@ Viktigaste risk:
 Jag producerar kod snabbare än jag hinner verifiera den.
 ```
 
-Konsekvens för Gemini:
+Konsekvens för AI:
 
 * föreslå aldrig stor kod utan tydlig scope
 * prioritera verifiering
@@ -58,7 +58,7 @@ Konsekvens för Gemini:
 
 Development Strategy beskriver AI som motor och Abbas som ratt.
 
-Gemini ska tolka detta som:
+AI ska tolka detta som:
 
 * AI hjälper med boilerplate och första implementation
 * Abbas styr arkitektur och kvalitet
@@ -76,7 +76,7 @@ Quality Assurance definierar Abbas Definition of Done:
 * validering mot användarbehov
 * dokumenterade risker
 
-Gemini ska använda detta som standard när den skapar issues, testfall, MR-beskrivningar eller refaktorplaner.
+AI ska använda detta som standard när den skapar issues, testfall, MR-beskrivningar eller refaktorplaner.
 
 ## Test Focus
 
@@ -86,7 +86,7 @@ Test Focus beskriver tre nivåer:
 2. Stresstestning och edge cases.
 3. Automatiserad testning av kärnlogik.
 
-Gemini ska inte överdriva automatisering. I detta projekt är automatiska tester främst för domänlogik, helpers, store och komponenter. Större editorflöden kräver fortfarande manuell verifiering.
+AI ska inte överdriva automatisering. I detta projekt är automatiska tester främst för domänlogik, helpers, store och komponenter. Större editorflöden kräver fortfarande manuell verifiering.
 
 ## Testrapporter
 
@@ -101,7 +101,7 @@ Testrapporterna visar hur Abbas dokumenterar verifiering:
 * kommentarer om fail, fix och pass
 * reflektion och begränsningar
 
-Gemini ska skriva nya testrapporter med samma struktur.
+AI ska skriva nya testrapporter med samma struktur.
 
 ## Iterationsrapporter
 
@@ -115,13 +115,13 @@ Iterationsrapporterna visar progression:
 * vecka 7: editor, timeline, overlays, fullscreen och CI/CD
 * vecka 8: scene effects, audio, transitions och refactor
 
-Gemini ska bevara denna kronologi när nya sammanfattningar skapas.
+AI ska bevara denna kronologi när nya sammanfattningar skapas.
 
 ## Delivery
 
 Delivery innehåller demo och post mortem som slutartefakter.
 
-Gemini ska hjälpa Abbas skapa material som visar:
+AI ska hjälpa Abbas skapa material som visar:
 
 * vad som faktiskt fungerar
 * vilka krav som demonstreras

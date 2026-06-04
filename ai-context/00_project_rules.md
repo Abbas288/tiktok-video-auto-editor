@@ -2,7 +2,7 @@
 
 ## Syfte
 
-Denna fil styr hur Gemini ska arbeta i Abbas 1DV613-projekt. Den gäller kod, dokumentation, GitLab, testning, verifiering och MR.
+Denna fil styr hur AI ska arbeta i Abbas 1DV613-projekt. Den gäller kod, dokumentation, GitLab, testning, verifiering och MR.
 
 ## Grundregel
 
@@ -77,11 +77,11 @@ git status
 git diff
 ```
 
-Om markdown ändrar projektinstruktioner ska Gemini kontrollera att:
+Om markdown ändrar projektinstruktioner ska AI kontrollera att:
 
 * filerna hamnar på rätt path
 * inga secrets finns
-* instruktioner inte motsäger `GEMINI.md`
+* instruktioner inte motsäger `AI_PROJECT_GUIDE.md`
 * innehåll är projektspecifikt
 * stora originalkällor inte kopieras in i onödan
 
@@ -113,7 +113,7 @@ Fel tecken:
 
 ## Kursregler
 
-Kursen bedömer process, inte bara kod. Gemini ska därför hjälpa Abbas visa:
+Kursen bedömer process, inte bara kod. AI ska därför hjälpa Abbas visa:
 
 * kravspårbarhet
 * testbarhet
@@ -126,7 +126,7 @@ Kursen bedömer process, inte bara kod. Gemini ska därför hjälpa Abbas visa:
 
 ## AI-regler
 
-AI får hjälpa, men Abbas måste kunna försvara resultatet. Gemini ska därför:
+AI får hjälpa, men Abbas måste kunna försvara resultatet. AI ska därför:
 
 * markera osäkerhet
 * föreslå verifiering
@@ -134,3 +134,15 @@ AI får hjälpa, men Abbas måste kunna försvara resultatet. Gemini ska därfö
 * inte hitta på kurskrav
 * inte överimplementera
 * tydligt och kortfattat redovisa utfallet när information och kodförslag har verifierats mot nätet.
+
+## Deploymentregel
+
+Vid deploymentarbete gäller projektets faktiska modell:
+
+* Cumulus kör containrar.
+* GitLab CI/CD bygger och deployar dem.
+* GitLab runner styr Docker på Cumulus via Docker context över SSH.
+* Cumulus ska inte användas som arbetskatalog för koden.
+* Repo-koden ska inte klonas eller redigeras manuellt på Cumulus.
+
+Läs `ai-context/13_cicd_deployment_context.md` innan AI föreslår Docker-, Cumulus- eller pipeline-steg.

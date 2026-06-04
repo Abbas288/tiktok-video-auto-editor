@@ -2,7 +2,7 @@
 
 ## Syfte
 
-Denna fil sammanfattar slutdelen av kursen och vad Gemini ska prioritera.
+Denna fil sammanfattar slutdelen av kursen och vad AI ska prioritera.
 
 ## Fokus
 
@@ -80,7 +80,7 @@ Projektet ska vara begripligt för en annan utvecklare.
 Viktigt:
 
 * README
-* GEMINI.md
+* AI_PROJECT_GUIDE.md
 * ai-context
 * issues och MR-historik
 * testfall

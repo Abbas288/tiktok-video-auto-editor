@@ -31,7 +31,7 @@ Kapitlet lyfter fyra återkommande aktiviteter i alla mjukvaruprocesser:
 
 Kursen handlar inte bara om att få fram kod. Den examinerar om studenten arbetar som en mjukvaruutvecklare: planerar, dokumenterar, testar, versionhanterar, reflekterar och kan förklara sina beslut.
 
-Gemini ska därför inte bara hjälpa med implementation. Gemini ska hjälpa Abbas visa ett professionellt arbetssätt i GitLab, Wiki, issues, testfall, rapporter och presentationer.
+AI ska därför inte bara hjälpa med implementation. AI ska hjälpa Abbas visa ett professionellt arbetssätt i GitLab, Wiki, issues, testfall, rapporter och presentationer.
 
 ## 4. Relevans för Abbas projekt
 
@@ -43,9 +43,9 @@ TikTok URL → AI/API video analysis → Template-JSON → EditSession → Edito
 
 Kapitel 1 stödjer att detta ska behandlas som ett system, inte som en isolerad UI-app. Appen är beroende av upstream AI/API, JSON-format, GCS/Supabase, video, state och backend-rendering.
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - förklara varför dokumentation, testning och krav behövs
 - skriva introduktion till rapport eller Wiki
@@ -70,7 +70,7 @@ I presentationen kan detta formuleras som:
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini kodar ska kapitel 1 påverka arbetet så här:
+När AI kodar ska kapitel 1 påverka arbetet så här:
 
 - Dokumentera centrala typer och stores.
 - Skriv kod som någon annan kan förstå.

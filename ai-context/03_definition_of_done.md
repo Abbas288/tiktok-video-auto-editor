@@ -2,7 +2,7 @@
 
 ## Syfte
 
-Denna fil definierar vad "klart" betyder i Abbas projekt. Gemini ska använda den innan den föreslår att en issue stängs, en commit görs eller en feature beskrivs som färdig.
+Denna fil definierar vad "klart" betyder i Abbas projekt. AI ska använda den innan den föreslår att en issue stängs, en commit görs eller en feature beskrivs som färdig.
 
 ## Huvudregel
 
@@ -139,7 +139,7 @@ AI-genererad kod får bara accepteras om:
 - minst ett edge case har testats eller dokumenterats
 - antaganden är dokumenterade
 - koden inte introducerar onödigt scope creep
-- Gemini inte har hittat på API-format utan källa
+- AI inte har hittat på API-format utan källa
 - koden är granskad med `git diff`
 
 AI-genererad kod som bara ser rätt ut men inte är verifierad ska behandlas som ofärdig.

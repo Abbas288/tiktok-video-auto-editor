@@ -43,7 +43,7 @@ Kursen kräver särskilt att krav kan kopplas till:
 
 ## 4. Relevans för Abbas projekt
 
-Abbas projekt har lätt att bli för vagt om kraven bara skrivs som "AI-redigering" eller "CapCut-liknande app". Kapitel 4 hjälper Gemini att göra kraven testbara.
+Abbas projekt har lätt att bli för vagt om kraven bara skrivs som "AI-redigering" eller "CapCut-liknande app". Kapitel 4 hjälper AI att göra kraven testbara.
 
 Exempel på användarkrav:
 
@@ -69,9 +69,9 @@ Exempel på icke-funktionella krav:
 - Template parsing ska ge tydligt fel vid saknade obligatoriska fält.
 - UI ska förbli responsivt vid många scener.
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - skriva kravspecifikation
 - förbättra GitLab issues
@@ -106,7 +106,7 @@ Presentation ska kunna säga:
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini kodar ska kapitel 4 påverka arbetet så här:
+När AI kodar ska kapitel 4 påverka arbetet så här:
 
 - Implementera inte en feature utan krav.
 - Skriv acceptance criteria före eller samtidigt som implementation.

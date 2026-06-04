@@ -99,7 +99,7 @@ Fokus:
 
 Etik handlar inte bara om avsikt. Det handlar även om kvalitet, risker, falska antaganden och konsekvenser.
 
-Gemini ska hjälpa Abbas visa:
+AI ska hjälpa Abbas visa:
 
 * att mjukvaruutvecklare ansvarar för kvalitet
 * att felaktiga system kan skada människor
@@ -121,9 +121,25 @@ Viktiga dokument:
 
 * Wiki
 * README
-* GEMINI.md
+* AI_PROJECT_GUIDE.md
 * ai-context
 * GitLab issues
 * testfall
 * MR-beskrivningar
 * iterationsrapporter
+
+## Betygskrav
+
+`ai-context/08_study_guide_context.md` är den styrande ai-context-filen för G- och VG-krav.
+
+Viktiga VG-signaler i Abbas projekt:
+
+* spårbarhet mellan krav, issues, testfall och MR
+* release-testöversikt och testrapporter
+* minst 10 användbara automatiska metodtester
+* automatiska tester i CI/CD
+* sekvensdiagram och klassdiagram för centrala flöden
+* CI/CD-baserad deployment till Cumulus
+* dokumenterad branching strategy
+* semantisk versionshantering
+* tydlig etik- och AI-reflektion

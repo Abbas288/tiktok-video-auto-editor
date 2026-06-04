@@ -30,7 +30,7 @@ Configuration items:
 * package-lock
 * testfall
 * ai-context
-* GEMINI.md
+* AI_PROJECT_GUIDE.md
 * Wiki
 * CI/CD-filer
 * Dockerfiler när deployment används
@@ -50,12 +50,12 @@ git switch -c <issue-number-short-branch-name>
 
 CI/CD ska ses som automatiserad configuration management. Pipeline verifierar att rätt filer och beroenden fungerar tillsammans.
 
-## Praktisk regel för Gemini
+## Praktisk regel för AI
 
-När Gemini föreslår commit ska den först be om:
+När AI föreslår commit ska den först be om:
 
 * `git status`
 * `git diff`
 * relevant verifiering
 
-Gemini ska inte föreslå att dokumentation, kod och deploy blandas i samma MR om de inte hör till samma issue.
+AI ska inte föreslå att dokumentation, kod och deploy blandas i samma MR om de inte hör till samma issue.

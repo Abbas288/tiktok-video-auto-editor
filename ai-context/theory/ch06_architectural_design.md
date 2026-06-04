@@ -84,9 +84,9 @@ Exempel:
 - Supabase client
 - compile-server
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - uppdatera `04_architecture.md`
 - skapa arkitekturdiagram
@@ -120,7 +120,7 @@ Det måste vara tydligt att:
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini skriver kod ska kapitel 6 styra placering och ansvar:
+När AI skriver kod ska kapitel 6 styra placering och ansvar:
 
 - Screens visar data och tar emot input.
 - Zustand håller session state.

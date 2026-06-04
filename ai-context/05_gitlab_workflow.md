@@ -2,7 +2,7 @@
 
 ## Syfte
 
-Denna fil styr hur Gemini ska hjälpa Abbas med GitLab, issues, branches, commits, merge requests, estimates, spend, milestones, iterations och Wiki.
+Denna fil styr hur AI ska hjälpa Abbas med GitLab, issues, branches, commits, merge requests, estimates och spend.
 
 GitLab är projektets arbetsyta för:
 - kod
@@ -10,18 +10,16 @@ GitLab är projektets arbetsyta för:
 - krav
 - issues
 - testfall
-- iterationsrapporter
 - versionshantering
 - tidsrapportering
 - spårbarhet mellan krav, implementation och test
 
-Gemini ska använda denna fil när den:
+AI ska använda denna fil när den:
 - skriver eller granskar issues
 - föreslår milestones eller iterations
 - formulerar commits
-- hjälper till med Wiki
+- hjälper till med att kontrollera krav mot Wiki
 - kopplar krav till testfall
-- sammanfattar iterationer
 - bedömer om en issue kan stängas
 - förklarar `git status`, `git diff`, staging eller commit-flöde
 - hjälper till med branching strategy, partnerövning eller GitLab automation
@@ -32,13 +30,13 @@ Varje feature ska kunna spåras genom hela kedjan:
 
 Krav -> Issue -> Branch -> Implementation -> Testfall -> Verifiering -> Dokumentation -> Commit/Merge Request
 
-Gemini får inte behandla kod som fristående från krav, testning och dokumentation.
+AI får inte behandla kod som fristående från krav, testning och dokumentation.
 
 ## GitLab Wiki
 
 Wikin är kursens huvudsakliga dokumentationsyta.
 
-Gemini ska se wikin som:
+AI ska se wikin som:
 - projektets minne
 - platsen där beslut förklaras
 - platsen där krav, risker, testning och iterationer följs upp
@@ -46,11 +44,11 @@ Gemini ska se wikin som:
 
 Dokumentation ska vara lätt att uppdatera. Hellre kort, korrekt och levande än lång och död.
 
-När Gemini föreslår implementation ska den också ange om någon Wiki-sida behöver uppdateras.
+När AI föreslår implementation ska den också ange om någon Wiki-sida behöver uppdateras.
 
 ## Issue-arbete
 
-När Gemini hjälper till med en issue ska den följa detta:
+När AI hjälper till med en issue ska den följa detta:
 
 1. Läs aktuell issue.
 2. Identifiera mål och scope.
@@ -68,19 +66,14 @@ När Gemini hjälper till med en issue ska den följa detta:
 Rekommenderade typer i Abbas projekt:
 - USER STORY: beskriver användarvärde.
 - SYSTEM: beskriver tekniskt systemkrav.
-- FUNCTIONAL REQUIREMENT: beskriver vad systemet ska göra.
-- NON-FUNCTIONAL REQUIREMENT: beskriver kvalitet, stabilitet, prestanda, säkerhet eller användbarhet.
-- TASK: konkret arbetsuppgift.
-- BUG: fel som ska åtgärdas.
-- TEST: testfall eller testsvit.
+- FIX: fel som ska åtgärdas.
+- TC-XXX: testfall.
 - DOCS: dokumentationsarbete.
-- SPIKE: kort undersökning för att minska risk.
-- RISK: risk eller åtgärd.
 - DEPLOYMENT: Docker, Cumulus, reverse proxy, build eller releasekontroll.
 
 ## GitLab-detaljer som kan användas vid behov
 
-Gemini kan föreslå följande när det hjälper Abbas strukturera issues:
+AI kan föreslå följande när det hjälper Abbas strukturera issues:
 
 - labels för typ av arbete, till exempel `feature`, `bug`, `docs`, `test`, `risk`, `spike`, `deployment`
 - weight eller prioritet när flera issues konkurrerar
@@ -90,7 +83,7 @@ Gemini kan föreslå följande när det hjälper Abbas strukturera issues:
 - iteration cadence om återkommande sprintliknande cykler används
 
 Regel:
-Dessa verktyg ska bara användas när de hjälper projektet. Gemini ska inte skapa administrativt brus.
+Dessa verktyg ska bara användas när de hjälper projektet. AI ska inte skapa administrativt brus.
 
 ## User Story-format
 
@@ -147,7 +140,7 @@ Kända issues i projektet visar denna riktning:
 - `#40` Cumulus, HTTPS eller reverse proxy
 - `#42` och `#43` route-stabilisering, template-id och stale state
 
-Gemini ska använda dessa som projektets faktiska backlog, men ska kontrollera aktuell GitLab-status om Abbas klistrar in ny status.
+AI ska använda dessa som projektets faktiska backlog, men ska kontrollera aktuell GitLab-status om Abbas klistrar in ny status.
 
 ## Estimate och spend
 
@@ -376,13 +369,15 @@ Varje iteration bör ha:
 - vad som flyttas vidare
 - skillnaden mellan plan och faktisk utveckling
 
-Abbas har haft problem med att komma igång med tidsloggning och GitLab Iterations. Gemini ska därför vara extra tydlig med konkreta steg.
+Abbas har haft problem med att komma igång med tidsloggning och GitLab Iterations. AI ska därför vara extra tydlig med konkreta steg.
 
 ## Kanban och sprint
 
 Använd båda:
-- Kanban för daglig överblick: To Do, In Progress, Done.
+- Kanban för daglig överblick: To Do, In Progress, Done
 - Sprint/Iteration för veckans mål och uppföljning.
+
+Notera: Abbas har valt att följa kanban-metodiken med papper och penna, medan sprint/iteration-relaterad dokumentation sker i GitLab. 
 
 ## `.gitignore`
 
@@ -392,7 +387,7 @@ Rimlig modell:
 - root `.gitignore`: projektövergripande skräp, AI-context cache, OS-filer, editor-filer, `.env`
 - app `.gitignore`: Expo/Node-specifika filer, `node_modules`, `.expo`, build-output
 
-Gemini ska inte slentrianmässigt ta bort en `.gitignore`. Först ska den kontrollera vad varje fil ignorerar.
+AI ska inte slentrianmässigt ta bort en `.gitignore`. Först ska den kontrollera vad varje fil ignorerar.
 
 ## `.dockerignore`
 
@@ -415,7 +410,7 @@ Risker ska bli konkreta uppgifter, inte bara text i Wiki.
 
 Exempel:
 - Risk: GCS-video laddar inte i Expo.
-- Spike: testa signerad video-URL i Expo Go.
+- Undersökning: testa signerad video-URL i Expo Go.
 - Acceptanskriterium: video kan öppnas eller felhantering visas.
 - Testfall: TC för lyckad laddning och TC för bruten URL.
 
@@ -428,9 +423,9 @@ Andra risker för Abbas projekt:
 - Docker/deployment tar tid från editor-MVP om det inte avgränsas.
 - Secrets eller `.env` råkar committas.
 
-## Vad Gemini inte får göra
+## Vad AI inte får göra
 
-Gemini får inte:
+AI får inte:
 - föreslå commit utan verifiering
 - blanda flera features i samma commit om det går att undvika
 - ignorera untracked files
@@ -454,19 +449,22 @@ GitLab används för att visa att Abbas arbetar strukturerat:
 - branching strategy och partnerövning
 - eventuell automation och deployment
 
-Gemini ska därför alltid koppla kodarbete till GitLab-spår när det är relevant.
+AI ska därför alltid koppla kodarbete till GitLab-spår när det är relevant.
 
-## Iterationsrapport
+## Faktisk CI/CD och Cumulus-deployment
 
-När Gemini skriver iterationsrapport ska den få med:
-- mål för iterationen
-- vad som planerades
-- vad som blev gjort
-- vad som inte blev klart
-- tidsestimat jämfört med faktisk tid
-- vilka issues som berördes
-- vilka testfall som kördes
-- vilka risker som upptäcktes
-- vad som flyttas till nästa iteration
-- personlig reflektion i Abbas ton
-- om Git, branching, partnerövning, automation eller deployment påverkade arbetet
+Projektets deploymentmodell är:
+
+```text
+local branch -> MR -> main -> GitLab verify -> GitLab build -> manual deploy_production -> Cumulus containers
+```
+
+Viktigt:
+
+* Cumulus är runtime-server för containrar, inte arbetskatalog för koden.
+* GitLab CI/CD bygger webapp, compile-server och Caddy som Docker-images.
+* Deploy-jobbet skapar Docker context mot Cumulus via SSH.
+* `deploy_production` är manuellt och ska bara köras när verify och build är gröna.
+* AI ska inte föreslå manuell kloning av repot på Cumulus.
+
+Läs även `ai-context/13_cicd_deployment_context.md` vid deploymentfrågor.

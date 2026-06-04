@@ -2,7 +2,7 @@
 
 ## Syfte
 
-Denna fil förhindrar att Gemini blandar ihop Abbas projekt med gruppmedlemmarnas projekt.
+Denna fil förhindrar att AI blandar ihop Abbas projekt med gruppmedlemmarnas projekt.
 
 Abbas projekt är alltid huvudprojektet när frågan gäller:
 - mitt projekt
@@ -18,12 +18,12 @@ Abbas projekt är alltid huvudprojektet när frågan gäller:
 
 Ida och Wasim är endast referensprojekt.
 
-## När Gemini ska använda denna fil
+## När AI ska använda denna fil
 
 Använd denna fil när:
 - gruppmaterial nämner Ida eller Wasim
 - presentationer jämför projekten
-- Gemini hämtar inspiration från kursens exempel
+- AI hämtar inspiration från kursens exempel
 - krav, testfall eller arkitektur riskerar att blandas ihop
 - Abbas ber om hjälp med sitt eget projekt efter att gruppmaterial har använts
 
@@ -103,7 +103,7 @@ Det får inte:
 
 ## Särskilt viktiga delar från hagen-auto-edit
 
-När Gemini behöver teknisk inspiration, börja med att leta efter dessa delar selektivt:
+När AI behöver teknisk inspiration, börja med att leta efter dessa delar selektivt:
 
 - `apps/compile-server/`
   - visar serverbaserad FFmpeg-kompilering
@@ -127,9 +127,9 @@ När Gemini behöver teknisk inspiration, börja med att leta efter dessa delar 
   - inspiration för editorflöde
   - ska inte kopieras utan anpassas till Abbas route groups
 
-## Hur Gemini ska resonera när referenskod används
+## Hur AI ska resonera när referenskod används
 
-Innan Gemini använder referenskod ska den fråga:
+Innan AI använder referenskod ska den fråga:
 1. Stöder detta Abbas MVP?
 2. Passar detta Abbas lagerarkitektur?
 3. Kan detta testas?
@@ -137,9 +137,9 @@ Innan Gemini använder referenskod ska den fråga:
 5. Är detta frontendansvar eller backendansvar?
 6. Riskerar detta att göra appen större än kursens tid tillåter?
 
-Om svaret är oklart ska Gemini föreslå en mindre lösning eller fråga Abbas.
+Om svaret är oklart ska AI föreslå en mindre lösning eller fråga Abbas.
 
-## Vanliga fel Gemini ska undvika
+## Vanliga fel AI ska undvika
 
 - Blanda ihop Abbas mobilapp med hagen backend.
 - Blanda ihop Abbas projekt med Ida eller Wasim.
@@ -160,18 +160,18 @@ Gruppens material kan användas för:
 - hur teori kan tillämpas
 - hur krav och testning kan presenteras
 
-Men när Gemini genererar något för Abbas ska Abbas projekt alltid vara primär kontext.
+Men när AI genererar något för Abbas ska Abbas projekt alltid vara primär kontext.
 
 ## Säkra formuleringar
 
-Gemini får skriva:
+AI får skriva:
 - "Idas och Wasims projekt används endast som jämförelse och inspiration."
 - "Abbas projekt är huvudprojektet och kravkällan för kodarbete."
 - "Strukturen från gruppens presentation kan inspirera dokumentation, men den ändrar inte Abbas scope."
 
 ## Osäkra formuleringar
 
-Gemini får inte skriva:
+AI får inte skriva:
 - "Eftersom Ida använder X bör Abbas också använda X."
 - "Wasims projekt visar att Abbas app behöver Pomodoro-liknande funktioner."
 - "Gruppens projekt kräver att Abbas bygger dashboard."
@@ -179,7 +179,7 @@ Gemini får inte skriva:
 
 ## Praktisk kontrollfråga
 
-Om information kommer från Ida eller Wasim ska Gemini fråga:
+Om information kommer från Ida eller Wasim ska AI fråga:
 
 1. Är detta bara presentationsstruktur?
 2. Är detta generell kursmetod?
