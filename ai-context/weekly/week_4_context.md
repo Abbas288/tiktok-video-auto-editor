@@ -29,7 +29,7 @@ Abbas behöver bygga en stabil grund för editorflödet:
 - Domain: Template, Scene, TextOverlay, Transition, Effect, EditSession.
 - Infrastructure: API-klienter och kommunikation med GCS/Supabase/compile-server när det behövs.
 
-## Vad Gemini ska prioritera
+## Vad AI ska prioritera
 - Små implementationer.
 - Testbar struktur.
 - Ingen tung logik i UI.
@@ -62,7 +62,7 @@ Docker är inte relevant som lösning för att köra FFmpeg i mobilappen.
 - Appen blir svår att testa eftersom logik blandas in i UI.
 
 ## Praktisk koppling till kod
-Gemini ska föreslå foundation-commit först när följande testats:
+AI ska föreslå foundation-commit först när följande testats:
 - Home route renderas.
 - Template kan laddas till EditSession.
 - Editor route öppnas med id.

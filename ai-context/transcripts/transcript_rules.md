@@ -1,7 +1,7 @@
 # Transkriptregler (transcript_rules.md)
 
 ## Syfte
-Denna fil styr hur Gemini ska använda transkriptioner från kursen. Transkriptionerna är råmaterial, inte primär arbetskontext. Gemini ska läsa dem selektivt och omvandla dem till praktisk projektkunskap.
+Denna fil styr hur AI ska använda transkriptioner från kursen. Transkriptionerna är råmaterial, inte primär arbetskontext. AI ska läsa dem selektivt och omvandla dem till praktisk projektkunskap.
 
 ## Grundregel
 Transkriptioner ska aldrig klistras in som en enda lång kontextmassa. De ska kondenseras efter vecka, tema och relevans.
@@ -48,11 +48,11 @@ Varje kompakt transkript ska använda denna struktur:
 
 ## Risker och krav som påverkar Abbas projekt
 
-## Saker Gemini ska komma ihåg vid kodarbete
+## Saker AI ska komma ihåg vid kodarbete
 ```
 
 ## Prioriteringsordning
-När informationen är för lång ska Gemini prioritera:
+När informationen är för lång ska AI prioritera:
 1. kurskrav och examination
 2. krav, testning och GitLab
 3. implementation och arkitektur
@@ -68,7 +68,7 @@ Transkript ska alltid kopplas till Abbas verkliga projektflöde:
 
 `TikTok URL -> AI/API video analysis -> Template-JSON -> EditSession -> Editor UI -> Preview/Timeline -> Compile-payload -> backend/compile-server -> Rendered video via FFmpeg`
 
-Gemini ska aldrig låta transkriptioner från grupparbete med Ida och Wasim bli krav för Abbas kod.
+AI ska aldrig låta transkriptioner från grupparbete med Ida och Wasim bli krav för Abbas kod.
 
 ## När råtranskript ska läsas igen
 Läs råtranskript bara när:
@@ -80,7 +80,7 @@ Läs råtranskript bara när:
 
 ## När råtranskript inte ska läsas
 Läs inte råtranskript när:
-- Gemini ska implementera kod
+- AI ska implementera kod
 - en enkel issue ska lösas
 - kompaktfilen redan täcker frågan
 - stora filer riskerar att kapa kontexten

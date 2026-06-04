@@ -34,8 +34,8 @@
 - Krav: skilj mellan upstream AI/API och mobilappens editorflöde.
 - Krav: formulera projektets värde som att härma redigeringsformat, struktur och stil, inte kopiera innehåll.
 
-## Saker Gemini ska komma ihåg vid kodarbete
+## Saker AI ska komma ihåg vid kodarbete
 - Visionen ska styra scope. Bygg inte features bara för att de är tekniskt intressanta.
 - MVP ska stödja kärnflödet: Template-JSON -> EditSession -> Editor UI.
-- Om kodförslag inte stärker visionen eller MVP:n ska Gemini varna för scope creep.
+- Om kodförslag inte stärker visionen eller MVP:n ska AI varna för scope creep.
 - Ida och Wasim är gruppreferenser, inte kravkällor för Abbas app.

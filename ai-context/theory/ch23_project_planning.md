@@ -54,9 +54,9 @@ Planeringen bör fokusera på kärnflödet:
 
 Om tid saknas ska extra polish, avancerade effects och direkt TikTok-delning prioriteras bort.
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - skapa eller förbättra issues
 - föreslå estimates
@@ -86,7 +86,7 @@ Presentation kan säga:
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini hjälper Abbas planera ska issues vara små nog att testas.
+När AI hjälper Abbas planera ska issues vara små nog att testas.
 
 Dålig issue:
 
@@ -116,7 +116,7 @@ Rekommenderad issue-struktur:
 ## Estimate
 ```
 
-Gemini ska komma ihåg:
+AI ska komma ihåg:
 
 - Estimat ska inkludera testning och dokumentation.
 - AI kan minska kodtid men ökar granskningsbehov.

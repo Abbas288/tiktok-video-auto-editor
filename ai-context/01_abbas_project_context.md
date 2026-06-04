@@ -2,7 +2,7 @@
 
 ## Syfte
 
-Denna fil beskriver vad Abbas bygger och vad Gemini inte får anta. Använd den vid krav, kod, testfall, Wiki, MR och presentation.
+Denna fil beskriver vad Abbas bygger och vad AI inte får anta. Använd den vid krav, kod, testfall, Wiki, MR och presentation.
 
 ## Produkt
 
@@ -56,7 +56,7 @@ Projektet har nu stöd för:
 
 Upstream AI/API ansvarar för analys av videoreferens och generering av Template-JSON. Mobilappen ska inte göra denna analys själv.
 
-Gemini ska inte anta att:
+AI ska inte anta att:
 
 * TikTok-parsning sker i mobilappen
 * Vertex AI eller hagen backend finns i Abbas repo

@@ -40,9 +40,9 @@ Risker:
 * exportreferenser kan bli trasiga
 * scope kan bli för stort
 
-## Praktisk regel för Gemini
+## Praktisk regel för AI
 
-När Gemini hjälper med planering ska den:
+När AI hjälper med planering ska den:
 
 * hålla scope litet
 * föreslå estimates

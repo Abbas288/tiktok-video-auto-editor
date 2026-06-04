@@ -42,9 +42,9 @@ Men det finns en hård regel:
 
 hagen-auto-edit är inspiration, inte kod som ska kopieras rakt av.
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - avgöra om något från hagen-auto-edit ska användas
 - motivera tekniska bibliotek
@@ -71,7 +71,7 @@ Presentation kan säga:
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini använder återanvändning ska den följa detta:
+När AI använder återanvändning ska den följa detta:
 
 1. Identifiera vad som återanvänds.
 2. Kontrollera att det passar Abbas krav.

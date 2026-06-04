@@ -72,7 +72,7 @@ Tester ska helst följa:
 
 ## Falsk trygghet
 
-Mockar är bra men kan dölja riktiga integrationsproblem. Gemini ska därför inte påstå att appen är helt testad bara för att unit tests passerar.
+Mockar är bra men kan dölja riktiga integrationsproblem. AI ska därför inte påstå att appen är helt testad bara för att unit tests passerar.
 
 Kombinera:
 

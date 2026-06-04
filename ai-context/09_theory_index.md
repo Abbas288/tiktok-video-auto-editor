@@ -2,7 +2,7 @@
 
 ## Syfte
 
-Denna fil hjälper Gemini välja rätt teori utan att läsa allt varje gång.
+Denna fil hjälper AI välja rätt teori utan att läsa allt varje gång.
 
 ## Snabbval
 

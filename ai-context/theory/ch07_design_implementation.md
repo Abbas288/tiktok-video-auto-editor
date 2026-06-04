@@ -44,9 +44,9 @@ Viktiga designbeslut för Abbas:
 - Backend och compile-server ska kapslas i infrastructure.
 - `hagen-auto-edit` får inspirera men inte styra appens kod rakt av.
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - skriva eller refaktorera kod
 - välja filplacering
@@ -74,7 +74,7 @@ Presentation kan nämna:
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini kodar ska kapitel 7 leda till:
+När AI kodar ska kapitel 7 leda till:
 
 - små, fokuserade filer
 - tydliga props och typer
@@ -96,4 +96,4 @@ src/services/renderApiClient.ts
 
 Exempel på varning:
 
-Om Gemini vill skapa en jättestor `editor.tsx` som gör allt, ska den stoppa och föreslå separering.
+Om AI vill skapa en jättestor `editor.tsx` som gör allt, ska den stoppa och föreslå separering.

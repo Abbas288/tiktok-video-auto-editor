@@ -36,10 +36,10 @@
 - Krav: minst ett testfall per implementerat krav.
 - Krav: regressionstest ska göras när tidigare funktionalitet påverkas.
 
-## Saker Gemini ska komma ihåg vid kodarbete
-- När Gemini implementerar en feature ska den först identifiera kravet.
+## Saker AI ska komma ihåg vid kodarbete
+- När AI implementerar en feature ska den först identifiera kravet.
 - Varje kodändring ska få testförslag direkt.
 - Testfall ska använda `TCx.y` och kopplas till krav.
-- Gemini ska föreslå små issues om uppgiften är stor.
-- Vid Template-JSON ska Gemini alltid tänka på validering, normalisering och felhantering.
-- Vid Zustand-store ska Gemini tänka på state-reset, invalid id och flera templates.
+- AI ska föreslå små issues om uppgiften är stor.
+- Vid Template-JSON ska AI alltid tänka på validering, normalisering och felhantering.
+- Vid Zustand-store ska AI tänka på state-reset, invalid id och flera templates.

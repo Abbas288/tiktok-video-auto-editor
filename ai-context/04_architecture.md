@@ -133,7 +133,7 @@ Deployment är separat från editorlogik. Docker, Cumulus, Nginx, Caddy och GitL
 
 ## Arkitekturrisker
 
-Gemini ska vara extra försiktig med:
+AI ska vara extra försiktig med:
 
 * stora komponentfiler
 * state och UI blandat i samma fil

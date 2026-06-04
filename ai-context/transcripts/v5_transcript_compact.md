@@ -47,7 +47,7 @@
 * Krav: `git status`, `git diff`, lint, TypeScript och relevanta tester ska köras före commit.
 * Krav: partnerövningen ska visa kodförståelse, liten ändring och reflektion över branching.
 
-## Saker Gemini ska komma ihåg vid kodarbete
+## Saker AI ska komma ihåg vid kodarbete
 * Börja alltid med aktuell issue och acceptanskriterier.
 * Föreslå en liten branch per feature eller fix.
 * Kontrollera att ändringen inte blandar flera orelaterade features.

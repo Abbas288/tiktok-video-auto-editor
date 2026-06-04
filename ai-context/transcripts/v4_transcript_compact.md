@@ -38,7 +38,7 @@
 - Krav: dokumentera arkitektur och beslut i wiki.
 - Krav: innan commit ska linter, testfall och förståelse kontrolleras.
 
-## Saker Gemini ska komma ihåg vid kodarbete
+## Saker AI ska komma ihåg vid kodarbete
 - Föreslå spike när teknik är osäker, till exempel GCS-video, expo-video eller compile-server.
 - Håll implementationen liten och testbar.
 - Skriv inte om hela appen när en route eller store-funktion räcker.

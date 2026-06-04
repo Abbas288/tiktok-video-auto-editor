@@ -2,9 +2,9 @@
 
 ## Syfte
 
-Denna fil styr hur Gemini ska hjälpa Abbas med testning, testplan, testfall, testsviter, testrapport, edge cases, regressionstestning och kravspårbarhet.
+Denna fil styr hur AI ska hjälpa Abbas med testning, testplan, testfall, testsviter, testrapport, edge cases, regressionstestning och kravspårbarhet.
 
-Gemini ska använda denna fil när den:
+AI ska använda denna fil när den:
 - skriver testfall
 - granskar en implementation
 - hjälper till med GitLab issues
@@ -32,7 +32,7 @@ Varje feature följer denna kedja:
 
 Krav -> Acceptanskriterier -> Implementation -> Testfall -> Verifiering -> Dokumentation -> Commit
 
-Gemini får inte hoppa direkt från implementation till commit.
+AI får inte hoppa direkt från implementation till commit.
 
 ## Testspecifikation
 
@@ -160,7 +160,7 @@ Prioriterade områden:
 - route-param-normalisering
 - state reset vid ogiltig template
 
-Gemini ska föredra rena funktioner i Domain och Application när den skapar testbar kod.
+AI ska föredra rena funktioner i Domain och Application när den skapar testbar kod.
 
 `npm test` ska inte läggas till som standardkrav för varje issue. Det ska köras när aktuell issue eller testfall kräver automatiska tester, när testkod ändras eller när testad domain/application-logik påverkas.
 
@@ -200,7 +200,7 @@ Exempel:
 
 ## Negativ testning och edge cases
 
-Gemini ska alltid föreslå minst ett negativt test när en feature hanterar input.
+AI ska alltid föreslå minst ett negativt test när en feature hanterar input.
 
 Viktiga edge cases:
 - saknat template id
@@ -233,7 +233,7 @@ Deployment-specifika edge cases gäller bara när aktuell issue påverkar deploy
 
 Explorativ testning används när funktionaliteten är ny och osäker.
 
-Gemini ska föreslå att Abbas:
+AI ska föreslå att Abbas:
 - använder appen fritt i 10 till 20 minuter
 - loggar exakt vad han gör
 - gör om upptäckta buggar till TC-fall

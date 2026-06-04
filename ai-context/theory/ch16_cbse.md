@@ -49,9 +49,9 @@ Exempel:
 - CompilePayloadFactory tar EditSession och returnerar payload.
 - RenderApiClient skickar payload till backend.
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - dela upp kod i komponenter
 - skapa tydliga interface
@@ -81,7 +81,7 @@ Testplanen bör koppla testfall till komponenter:
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini kodar ska kapitel 16 leda till:
+När AI kodar ska kapitel 16 leda till:
 
 - skapa komponenter med ett ansvar
 - undvika att screens gör allt

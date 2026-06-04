@@ -22,7 +22,7 @@ Viktiga kravområden:
 - Preview ska kopplas till scener och video.
 - Compile-payload ska senare byggas från EditSession.
 
-## Vad Gemini ska prioritera
+## Vad AI ska prioritera
 - Skapa små, testbara issues.
 - Formulera acceptanskriterier.
 - Skriva TC-fall direkt från krav.
@@ -30,7 +30,7 @@ Viktiga kravområden:
 - Vara skeptisk mot otydliga krav.
 
 ## GitLab-arbete
-Gemini ska hjälpa Abbas att använda:
+AI ska hjälpa Abbas att använda:
 - issues som krav och tasks
 - iterations för sprintliknande planering
 - milestones för större faser
@@ -55,4 +55,4 @@ Viktiga testfall:
 - Tidsrapportering glöms bort.
 
 ## Praktisk koppling till kod
-När Gemini skriver kod i denna fas ska den alltid skriva eller föreslå testfall i samma svar. Kod utan testplan räknas inte som färdig.
+När AI skriver kod i denna fas ska den alltid skriva eller föreslå testfall i samma svar. Kod utan testplan räknas inte som färdig.

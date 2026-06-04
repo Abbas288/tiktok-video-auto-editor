@@ -47,9 +47,9 @@ Därför måste appen ha tydliga gränser mellan:
 
 Om dessa blandas blir varje framtida ändring dyr.
 
-## 5. När Gemini ska använda kapitlet
+## 5. När AI ska använda kapitlet
 
-Använd detta kapitel när Gemini ska:
+Använd detta kapitel när AI ska:
 
 - beskriva vidareutveckling i rapporten
 - analysera teknisk skuld
@@ -77,7 +77,7 @@ Presentation kan säga:
 
 ## 7. Praktisk koppling till projektet
 
-När Gemini kodar ska kapitel 9 leda till:
+När AI kodar ska kapitel 9 leda till:
 
 - använd adapter eller parser mellan extern JSON och intern session
 - undvik att UI är beroende av rå API-data
