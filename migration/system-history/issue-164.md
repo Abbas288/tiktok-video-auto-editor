@@ -1,0 +1,92 @@
+# Arbetsobjekt #164 — systemhistorik
+
+<a id="note-875730"></a>
+### Systemhändelse 875730
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-02T15:02:29.489+02:00 |
+| Senast ändrad | 2026-06-02T15:02:29.495+02:00 |
+| Diskussion | `2af18fbe5cbd0f5e585765de40d45a2fde5e8c2c` |
+
+
+mentioned in merge request [!33](https://github.com/Abbas288/tiktok-video-auto-editor/blob/main/migration/merge-requests/033.md)
+
+<a id="note-875732"></a>
+### Systemhändelse 875732
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-02T15:12:28.590+02:00 |
+| Senast ändrad | 2026-06-02T15:12:28.597+02:00 |
+| Diskussion | `828c7c7d7ef9546945e91a9234a90cbe7c3cd9d8` |
+
+
+mentioned in commit e7316a3d74e61d9b9b77f637863113287c7bcfea
+
+<a id="note-876047"></a>
+### Systemhändelse 876047
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-03T20:56:39.630+02:00 |
+| Senast ändrad | 2026-06-03T20:56:39.636+02:00 |
+| Diskussion | `b88d413f9c87de4491e438f8a13e915a37125d27` |
+
+
+<p>changed title from <code class="idiff">TC-<span class="idiff left deletion">C</span>S4: <span class="idiff right deletion">Deploymentkonfiguration är reproducerbar</span></code> to <code class="idiff">TC-S<span class="idiff left addition">R</span>4: <span class="idiff right addition">Nya sessioner påverkas inte negativt</span></code></p>
+
+<a id="note-876048"></a>
+### Systemhändelse 876048
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-03T20:56:39.699+02:00 |
+| Senast ändrad | 2026-06-03T20:56:39.704+02:00 |
+| Diskussion | `a0bf7c10aac66404e2e140d46e28a06187748ee4` |
+
+
+changed the description
+
+<a id="note-876053"></a>
+### Systemhändelse 876053
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-03T20:59:47.145+02:00 |
+| Senast ändrad | 2026-06-03T20:59:47.150+02:00 |
+| Diskussion | `b0802cdff54eb3f68a47f78b255f101c2b42fdd2` |
+
+
+mentioned in issue #169
+
+<a id="note-876110"></a>
+### Systemhändelse 876110
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-04T00:12:34.572+02:00 |
+| Senast ändrad | 2026-06-04T00:12:34.577+02:00 |
+| Diskussion | `fbc700a79e3fa844cf85b5fc3ec15f6706e09fb9` |
+
+
+mentioned in merge request [!36](https://github.com/Abbas288/tiktok-video-auto-editor/blob/main/migration/merge-requests/036.md)
+
+<a id="note-876121"></a>
+### Systemhändelse 876121
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-04T00:15:05.119+02:00 |
+| Senast ändrad | 2026-06-04T00:15:05.183+02:00 |
+| Diskussion | `3d8e774b1e6b164776f4a3bd0f0d111b7c178e42` |
+
+
+mentioned in commit 18bd591223beb56e530190148d7bfe46c71dc2e5

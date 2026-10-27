@@ -1,0 +1,313 @@
+# Arbetsobjekt #7 — systemhistorik
+
+<a id="note-838545"></a>
+### Systemhändelse 838545
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-17T00:35:09.317+02:00 |
+| Senast ändrad | 2026-04-17T00:35:09.322+02:00 |
+| Diskussion | `b7c460e385c6f0e8d9f5d4c414a6e1b42524d97d` |
+
+
+set status to **To do**
+
+<a id="note-840185"></a>
+### Systemhändelse 840185
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-19T23:35:46.912+02:00 |
+| Senast ändrad | 2026-04-19T23:35:46.919+02:00 |
+| Diskussion | `c0ccf7c0de65ad25e2d9bceeb65057145a5b8d50` |
+
+
+added time estimate of 6h
+
+<a id="note-846495"></a>
+### Systemhändelse 846495
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-27T15:07:45.368+02:00 |
+| Senast ändrad | 2026-04-27T15:07:45.373+02:00 |
+| Diskussion | `b0f984154cb301803401d7de8cf9cfc928501656` |
+
+
+<p>changed title from <code class="idiff">Som användare vill jag kunna lägga till visuella filter (ljusstyrka, kontrast, zoom) på en specifik scen.</code> to <code class="idiff"><span class="idiff left right addition">USER STORY: </span>Som användare vill jag kunna lägga till visuella filter (ljusstyrka, kontrast, zoom) på en specifik scen.</code></p>
+
+<a id="note-866363"></a>
+### Systemhändelse 866363
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T17:12:44.646+02:00 |
+| Senast ändrad | 2026-05-20T17:12:44.655+02:00 |
+| Diskussion | `09a2879d35e4aa6bea5ffa4503b04ef356de6f9c` |
+
+
+changed the description
+
+<a id="note-866364"></a>
+### Systemhändelse 866364
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T17:16:08.142+02:00 |
+| Senast ändrad | 2026-05-20T17:16:08.149+02:00 |
+| Diskussion | `4dcf71f36692831d9003581a416ad7c7d6e0c769` |
+
+
+changed the description
+
+<a id="note-866443"></a>
+### Systemhändelse 866443
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:51:49.107+02:00 |
+| Senast ändrad | 2026-05-20T21:51:49.170+02:00 |
+| Diskussion | `05f4e9d7f73f74aec65fc54161bf4b4de701cfcd` |
+
+
+changed the description
+
+<a id="note-866444"></a>
+### Systemhändelse 866444
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:51:53.166+02:00 |
+| Senast ändrad | 2026-05-20T21:51:53.174+02:00 |
+| Diskussion | `fae1e29bd50684ae4bfe362e6213f8fd64c4f362` |
+
+
+marked the checklist item **Användaren kan ändra ljusstyrka för vald scen\.** as completed
+
+<a id="note-866445"></a>
+### Systemhändelse 866445
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:51:55.417+02:00 |
+| Senast ändrad | 2026-05-20T21:51:55.425+02:00 |
+| Diskussion | `bf243977b800d77457b726afa0520df5fab994f5` |
+
+
+marked the checklist item **Användaren kan ändra kontrast för vald scen\.** as completed
+
+<a id="note-866446"></a>
+### Systemhändelse 866446
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:52:08.697+02:00 |
+| Senast ändrad | 2026-05-20T21:52:08.703+02:00 |
+| Diskussion | `c0bbe3a6cf9dae56cc71416621e1b024a8de0eb9` |
+
+
+marked the checklist item **Användaren kan ändra zoom för vald scen\.** as completed
+
+<a id="note-866447"></a>
+### Systemhändelse 866447
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:52:11.770+02:00 |
+| Senast ändrad | 2026-05-20T21:52:11.779+02:00 |
+| Diskussion | `8f4158a79c73badda76b7651372522a4ba5f8993` |
+
+
+marked the checklist item **Användaren kan flytta zoomfokus inom videoklippet när inzoomning är aktiverad\.** as completed
+
+<a id="note-866448"></a>
+### Systemhändelse 866448
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:52:15.468+02:00 |
+| Senast ändrad | 2026-05-20T21:52:15.474+02:00 |
+| Diskussion | `9fadcc6ef21540676018e1fcf35145fdb3c3183d` |
+
+
+marked the checklist item **Filter appliceras endast på den scen där de är inställda\.** as completed
+
+<a id="note-866449"></a>
+### Systemhändelse 866449
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:52:18.427+02:00 |
+| Senast ändrad | 2026-05-20T21:52:18.436+02:00 |
+| Diskussion | `e63be66071ccb6462c8907504bd513472a34a97a` |
+
+
+marked the checklist item **Filter uppdateras visuellt i previewen när videon spelas inom scenens tidsintervall\.** as completed
+
+<a id="note-866450"></a>
+### Systemhändelse 866450
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:53:12.577+02:00 |
+| Senast ändrad | 2026-05-20T21:53:12.584+02:00 |
+| Diskussion | `cdd0b97d2915a6a7d7b9a80b318160bebc118671` |
+
+
+changed the description
+
+<a id="note-866451"></a>
+### Systemhändelse 866451
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:53:16.651+02:00 |
+| Senast ändrad | 2026-05-20T21:53:16.657+02:00 |
+| Diskussion | `9f1b970039887c5c1656a4539b3821d37e1d9ed4` |
+
+
+marked the checklist item **Andra scener påverkas inte av ändringen\.** as completed
+
+<a id="note-866452"></a>
+### Systemhändelse 866452
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:53:19.310+02:00 |
+| Senast ändrad | 2026-05-20T21:53:19.316+02:00 |
+| Diskussion | `930aab5aafdf790af968187407223d236885183e` |
+
+
+marked the checklist item **Filtervärden sparas i den aktiva redigeringssessionen\.** as completed
+
+<a id="note-866453"></a>
+### Systemhändelse 866453
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:53:23.755+02:00 |
+| Senast ändrad | 2026-05-20T21:53:23.760+02:00 |
+| Diskussion | `a35cbe06d427135a9469de58c3f72eb5cec4a5a5` |
+
+
+marked the checklist item **Filterändringar finns kvar när projektet öppnas igen\.** as completed
+
+<a id="note-866454"></a>
+### Systemhändelse 866454
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:53:26.564+02:00 |
+| Senast ändrad | 2026-05-20T21:53:26.569+02:00 |
+| Diskussion | `7b7380fb4d0cea3f3bfbdabba9990afd9f0a62a1` |
+
+
+marked the checklist item **Reset återställer scenens filtervärden till standardläge\.** as completed
+
+<a id="note-866455"></a>
+### Systemhändelse 866455
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T21:53:36.692+02:00 |
+| Senast ändrad | 2026-05-20T21:53:36.699+02:00 |
+| Diskussion | `607d0a7029809118f9f6808526e9fbface026503` |
+
+
+marked the checklist item **Kodens struktur behåller separation mellan presentation, domänlogik och state\.** as completed
+
+<a id="note-866457"></a>
+### Systemhändelse 866457
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T22:03:56.322+02:00 |
+| Senast ändrad | 2026-05-20T22:03:56.331+02:00 |
+| Diskussion | `27d3e6960dfdcc7edb386e90208b8d68d9f3a573` |
+
+
+mentioned in merge request [!12](https://github.com/Abbas288/tiktok-video-auto-editor/blob/main/migration/merge-requests/012.md)
+
+<a id="note-866467"></a>
+### Systemhändelse 866467
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T22:14:46.044+02:00 |
+| Senast ändrad | 2026-05-20T22:14:46.073+02:00 |
+| Diskussion | `b87e90251504b090d1d78729c5e7f65776a5e5c3` |
+
+
+set status to **Done**
+
+<a id="note-866469"></a>
+### Systemhändelse 866469
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-20T22:14:46.519+02:00 |
+| Senast ändrad | 2026-05-20T22:14:46.583+02:00 |
+| Diskussion | `926b0a1838f4857575d1c380cd16a78deceed674` |
+
+
+mentioned in commit 10c14590c6817fb538082340c30b0d1a63389780
+
+<a id="note-870336"></a>
+### Systemhändelse 870336
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-26T15:56:21.927+02:00 |
+| Senast ändrad | 2026-05-26T15:56:21.934+02:00 |
+| Diskussion | `50ba6d0ba7c6c5adaf94c2202710156967a9c3f3` |
+
+
+marked the checklist item **Samtliga kopplade testfall är godkända\.** as completed
+
+<a id="note-870416"></a>
+### Systemhändelse 870416
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-26T16:57:02.519+02:00 |
+| Senast ändrad | 2026-05-26T16:57:02.524+02:00 |
+| Diskussion | `5d5d116575aeebcfbae0989a863cc05684d66e1f` |
+
+
+added 5h of time spent at 2026-05-26 16:57:02 +0200
+
+<a id="note-876357"></a>
+### Systemhändelse 876357
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-05T11:40:28.098+02:00 |
+| Senast ändrad | 2026-06-05T11:40:28.103+02:00 |
+| Diskussion | `52c3b3940c343439bef2ed058fc9339920ec65f9` |
+
+
+mentioned in requirement #177

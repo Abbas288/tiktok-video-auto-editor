@@ -1,0 +1,52 @@
+[
+  {
+    "color": "ed9121",
+    "description": "For a passing grade complement and resubmit",
+    "name": "examiner::complement"
+  },
+  {
+    "color": "ff0000",
+    "description": "A failing grade achieved",
+    "name": "examiner::fail"
+  },
+  {
+    "color": "00b140",
+    "description": "A passing grade achieved",
+    "name": "examiner::passed"
+  },
+  {
+    "color": "8fbc8f",
+    "description": "",
+    "name": "feature"
+  },
+  {
+    "color": "682eb0",
+    "description": "Submit the assignement again after adding required changes.",
+    "name": "Re-submitted"
+  },
+  {
+    "color": "005d8b",
+    "description": "The assignment is ready to be graded.",
+    "name": "Submitted"
+  },
+  {
+    "color": "64748b",
+    "description": "Ursprunglig GitLab-typ: issue.",
+    "name": "type:issue"
+  },
+  {
+    "color": "3b82f6",
+    "description": "Ursprunglig GitLab-typ: test case. Status är inte ett testresultat.",
+    "name": "type:test-case"
+  },
+  {
+    "color": "8b5cf6",
+    "description": "Ursprunglig GitLab-typ: requirement.",
+    "name": "type:requirement"
+  },
+  {
+    "color": "d1d5db",
+    "description": "Reserverar ett ursprungligt nummer. Ingen importerad arbetsuppgift.",
+    "name": "migration:number-placeholder"
+  }
+]

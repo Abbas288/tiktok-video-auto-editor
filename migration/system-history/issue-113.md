@@ -1,0 +1,274 @@
+# Arbetsobjekt #113 — systemhistorik
+
+<a id="note-872774"></a>
+### Systemhändelse 872774
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T03:44:56.040+02:00 |
+| Senast ändrad | 2026-05-29T03:44:56.049+02:00 |
+| Diskussion | `e82b157040330cbd7249116c86a96b5445ebe544` |
+
+
+set status to **To do**
+
+<a id="note-872775"></a>
+### Systemhändelse 872775
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T03:44:56.315+02:00 |
+| Senast ändrad | 2026-05-29T03:44:56.321+02:00 |
+| Diskussion | `c55e2a02a9e1b95026b9d607e7b7304b02726434` |
+
+
+added time estimate of 2h 30m
+
+<a id="note-872776"></a>
+### Systemhändelse 872776
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T03:50:12.469+02:00 |
+| Senast ändrad | 2026-05-29T03:50:12.536+02:00 |
+| Diskussion | `2dc660bb8668319bd80b93e76d0132394ea7fd6d` |
+
+
+<p>changed title from <code class="idiff">REFACTOR: <span class="idiff left right deletion">Dela upp editorns orkestreringslogik i mindre hooks</span></code> to <code class="idiff">REFACTOR: <span class="idiff left right addition">Minska ansvar i editor-controller och förbättra testbarheten</span></code></p>
+
+<a id="note-872777"></a>
+### Systemhändelse 872777
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T03:50:12.632+02:00 |
+| Senast ändrad | 2026-05-29T03:50:12.638+02:00 |
+| Diskussion | `a0c4723b3ebd9157f49567a88cd58fbadff49c19` |
+
+
+changed the description
+
+<a id="note-872781"></a>
+### Systemhändelse 872781
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T03:54:56.594+02:00 |
+| Senast ändrad | 2026-05-29T03:54:56.604+02:00 |
+| Diskussion | `1ee70f05fe9aa91c6887ec71f4ae15d59a6dac30` |
+
+
+changed the description
+
+<a id="note-873327"></a>
+### Systemhändelse 873327
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:17:27.720+02:00 |
+| Senast ändrad | 2026-05-29T22:17:27.727+02:00 |
+| Diskussion | `adf4b40d2a07c110f516970a9e1f0a044cae4680` |
+
+
+mentioned in merge request [!23](https://github.com/Abbas288/tiktok-video-auto-editor/blob/main/migration/merge-requests/023.md)
+
+<a id="note-873338"></a>
+### Systemhändelse 873338
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:20:09.172+02:00 |
+| Senast ändrad | 2026-05-29T22:20:09.187+02:00 |
+| Diskussion | `7f337037373f6c9f711847f3107ae2497b70413c` |
+
+
+mentioned in commit 26112408438e2cb74bbca91978d3eea0c2acc6d9
+
+<a id="note-873340"></a>
+### Systemhändelse 873340
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:20:09.708+02:00 |
+| Senast ändrad | 2026-05-29T22:20:09.768+02:00 |
+| Diskussion | `2d864630e4956c4ac20416cf77283be65d90dec2` |
+
+
+set status to **Done**
+
+<a id="note-873341"></a>
+### Systemhändelse 873341
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.139+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.163+02:00 |
+| Diskussion | `80734dc76e9ba28e304e8e2cdc07f8e7bab43f70` |
+
+
+marked the checklist item **Editorflödet fungerar som tidigare efter refaktoreringen\.** as completed
+
+<a id="note-873342"></a>
+### Systemhändelse 873342
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.227+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.232+02:00 |
+| Diskussion | `f04dec32ffda310494bf5ad048fce9a131cdcbb0` |
+
+
+marked the checklist item **Editor\-controllern har ett tydligare och mindre ansvar\.** as completed
+
+<a id="note-873343"></a>
+### Systemhändelse 873343
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.284+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.290+02:00 |
+| Diskussion | `e65710d6cbd710f2e5ee2912fd2d560116159bdf` |
+
+
+marked the checklist item **Separata editorflöden är lättare att testa var för sig\.** as completed
+
+<a id="note-873344"></a>
+### Systemhändelse 873344
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.344+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.349+02:00 |
+| Diskussion | `ac0b9f72f92a14e28e656e9264293f09ab1ee119` |
+
+
+marked the checklist item **Presentation\-komponenter innehåller inte ny affärslogik\.** as completed
+
+<a id="note-873345"></a>
+### Systemhändelse 873345
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.404+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.409+02:00 |
+| Diskussion | `fc94a179dc565d68a3e0ece677fc00ba4fc52e31` |
+
+
+marked the checklist item **Domänlogik ligger fortsatt i domain\-lagret\.** as completed
+
+<a id="note-873346"></a>
+### Systemhändelse 873346
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.461+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.466+02:00 |
+| Diskussion | `fb6ae7f0a66f4d118898fd945efc092de5e7c8bc` |
+
+
+marked the checklist item **Infrastructure\-anrop ligger utanför UI\-komponenter\.** as completed
+
+<a id="note-873347"></a>
+### Systemhändelse 873347
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.520+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.526+02:00 |
+| Diskussion | `fd526b6e033c6845b58e3e2e6525e673d6e16881` |
+
+
+marked the checklist item **Befintliga kontrakt mot store, template\-data och compile\-flow bevaras\.** as completed
+
+<a id="note-873348"></a>
+### Systemhändelse 873348
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.578+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.584+02:00 |
+| Diskussion | `d7c4ec606fcbe7fc154de1e847dd4e3948b96567` |
+
+
+marked the checklist item **Befintliga tester påverkas inte negativt\.** as completed
+
+<a id="note-873349"></a>
+### Systemhändelse 873349
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.638+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.644+02:00 |
+| Diskussion | `e50f29b3cfdfaadabe7ee01fe08e7dc548f660b1` |
+
+
+marked the checklist item **Relevanta tester läggs till där ansvar har flyttats eller avgränsats\.** as completed
+
+<a id="note-873350"></a>
+### Systemhändelse 873350
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.699+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.704+02:00 |
+| Diskussion | `12ad6aee332956f01ea7f1ba190177ed51a4e81c` |
+
+
+marked the checklist item **Projektets verifiering passerar\.** as completed
+
+<a id="note-873351"></a>
+### Systemhändelse 873351
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:36:44.757+02:00 |
+| Senast ändrad | 2026-05-29T22:36:44.762+02:00 |
+| Diskussion | `e74198b0da372c8978b511ff5977f03861529332` |
+
+
+marked the checklist item **Samtliga kopplade testfall är godkända\.** as completed
+
+<a id="note-873352"></a>
+### Systemhändelse 873352
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T22:37:22.014+02:00 |
+| Senast ändrad | 2026-05-29T22:37:22.033+02:00 |
+| Diskussion | `833d63eceeecde853cb814628c85733c11b29a05` |
+
+
+added 2h 5m of time spent at 2026-05-29 22:37:21 +0200
+
+<a id="note-876351"></a>
+### Systemhändelse 876351
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-05T11:40:27.101+02:00 |
+| Senast ändrad | 2026-06-05T11:40:27.107+02:00 |
+| Diskussion | `536f2df7bb24c266252b0eceb81a52b7f1d83c2f` |
+
+
+mentioned in requirement #175

@@ -1,0 +1,378 @@
+# Arbetsobjekt #147 — systemhistorik
+
+<a id="note-873997"></a>
+### Systemhändelse 873997
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T02:37:56.451+02:00 |
+| Senast ändrad | 2026-05-31T02:37:56.473+02:00 |
+| Diskussion | `0d464e9458781d06b14ab4f8e34f01978f098be1` |
+
+
+set status to **To do**
+
+<a id="note-873998"></a>
+### Systemhändelse 873998
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T02:37:56.703+02:00 |
+| Senast ändrad | 2026-05-31T02:37:56.708+02:00 |
+| Diskussion | `dc3ab72fb4eb2d78c094c3b7c1c3a5217bbb1f13` |
+
+
+added time estimate of 1h
+
+<a id="note-873999"></a>
+### Systemhändelse 873999
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T02:42:30.527+02:00 |
+| Senast ändrad | 2026-05-31T02:42:30.537+02:00 |
+| Diskussion | `0a93cdd2f1b207d9c64d257657aa12075b3345d7` |
+
+
+changed the description
+
+<a id="note-874007"></a>
+### Systemhändelse 874007
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T02:50:29.222+02:00 |
+| Senast ändrad | 2026-05-31T02:50:29.233+02:00 |
+| Diskussion | `a6919d4e88fff667463d570759868fa5fbe33805` |
+
+
+changed the description
+
+<a id="note-874008"></a>
+### Systemhändelse 874008
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T02:52:33.776+02:00 |
+| Senast ändrad | 2026-05-31T02:52:33.800+02:00 |
+| Diskussion | `12812e0e6996fc5235d9e5de4338793f463c31be` |
+
+
+<p>changed title from <code class="idiff">FIX: Separera download och open i exportflödet<span class="idiff left right deletion"> och förenkla export-UX</span></code> to <code class="idiff">FIX: Separera download och open i exportflödet</code></p>
+
+<a id="note-874009"></a>
+### Systemhändelse 874009
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:04:04.935+02:00 |
+| Senast ändrad | 2026-05-31T03:04:04.948+02:00 |
+| Diskussion | `ccfc6b39c7ae75e16a89fc1ad723a2883474a4ce` |
+
+
+changed the description
+
+<a id="note-874013"></a>
+### Systemhändelse 874013
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:07:57.234+02:00 |
+| Senast ändrad | 2026-05-31T03:07:57.242+02:00 |
+| Diskussion | `b962969110cb7c7b68affba65f8e809e4ecd3a72` |
+
+
+changed the description
+
+<a id="note-874014"></a>
+### Systemhändelse 874014
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:02.630+02:00 |
+| Senast ändrad | 2026-05-31T03:08:02.639+02:00 |
+| Diskussion | `177fa863621d92299352fa6e34809a0c60da5091` |
+
+
+marked the checklist item **Download försöker starta en faktisk nedladdning i webbläsaren\.** as completed
+
+<a id="note-874015"></a>
+### Systemhändelse 874015
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:06.177+02:00 |
+| Senast ändrad | 2026-05-31T03:08:06.199+02:00 |
+| Diskussion | `56ae241c0a751d0938404903961051a65c6f5584` |
+
+
+marked the checklist item **Open öppnar videon för uppspelning\.** as completed
+
+<a id="note-874016"></a>
+### Systemhändelse 874016
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:10.867+02:00 |
+| Senast ändrad | 2026-05-31T03:08:10.889+02:00 |
+| Diskussion | `d612368b30a3b0d54ca5e42f2281aa8e8d54ff25` |
+
+
+marked the checklist item **På mobil sparas videon lokalt där plattformen stödjer det\.** as completed
+
+<a id="note-874017"></a>
+### Systemhändelse 874017
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:12.490+02:00 |
+| Senast ändrad | 2026-05-31T03:08:12.496+02:00 |
+| Diskussion | `56d0efd6eaf4e12f37cb54596a17672db806add2` |
+
+
+marked the checklist item **Nekad behörighet eller misslyckat sparande hanteras utan krasch\.** as completed
+
+<a id="note-874018"></a>
+### Systemhändelse 874018
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:14.936+02:00 |
+| Senast ändrad | 2026-05-31T03:08:14.944+02:00 |
+| Diskussion | `5c6d8bfc4610920653100bd53346ddd4fb0fa03c` |
+
+
+marked the checklist item **Trasig eller otillgänglig videoreferens hanteras utan krasch\.** as completed
+
+<a id="note-874019"></a>
+### Systemhändelse 874019
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:16.172+02:00 |
+| Senast ändrad | 2026-05-31T03:08:16.181+02:00 |
+| Diskussion | `049fbdfd1b3a311d954c66435c6f7884f83af595` |
+
+
+marked the checklist item **Nekad behörighet eller misslyckat sparande hanteras utan krasch\.** as incomplete
+
+<a id="note-874020"></a>
+### Systemhändelse 874020
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:16.243+02:00 |
+| Senast ändrad | 2026-05-31T03:08:16.248+02:00 |
+| Diskussion | `59f6f0576f928a5fa9ed4217df79566a2b8a74b8` |
+
+
+marked the checklist item **Trasig eller otillgänglig videoreferens hanteras utan krasch\.** as incomplete
+
+<a id="note-874021"></a>
+### Systemhändelse 874021
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:16.301+02:00 |
+| Senast ändrad | 2026-05-31T03:08:16.306+02:00 |
+| Diskussion | `ae17c0873b4398324c049448196bd95d0b675b84` |
+
+
+marked the checklist item **Befintligt compile\-flöde påverkas inte negativt\.** as completed
+
+<a id="note-874022"></a>
+### Systemhändelse 874022
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:17.899+02:00 |
+| Senast ändrad | 2026-05-31T03:08:17.904+02:00 |
+| Diskussion | `f97dd320d8dc6e9e72469931bb3ccbc389a54e42` |
+
+
+marked the checklist item **Projektets verifiering passerar\.** as completed
+
+<a id="note-874023"></a>
+### Systemhändelse 874023
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:19.980+02:00 |
+| Senast ändrad | 2026-05-31T03:08:19.985+02:00 |
+| Diskussion | `0415e8eafe193ba64400faef82ca61dbfc521368` |
+
+
+marked the checklist item **Trasig eller otillgänglig videoreferens hanteras utan krasch\.** as completed
+
+<a id="note-874024"></a>
+### Systemhändelse 874024
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:23.014+02:00 |
+| Senast ändrad | 2026-05-31T03:08:23.020+02:00 |
+| Diskussion | `dd43f5ff0ec49cbb8b5bca5b03fea9d6ac1c7bbd` |
+
+
+marked the checklist item **Nekad behörighet eller misslyckat sparande hanteras utan krasch\.** as completed
+
+<a id="note-874025"></a>
+### Systemhändelse 874025
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:23.077+02:00 |
+| Senast ändrad | 2026-05-31T03:08:23.083+02:00 |
+| Diskussion | `b91a1cdba5560d488a16da7fd127e3c411335c21` |
+
+
+marked the checklist item **Trasig eller otillgänglig videoreferens hanteras utan krasch\.** as incomplete
+
+<a id="note-874026"></a>
+### Systemhändelse 874026
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:23.136+02:00 |
+| Senast ändrad | 2026-05-31T03:08:23.143+02:00 |
+| Diskussion | `44545e61e324d8c9d367682c26f49fcfd5a21530` |
+
+
+marked the checklist item **Projektets verifiering passerar\.** as incomplete
+
+<a id="note-874027"></a>
+### Systemhändelse 874027
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:27.775+02:00 |
+| Senast ändrad | 2026-05-31T03:08:27.780+02:00 |
+| Diskussion | `09c7c4acfab58c49baf7ef91ffa6985c471ea3be` |
+
+
+marked the checklist item **Trasig eller otillgänglig videoreferens hanteras utan krasch\.** as completed
+
+<a id="note-874028"></a>
+### Systemhändelse 874028
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:27.842+02:00 |
+| Senast ändrad | 2026-05-31T03:08:27.848+02:00 |
+| Diskussion | `8a6d2138f097d260dfde0962dc6a0827d9e3f714` |
+
+
+marked the checklist item **Projektets verifiering passerar\.** as completed
+
+<a id="note-874029"></a>
+### Systemhändelse 874029
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:08:31.683+02:00 |
+| Senast ändrad | 2026-05-31T03:08:31.688+02:00 |
+| Diskussion | `847d8d21ec454a2d3c142c446d251062d4fd534f` |
+
+
+marked the checklist item **Samtliga kopplade testfall är godkända\.** as completed
+
+<a id="note-874030"></a>
+### Systemhändelse 874030
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:15:40.373+02:00 |
+| Senast ändrad | 2026-05-31T03:15:40.382+02:00 |
+| Diskussion | `ae0660277b4a83d0612232177d3cb54127cfeea5` |
+
+
+mentioned in merge request [!29](https://github.com/Abbas288/tiktok-video-auto-editor/blob/main/migration/merge-requests/029.md)
+
+<a id="note-874040"></a>
+### Systemhändelse 874040
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:16:56.305+02:00 |
+| Senast ändrad | 2026-05-31T03:16:56.394+02:00 |
+| Diskussion | `d85b35e634018dc285a92c7dcd67900d85b018b7` |
+
+
+set status to **Done**
+
+<a id="note-874041"></a>
+### Systemhändelse 874041
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:16:56.548+02:00 |
+| Senast ändrad | 2026-05-31T03:16:56.582+02:00 |
+| Diskussion | `3ca70c3ded5055a88bf9a845f5534f22427c7fc8` |
+
+
+mentioned in commit 96cd581d63b18d7dd90741754ab380c7af423919
+
+<a id="note-874043"></a>
+### Systemhändelse 874043
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:18:01.353+02:00 |
+| Senast ändrad | 2026-05-31T03:18:01.362+02:00 |
+| Diskussion | `cb64fb3b1b6a9cda7f1f611d8e0eccae7c55cbc0` |
+
+
+added 40m of time spent at 2026-05-31 03:18:00 +0200
+
+<a id="note-876371"></a>
+### Systemhändelse 876371
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-05T11:40:30.331+02:00 |
+| Senast ändrad | 2026-06-05T11:40:30.338+02:00 |
+| Diskussion | `8ad71c242102919c61c239c2f8a369d3c71d195b` |
+
+
+mentioned in requirement #183
+
+<a id="note-876377"></a>
+### Systemhändelse 876377
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-05T11:40:31.028+02:00 |
+| Senast ändrad | 2026-06-05T11:40:31.036+02:00 |
+| Diskussion | `2f7062730d9839c97807b4e09721377aae69f7a6` |
+
+
+mentioned in requirement #182

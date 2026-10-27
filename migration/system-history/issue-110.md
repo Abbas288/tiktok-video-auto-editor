@@ -1,0 +1,92 @@
+# Arbetsobjekt #110 — systemhistorik
+
+<a id="note-872489"></a>
+### Systemhändelse 872489
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-28T21:19:06.383+02:00 |
+| Senast ändrad | 2026-05-28T21:19:06.498+02:00 |
+| Diskussion | `acfb65c13f3aca4173438e497a3f2aa634ac4809` |
+
+
+<p>changed title from <code class="idiff">TC<span class="idiff left right deletion">4: Vald scenvideo kan bytas eller tas bort</span></code> to <code class="idiff">TC<span class="idiff left right addition">-SV4: För kort video blockeras</span></code></p>
+
+<a id="note-872490"></a>
+### Systemhändelse 872490
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-28T21:19:06.676+02:00 |
+| Senast ändrad | 2026-05-28T21:19:06.698+02:00 |
+| Diskussion | `f1cc2195909987bbb374f80425280b00c7e7d7ab` |
+
+
+changed the description
+
+<a id="note-872511"></a>
+### Systemhändelse 872511
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-28T21:41:43.313+02:00 |
+| Senast ändrad | 2026-05-28T21:41:43.319+02:00 |
+| Diskussion | `80be71ef3eacf95fb608e236cd624e5bae8a230a` |
+
+
+mentioned in issue #106
+
+<a id="note-872517"></a>
+### Systemhändelse 872517
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-28T21:43:50.940+02:00 |
+| Senast ändrad | 2026-05-28T21:43:51.006+02:00 |
+| Diskussion | `f35da42401d2c1db4e2fa70a5c3f20c8db17bf86` |
+
+
+<p>changed title from <code class="idiff">TC-SV4: <span class="idiff left right deletion">För kort video blockeras</span></code> to <code class="idiff">TC-SV4: <span class="idiff left right addition">Compile blockeras tills alla scener har godkända videor</span></code></p>
+
+<a id="note-872518"></a>
+### Systemhändelse 872518
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-28T21:43:51.094+02:00 |
+| Senast ändrad | 2026-05-28T21:43:51.100+02:00 |
+| Diskussion | `febe975c38aa382bca2d70be7723f7a348f2431d` |
+
+
+changed the description
+
+<a id="note-872758"></a>
+### Systemhändelse 872758
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T03:31:10.140+02:00 |
+| Senast ändrad | 2026-05-29T03:31:10.145+02:00 |
+| Diskussion | `16e12b8e17aeae62fdefed2a5aa0e688da2b6cd7` |
+
+
+mentioned in merge request [!22](https://github.com/Abbas288/tiktok-video-auto-editor/blob/main/migration/merge-requests/022.md)
+
+<a id="note-872763"></a>
+### Systemhändelse 872763
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-29T03:32:37.318+02:00 |
+| Senast ändrad | 2026-05-29T03:32:37.333+02:00 |
+| Diskussion | `b88dcfbe2414d730aeef3a7014c8deab41556249` |
+
+
+mentioned in commit e399e08d53baf21d0e0f0c5f46538d64d4ea99a8

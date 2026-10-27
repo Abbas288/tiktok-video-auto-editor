@@ -1,0 +1,170 @@
+# Arbetsobjekt #42 — systemhistorik
+
+<a id="note-859497"></a>
+### Systemhändelse 859497
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T15:58:10.828+02:00 |
+| Senast ändrad | 2026-05-12T15:58:10.850+02:00 |
+| Diskussion | `9a37004b6deeb96955cbe223c16350f04e6ce4e6` |
+
+
+set status to **To do**
+
+<a id="note-859498"></a>
+### Systemhändelse 859498
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T15:58:11.044+02:00 |
+| Senast ändrad | 2026-05-12T15:58:11.049+02:00 |
+| Diskussion | `0ee003506e439e153ce5a1c54610d6ab699afe00` |
+
+
+added time estimate of 1h 30m
+
+<a id="note-859647"></a>
+### Systemhändelse 859647
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T17:14:13.697+02:00 |
+| Senast ändrad | 2026-05-12T17:14:13.731+02:00 |
+| Diskussion | `ce78ef2882414768abf00f6de17f9e7fde169790` |
+
+
+mentioned in merge request [!5](https://github.com/Abbas288/tiktok-video-auto-editor/blob/main/migration/merge-requests/005.md)
+
+<a id="note-859649"></a>
+### Systemhändelse 859649
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T17:14:44.418+02:00 |
+| Senast ändrad | 2026-05-12T17:14:44.431+02:00 |
+| Diskussion | `2155e2350a1f2558a9ccad61618a886fead2243d` |
+
+
+set status to **Done**
+
+<a id="note-859651"></a>
+### Systemhändelse 859651
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T17:14:44.683+02:00 |
+| Senast ändrad | 2026-05-12T17:14:44.694+02:00 |
+| Diskussion | `558425afb0aef6c52e00d8fea33f3e2fed54b170` |
+
+
+mentioned in commit ac27ad70f4197723362586e9cf670c0a153408df
+
+<a id="note-859658"></a>
+### Systemhändelse 859658
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T17:26:53.203+02:00 |
+| Senast ändrad | 2026-05-12T17:26:53.208+02:00 |
+| Diskussion | `2b0e1374d91776df3fc6b9ce790ab25d611bf2a2` |
+
+
+added 1h 10m of time spent at 2026-05-12 17:26:53 +0200
+
+<a id="note-860912"></a>
+### Systemhändelse 860912
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T21:17:52.471+02:00 |
+| Senast ändrad | 2026-05-13T21:17:52.480+02:00 |
+| Diskussion | `d5a2356866b7b4f133c637ac8ba961abf6bad326` |
+
+
+marked the checklist item **Saknat eller ogiltigt template\-id visar error state\.** as completed
+
+<a id="note-860913"></a>
+### Systemhändelse 860913
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T21:17:55.599+02:00 |
+| Senast ändrad | 2026-05-13T21:17:55.606+02:00 |
+| Diskussion | `ed75c182902a5e447ef0432ee7cb6deba7cfeb49` |
+
+
+marked the checklist item **Gammal editorstate rensas när template inte hittas\.** as completed
+
+<a id="note-860914"></a>
+### Systemhändelse 860914
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T21:17:59.335+02:00 |
+| Senast ändrad | 2026-05-13T21:17:59.357+02:00 |
+| Diskussion | `a75f25f6a03a9fa6fcc3b8450ddea725ed89745b` |
+
+
+marked the checklist item **Editor och preview hanterar route\-parametrar konsekvent\.** as completed
+
+<a id="note-860915"></a>
+### Systemhändelse 860915
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T21:18:02.155+02:00 |
+| Senast ändrad | 2026-05-13T21:18:02.160+02:00 |
+| Diskussion | `4f0db0c56701e6c7f128a92fc5a3bf108c542f35` |
+
+
+marked the checklist item **Home visar tomt läge om templates saknas\.** as completed
+
+<a id="note-860916"></a>
+### Systemhändelse 860916
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T21:18:04.050+02:00 |
+| Senast ändrad | 2026-05-13T21:18:04.055+02:00 |
+| Diskussion | `3fa1de0c223ee03dca994a553c84199b86e058e5` |
+
+
+marked the checklist item **npx tsc \-\-noEmit passerar\.** as completed
+
+<a id="note-860917"></a>
+### Systemhändelse 860917
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T21:18:07.010+02:00 |
+| Senast ändrad | 2026-05-13T21:18:07.017+02:00 |
+| Diskussion | `667bb1654d988dc40cb6e380a02b176ff478f16c` |
+
+
+marked the checklist item **TC\-E1: Editor och preview hanterar saknat eller ogiltigt template\-id** as completed
+
+<a id="note-876369"></a>
+### Systemhändelse 876369
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-05T11:40:30.244+02:00 |
+| Senast ändrad | 2026-06-05T11:40:30.249+02:00 |
+| Diskussion | `fa32c23d39081d3d7a37bd88be9e1fa51431e888` |
+
+
+mentioned in requirement #183

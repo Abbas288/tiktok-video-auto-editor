@@ -1,0 +1,144 @@
+# Arbetsobjekt #159 — systemhistorik
+
+<a id="note-874602"></a>
+### Systemhändelse 874602
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T21:33:05.731+02:00 |
+| Senast ändrad | 2026-05-31T21:33:05.736+02:00 |
+| Diskussion | `142702031aec43547db38c11266cd90b906ec9ad` |
+
+
+set status to **To do**
+
+<a id="note-874603"></a>
+### Systemhändelse 874603
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T21:33:05.908+02:00 |
+| Senast ändrad | 2026-05-31T21:33:05.914+02:00 |
+| Diskussion | `bc1dacbfac9bfff14cadd532768b32a5dbdb5449` |
+
+
+added time estimate of 15m
+
+<a id="note-874612"></a>
+### Systemhändelse 874612
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T21:47:01.737+02:00 |
+| Senast ändrad | 2026-05-31T21:47:01.742+02:00 |
+| Diskussion | `190e0fde87b03f597649435abc24b25e032c84b2` |
+
+
+added 13m of time spent at 2026-05-31 21:47:01 +0200
+
+<a id="note-874613"></a>
+### Systemhändelse 874613
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T21:47:11.685+02:00 |
+| Senast ändrad | 2026-05-31T21:47:11.691+02:00 |
+| Diskussion | `4fb1da0b09bf328312d0f7eddc560984fb491e04` |
+
+
+marked the checklist item **preview/\[id\]\-routen tas bort\.** as completed
+
+<a id="note-874614"></a>
+### Systemhändelse 874614
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T21:47:14.335+02:00 |
+| Senast ändrad | 2026-05-31T21:47:14.345+02:00 |
+| Diskussion | `c3dfdf3e8cec29489a7043a2f9e456d7d1e8b7ac` |
+
+
+marked the checklist item **Preview\-routen tas bort från root layout\.** as completed
+
+<a id="note-874615"></a>
+### Systemhändelse 874615
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T21:47:16.574+02:00 |
+| Senast ändrad | 2026-05-31T21:47:16.583+02:00 |
+| Diskussion | `5a49a9a0eb8484b47ed23bc1f31422bf6c30c0ad` |
+
+
+marked the checklist item **Editor\-preview via VideoStage påverkas inte\.** as completed
+
+<a id="note-874616"></a>
+### Systemhändelse 874616
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T21:47:18.103+02:00 |
+| Senast ändrad | 2026-05-31T21:47:18.110+02:00 |
+| Diskussion | `7aa40396505b02ef1eabed07443b5678cfb0eb0b` |
+
+
+marked the checklist item **Projektets verifiering passerar\.** as completed
+
+<a id="note-874617"></a>
+### Systemhändelse 874617
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T21:47:22.051+02:00 |
+| Senast ändrad | 2026-05-31T21:47:22.059+02:00 |
+| Diskussion | `0a0f6d80b139733474f80832f03c454a05f50b93` |
+
+
+set status to **Done**
+
+<a id="note-875621"></a>
+### Systemhändelse 875621
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-02T01:26:33.843+02:00 |
+| Senast ändrad | 2026-06-02T01:26:33.868+02:00 |
+| Diskussion | `4ecdc48344d84c69d0742afcb83aa860a0502f6e` |
+
+
+changed the description
+
+<a id="note-875622"></a>
+### Systemhändelse 875622
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-02T01:29:18.788+02:00 |
+| Senast ändrad | 2026-06-02T01:29:18.810+02:00 |
+| Diskussion | `0173a0397b3c93e1b5d5bed0f6d97ae073a40cb3` |
+
+
+changed the description
+
+<a id="note-876355"></a>
+### Systemhändelse 876355
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-05T11:40:27.374+02:00 |
+| Senast ändrad | 2026-06-05T11:40:27.380+02:00 |
+| Diskussion | `1db0fb87f45063d0c0b593ea40aa541908e0e8ee` |
+
+
+mentioned in requirement #175

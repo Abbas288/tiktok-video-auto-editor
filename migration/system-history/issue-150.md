@@ -1,0 +1,53 @@
+# Arbetsobjekt #150 — systemhistorik
+
+<a id="note-874002"></a>
+### Systemhändelse 874002
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T02:42:31.136+02:00 |
+| Senast ändrad | 2026-05-31T02:42:31.141+02:00 |
+| Diskussion | `8d16a7d202008cf150907f89327453f5aa53cdb8` |
+
+
+mentioned in issue #147
+
+<a id="note-874012"></a>
+### Systemhändelse 874012
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:05:40.372+02:00 |
+| Senast ändrad | 2026-05-31T03:05:40.381+02:00 |
+| Diskussion | `289c69d4e2d0022eb1ab1e8c7003fb2590e667e2` |
+
+
+changed the description
+
+<a id="note-874033"></a>
+### Systemhändelse 874033
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:15:40.670+02:00 |
+| Senast ändrad | 2026-05-31T03:15:40.679+02:00 |
+| Diskussion | `7e3be4a41a9262b8f00d3aec3d3f28f4abe9c95d` |
+
+
+mentioned in merge request [!29](https://github.com/Abbas288/tiktok-video-auto-editor/blob/main/migration/merge-requests/029.md)
+
+<a id="note-874037"></a>
+### Systemhändelse 874037
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-31T03:16:55.587+02:00 |
+| Senast ändrad | 2026-05-31T03:16:55.640+02:00 |
+| Diskussion | `817257180cd145fa08bda45da89a63ffff3f7a51` |
+
+
+mentioned in commit 96cd581d63b18d7dd90741754ab380c7af423919

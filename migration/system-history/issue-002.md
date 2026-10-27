@@ -1,0 +1,365 @@
+# Arbetsobjekt #2 — systemhistorik
+
+<a id="note-838351"></a>
+### Systemhändelse 838351
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-16T22:08:29.094+02:00 |
+| Senast ändrad | 2026-04-16T22:08:29.117+02:00 |
+| Diskussion | `f81a1c9847686791caf1c1469db1292235e1f81a` |
+
+
+set status to **To do**
+
+<a id="note-838353"></a>
+### Systemhändelse 838353
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-16T22:09:14.777+02:00 |
+| Senast ändrad | 2026-04-16T22:09:14.786+02:00 |
+| Diskussion | `fe919049faaa382070e96c2ee18a2081d7a10241` |
+
+
+changed the description
+
+<a id="note-838354"></a>
+### Systemhändelse 838354
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-16T22:09:17.509+02:00 |
+| Senast ändrad | 2026-04-16T22:09:17.518+02:00 |
+| Diskussion | `383981ed550fc42103f1afa712aae21d29e2b903` |
+
+
+marked the checklist item **Appen kan hämta och spela en video från en GCS\-URL \(via signerad länk\)\. Spelaren hoppar automatiskt mellan definierade scener\.** as incomplete
+
+<a id="note-838364"></a>
+### Systemhändelse 838364
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-16T22:15:52.619+02:00 |
+| Senast ändrad | 2026-04-16T22:15:52.628+02:00 |
+| Diskussion | `c6a8f94bd93a013c35a6636e8b1f0b5c08144cf9` |
+
+
+<p>changed title from <code class="idiff">User Story: Som användare vill jag att källvideon spelas upp baserat på de starttider <span class="idiff left right deletion">(startSeconds) </span>som definierats i mallen, så att jag slipper se oredigerat råmaterial.</code> to <code class="idiff">User Story: Som användare vill jag att källvideon spelas upp baserat på de starttider som definierats i mallen, så att jag slipper se oredigerat råmaterial.</code></p>
+
+<a id="note-838365"></a>
+### Systemhändelse 838365
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-16T22:15:52.706+02:00 |
+| Senast ändrad | 2026-04-16T22:15:52.711+02:00 |
+| Diskussion | `7a9644457d6e558f9180e7e52073f92e4002e58e` |
+
+
+changed the description
+
+<a id="note-838372"></a>
+### Systemhändelse 838372
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-16T22:18:10.717+02:00 |
+| Senast ändrad | 2026-04-16T22:18:10.723+02:00 |
+| Diskussion | `91623d2f980f0d7a1d2fae3e53e23ce3e12205d5` |
+
+
+<p>changed title from <code class="idiff"><span class="idiff left right deletion">User Story: </span>Som användare vill jag att källvideon spelas upp baserat på de starttider som definierats i mallen, så att jag slipper se oredigerat råmaterial.</code> to <code class="idiff">Som användare vill jag att källvideon spelas upp baserat på de starttider som definierats i mallen, så att jag slipper se oredigerat råmaterial.</code></p>
+
+<a id="note-838554"></a>
+### Systemhändelse 838554
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-17T00:41:45.647+02:00 |
+| Senast ändrad | 2026-04-17T00:41:45.654+02:00 |
+| Diskussion | `b15eca97731d12fe30bd9ed1fbd6a61b4b93f293` |
+
+
+changed the description
+
+<a id="note-840173"></a>
+### Systemhändelse 840173
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-19T23:28:47.085+02:00 |
+| Senast ändrad | 2026-04-19T23:28:47.109+02:00 |
+| Diskussion | `cc8bab2c573873dc0f584d779e4ea02ea0c5e897` |
+
+
+added time estimate of 1d 2h
+
+<a id="note-846500"></a>
+### Systemhändelse 846500
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-04-27T15:08:59.017+02:00 |
+| Senast ändrad | 2026-04-27T15:08:59.027+02:00 |
+| Diskussion | `fb6943eafb857aa42599a50f241d556ed32a2ee1` |
+
+
+<p>changed title from <code class="idiff">Som användare vill jag att källvideon spelas upp baserat på de starttider som definierats i mallen, så att jag slipper se oredigerat råmaterial.</code> to <code class="idiff"><span class="idiff left right addition">USER STORY: </span>Som användare vill jag att källvideon spelas upp baserat på de starttider som definierats i mallen, så att jag slipper se oredigerat råmaterial.</code></p>
+
+<a id="note-859950"></a>
+### Systemhändelse 859950
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T22:55:08.831+02:00 |
+| Senast ändrad | 2026-05-12T22:55:08.841+02:00 |
+| Diskussion | `f60f7ec8f89a36863f85cb2fd8377c4ec7b7b882` |
+
+
+<p>changed title from <code class="idiff"><span class="idiff left deletion">USER STORY: </span>Som användare vill jag att källvideon spelas upp <span class="idiff right deletion">baserat på de starttider som definierats i mallen, så att jag slipper se oredigerat råmaterial</span>.</code> to <code class="idiff">Som användare vill jag att källvideon spelas upp <span class="idiff left right addition">i editorn, så att jag visuellt kan granska det rörliga materialet jag redigerar istället för att se en tom yta</span>.</code></p>
+
+<a id="note-859951"></a>
+### Systemhändelse 859951
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T22:55:08.929+02:00 |
+| Senast ändrad | 2026-05-12T22:55:08.935+02:00 |
+| Diskussion | `730f11a0a34d7cee590e52a8a7ebb3d46933355c` |
+
+
+changed the description
+
+<a id="note-859952"></a>
+### Systemhändelse 859952
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T22:55:09.001+02:00 |
+| Senast ändrad | 2026-05-12T22:55:09.006+02:00 |
+| Diskussion | `ac4dab9c26b944f4276a3cc223ebd89437413bc5` |
+
+
+changed time estimate to 3h from 1d 2h
+
+<a id="note-859953"></a>
+### Systemhändelse 859953
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T22:55:40.620+02:00 |
+| Senast ändrad | 2026-05-12T22:55:40.629+02:00 |
+| Diskussion | `181368881eb2462ba3c16e479ac63a2239068510` |
+
+
+changed the description
+
+<a id="note-859956"></a>
+### Systemhändelse 859956
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-12T23:00:23.909+02:00 |
+| Senast ändrad | 2026-05-12T23:00:23.922+02:00 |
+| Diskussion | `3ea0e9b9f7cac6a8f962b96263c38e2ff66749b0` |
+
+
+<p>changed title from <code class="idiff">Som användare vill jag att källvideon spelas upp i editorn, så att jag visuellt kan granska det rörliga materialet jag redigerar istället för att se en tom yta.</code> to <code class="idiff"><span class="idiff left right addition">USER STORY: </span>Som användare vill jag att källvideon spelas upp i editorn, så att jag visuellt kan granska det rörliga materialet jag redigerar istället för att se en tom yta.</code></p>
+
+<a id="note-860003"></a>
+### Systemhändelse 860003
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:31:05.392+02:00 |
+| Senast ändrad | 2026-05-13T04:31:05.411+02:00 |
+| Diskussion | `7c508cea9bcd0f34ec284bf5f4b8f7a4ab605557` |
+
+
+marked the checklist item **Editor\-vyn renderar en videospelare som ersätter det tidigare tomma läget/platshållaren\.** as completed
+
+<a id="note-860004"></a>
+### Systemhändelse 860004
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:31:10.828+02:00 |
+| Senast ändrad | 2026-05-13T04:31:10.894+02:00 |
+| Diskussion | `aa3994d7d14e4e9f660465ee1324e9315a32bfa4` |
+
+
+marked the checklist item **Videospelaren laddar den videolänk som finns angiven i det aktuella editor\-statet\.** as completed
+
+<a id="note-860005"></a>
+### Systemhändelse 860005
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:31:13.411+02:00 |
+| Senast ändrad | 2026-05-13T04:31:13.419+02:00 |
+| Diskussion | `5be0cdb0a3fd30273f480c27640e8abdfd56ee50` |
+
+
+marked the checklist item **Användaren kan starta och pausa videon\.** as completed
+
+<a id="note-860006"></a>
+### Systemhändelse 860006
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:31:21.726+02:00 |
+| Senast ändrad | 2026-05-13T04:31:21.732+02:00 |
+| Diskussion | `bf3769bd7d1975e8da147b2ccbd59217106febb4` |
+
+
+marked the checklist item **Om videolänken är ogiltig, trasig eller saknas, hanteras detta säkert \(t\.ex\. med en svart skärm eller ett felmeddelande\) och appen kraschar inte\.** as completed
+
+<a id="note-860007"></a>
+### Systemhändelse 860007
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:31:25.450+02:00 |
+| Senast ändrad | 2026-05-13T04:31:25.517+02:00 |
+| Diskussion | `66c232b2a6e0d4906a8e59b4c61b894c7dc28374` |
+
+
+marked the checklist item **Implementationen följer projektets arkitektur \(separerar UI från domänlogik\)\.** as completed
+
+<a id="note-860008"></a>
+### Systemhändelse 860008
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:41:14.778+02:00 |
+| Senast ändrad | 2026-05-13T04:41:14.790+02:00 |
+| Diskussion | `3463ee2cd6759ffd2e8fd254a4b0417c4f246c7e` |
+
+
+marked the checklist item **TC\-V2: Ogiltig video\-URL kraschar inte appen** as completed
+
+<a id="note-860009"></a>
+### Systemhändelse 860009
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:41:17.659+02:00 |
+| Senast ändrad | 2026-05-13T04:41:17.722+02:00 |
+| Diskussion | `cf8d117a50b247898e4ed8f8c6e6e79fd0befd12` |
+
+
+marked the checklist item **TC\-V1: Videon laddas och kan spelas upp i editorn** as completed
+
+<a id="note-860011"></a>
+### Systemhändelse 860011
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:41:37.013+02:00 |
+| Senast ändrad | 2026-05-13T04:41:37.020+02:00 |
+| Diskussion | `68f197be6174caffe6fd6aebb156d0fe0dd114e9` |
+
+
+added 1h 10m of time spent at 2026-05-13 04:41:36 +0200
+
+<a id="note-860013"></a>
+### Systemhändelse 860013
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:56:09.027+02:00 |
+| Senast ändrad | 2026-05-13T04:56:09.033+02:00 |
+| Diskussion | `ab2e3ee8ae5a6f526fc514265d1ad0ca7bc0ecbc` |
+
+
+mentioned in merge request [!6](https://github.com/Abbas288/tiktok-video-auto-editor/blob/main/migration/merge-requests/006.md)
+
+<a id="note-860018"></a>
+### Systemhändelse 860018
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:56:22.166+02:00 |
+| Senast ändrad | 2026-05-13T04:56:22.173+02:00 |
+| Diskussion | `df597e2da77a6eb7f45eead11595027134cf63de` |
+
+
+mentioned in commit b091738124a99716cc8f1883c9815ceedcc4c0bb
+
+<a id="note-860020"></a>
+### Systemhändelse 860020
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-13T04:56:23.423+02:00 |
+| Senast ändrad | 2026-05-13T04:56:23.433+02:00 |
+| Diskussion | `a657e27728731fc921bca1cf325bdc20f0fd785f` |
+
+
+set status to **Done**
+
+<a id="note-861920"></a>
+### Systemhändelse 861920
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-15T01:58:08.344+02:00 |
+| Senast ändrad | 2026-05-15T01:58:08.354+02:00 |
+| Diskussion | `167dd509b2a126426f0133333d9b0154c22b8762` |
+
+
+changed the description
+
+<a id="note-861921"></a>
+### Systemhändelse 861921
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-15T02:01:00.915+02:00 |
+| Senast ändrad | 2026-05-15T02:01:00.925+02:00 |
+| Diskussion | `3d334eaa92089f1732184380eb20f9e6e4d7c88d` |
+
+
+changed the description
+
+<a id="note-876348"></a>
+### Systemhändelse 876348
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-06-05T11:40:26.780+02:00 |
+| Senast ändrad | 2026-06-05T11:40:26.783+02:00 |
+| Diskussion | `4163f36df70152a1892db83bc1aac0a2a24932fd` |
+
+
+mentioned in requirement #175

@@ -1,0 +1,196 @@
+# Arbetsobjekt #79 — systemhistorik
+
+<a id="note-868214"></a>
+### Systemhändelse 868214
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T14:27:55.705+02:00 |
+| Senast ändrad | 2026-05-24T14:27:55.710+02:00 |
+| Diskussion | `6263275ba028a2a7cbc6bd9bc063d045cb07cf0f` |
+
+
+set status to **To do**
+
+<a id="note-868215"></a>
+### Systemhändelse 868215
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T14:27:55.873+02:00 |
+| Senast ändrad | 2026-05-24T14:27:55.878+02:00 |
+| Diskussion | `4eda350894341cf5ed4799c981e1a80b9037f3e1` |
+
+
+added time estimate of 2h
+
+<a id="note-868267"></a>
+### Systemhändelse 868267
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T15:55:04.163+02:00 |
+| Senast ändrad | 2026-05-24T15:55:04.175+02:00 |
+| Diskussion | `729c1f1c2521af42a7b34cac856884312184638c` |
+
+
+mentioned in merge request [!15](https://github.com/Abbas288/tiktok-video-auto-editor/blob/main/migration/merge-requests/015.md)
+
+<a id="note-868272"></a>
+### Systemhändelse 868272
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T15:56:21.605+02:00 |
+| Senast ändrad | 2026-05-24T15:56:21.610+02:00 |
+| Diskussion | `aa0f25952d28b662aafc392b9bd7842c6718a894` |
+
+
+mentioned in commit 72ad57c71fd6fdc012755c401e2a5a5e3167cfe6
+
+<a id="note-868274"></a>
+### Systemhändelse 868274
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T15:56:22.149+02:00 |
+| Senast ändrad | 2026-05-24T15:56:22.155+02:00 |
+| Diskussion | `78064f4b5a3d3abfa116365a909f25cceafb3470` |
+
+
+set status to **Done**
+
+<a id="note-868282"></a>
+### Systemhändelse 868282
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T16:04:05.564+02:00 |
+| Senast ändrad | 2026-05-24T16:04:05.572+02:00 |
+| Diskussion | `8bbd5c59dded59749b636d49088e139ad9784088` |
+
+
+marked the checklist item **Samtliga kopplade testfall är godkända\.** as completed
+
+<a id="note-868285"></a>
+### Systemhändelse 868285
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T16:04:07.632+02:00 |
+| Senast ändrad | 2026-05-24T16:04:07.656+02:00 |
+| Diskussion | `192ab95b80f04b21938c9bd7b7d99b05778dd4f5` |
+
+
+marked the checklist item **Editor\-skärmen är enklare att läsa och innehåller mindre koordineringslogik\.** as completed
+
+<a id="note-868286"></a>
+### Systemhändelse 868286
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T16:04:11.295+02:00 |
+| Senast ändrad | 2026-05-24T16:04:11.304+02:00 |
+| Diskussion | `333c20d7ae2113084551ca61ba92e02b9ac33d36` |
+
+
+marked the checklist item **Projekt kan fortfarande öppnas och lämnas som tidigare\.** as completed
+
+<a id="note-868287"></a>
+### Systemhändelse 868287
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T16:04:15.043+02:00 |
+| Senast ändrad | 2026-05-24T16:04:15.066+02:00 |
+| Diskussion | `1fe25052b2588093c67f62fb7050ae77359ebd88` |
+
+
+marked the checklist item **Tidslinjen fungerar som tidigare vid val av scen\.** as completed
+
+<a id="note-868288"></a>
+### Systemhändelse 868288
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T16:04:16.673+02:00 |
+| Senast ändrad | 2026-05-24T16:04:16.679+02:00 |
+| Diskussion | `e14b9404a498a7d19986b396c8014aa97e2581b3` |
+
+
+marked the checklist item **Aktiv scen uppdateras fortfarande när videons tid ändras\.** as completed
+
+<a id="note-868289"></a>
+### Systemhändelse 868289
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T16:04:19.144+02:00 |
+| Senast ändrad | 2026-05-24T16:04:19.168+02:00 |
+| Diskussion | `b25282d6a7e389b0836d0eb481da2e65393bdd26` |
+
+
+marked the checklist item **Textöverlägg kan fortfarande väljas, redigeras och flyttas\.** as completed
+
+<a id="note-868290"></a>
+### Systemhändelse 868290
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T16:04:20.952+02:00 |
+| Senast ändrad | 2026-05-24T16:04:20.958+02:00 |
+| Diskussion | `31e6c56f8b2ca2e641e84fe32081d1e5e15fb86e` |
+
+
+marked the checklist item **Scene effects kan fortfarande ändras och återställas\.** as completed
+
+<a id="note-868291"></a>
+### Systemhändelse 868291
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T16:04:23.196+02:00 |
+| Senast ändrad | 2026-05-24T16:04:23.220+02:00 |
+| Diskussion | `b78c210122acbf1c9a9ff3912b4e7e1390290ebb` |
+
+
+marked the checklist item **Ljudkontroller fungerar som tidigare\.** as completed
+
+<a id="note-868292"></a>
+### Systemhändelse 868292
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T16:04:24.709+02:00 |
+| Senast ändrad | 2026-05-24T16:04:24.716+02:00 |
+| Diskussion | `e44ce40445f376886823e2861b0eb9bd2999ddb0` |
+
+
+marked the checklist item **Projektets verifiering passerar\.** as completed
+
+<a id="note-868293"></a>
+### Systemhändelse 868293
+
+| Fält | Ursprungligt värde |
+|---|---|
+| Författare | Abbas Faeq Hadi (GitLab: `af223qz`) |
+| Skapad | 2026-05-24T16:04:50.012+02:00 |
+| Senast ändrad | 2026-05-24T16:04:50.018+02:00 |
+| Diskussion | `b9a49178915c086a823f68f878d60cb5cdeda9dc` |
+
+
+added 50m of time spent at 2026-05-24 16:04:49 +0200

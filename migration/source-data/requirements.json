@@ -1,0 +1,134 @@
+[
+  {
+    "createdAt": "2026-06-05T11:40:24+02:00",
+    "description": "Systemet ska låta användaren skapa, importera, öppna, byta namn på och ta bort projekt baserade på Template-JSON.\nKopplade issues: #1, #124, #130, #135, #142.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/688",
+    "iid": "1",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-01: Projekt och templates",
+    "updatedAt": "2026-06-05T11:44:55+02:00",
+    "workItemIid": "173"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:25+02:00",
+    "description": "Systemet ska hjälpa användaren förstå template-formatet och kunna kopiera en AI-prompt för att skapa giltig Template-JSON.\nKopplade issues: #124, #153.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/689",
+    "iid": "2",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-02: Template-guide och AI-prompt",
+    "updatedAt": "2026-06-05T11:44:54+02:00",
+    "workItemIid": "174"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:26+02:00",
+    "description": "Systemet ska visa en redigeringsvy med videoyta, scener, timeline och scenval som går att förstå och använda utan att tappa överblick.\nKopplade issues: #2, #3, #4, #113, #119, #142, #159.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/690",
+    "iid": "3",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-03: Editor och scenöversikt",
+    "updatedAt": "2026-06-05T11:44:52+02:00",
+    "workItemIid": "175"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:26+02:00",
+    "description": "Systemet ska visa och låta användaren justera template-baserade textöverlägg.\nKopplade issues: #5, #6.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/691",
+    "iid": "4",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-04: Textöverlägg",
+    "updatedAt": "2026-06-05T11:44:51+02:00",
+    "workItemIid": "176"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:27+02:00",
+    "description": "Systemet ska stödja centrala scene effects och transitions på MVP-nivå.\nKopplade issues: #7, #11.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/692",
+    "iid": "5",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-05: Effekter och övergångar",
+    "updatedAt": "2026-06-05T11:44:50+02:00",
+    "workItemIid": "177"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:27+02:00",
+    "description": "Systemet ska låta användaren justera originalljud och bakgrundsmusik på MVP-nivå.\nKopplade issues: #8.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/693",
+    "iid": "6",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-06: Ljudkontroll",
+    "updatedAt": "2026-06-05T11:44:47+02:00",
+    "workItemIid": "178"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:27+02:00",
+    "description": "Systemet ska låta användaren lägga in, trimma, byta och återställa egna videokällor per scen.\nKopplade issues: #106, #169.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/694",
+    "iid": "7",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-07: Egna scenvideor",
+    "updatedAt": "2026-06-05T11:44:46+02:00",
+    "workItemIid": "179"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:28+02:00",
+    "description": "Systemet ska bygga ett stabilt compile-kontrakt från aktuell template, scener, media och redigeringar.\nKopplade issues: #9, #96, #100, #167.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/695",
+    "iid": "8",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-08: Compile-payload",
+    "updatedAt": "2026-06-05T11:44:44+02:00",
+    "workItemIid": "180"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:28+02:00",
+    "description": "Compile-servern ska kunna rendera MVP-output med FFmpeg och hantera uppladdade scenkällor i deployed miljö.\nKopplade issues: #96, #100, #160, #167.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/696",
+    "iid": "9",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-09: Serverrendering",
+    "updatedAt": "2026-06-05T11:44:43+02:00",
+    "workItemIid": "181"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:28+02:00",
+    "description": "Systemet ska ge användaren åtkomst till färdig video via open, download eller save beroende på plattform.\nKopplade issues: #10, #147.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/697",
+    "iid": "10",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-10: Export",
+    "updatedAt": "2026-06-05T11:44:40+02:00",
+    "workItemIid": "182"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:29+02:00",
+    "description": "Systemet ska hantera ogiltig template, saknad media, gamla mediareferenser och compile-fel utan krasch.\nKopplade issues: #33, #34, #42, #147, #167, #169.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/698",
+    "iid": "11",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-11: Robust felhantering",
+    "updatedAt": "2026-06-05T11:44:38+02:00",
+    "workItemIid": "183"
+  },
+  {
+    "createdAt": "2026-06-05T11:40:29+02:00",
+    "description": "Projektet ska ha spårbarhet mellan krav, issues, testfall, MR, verifiering, CI/CD, deployment och dokumentation.\nKopplade issues: #35, #62, #158, #160.",
+    "id": "gid://gitlab/RequirementsManagement::Requirement/699",
+    "iid": "12",
+    "lastTestReportState": null,
+    "state": "ARCHIVED",
+    "title": "REQ-12: Verifiering och leverans",
+    "updatedAt": "2026-06-05T11:44:34+02:00",
+    "workItemIid": "184"
+  }
+]

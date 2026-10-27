@@ -1,0 +1,49 @@
+{
+  "archive_files": 421,
+  "body_and_comment_hashes_verified": true,
+  "closed_placeholders": [
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    64,
+    90,
+    131,
+    136,
+    141,
+    152
+  ],
+  "files_with_signature_like_source_lines": [],
+  "label_definitions": 10,
+  "manifest_comment_payloads": 4,
+  "manifest_items": 185,
+  "mapping_entries": 220,
+  "max_comment_body_characters": 408,
+  "max_issue_body_characters": 3217,
+  "merge_request_archives": 37,
+  "number_sequence_complete": true,
+  "reference_conversion_checks": 13,
+  "reference_conversion_counts": {
+    "merge_request_shorthand": 297,
+    "source_project_urls": 138
+  },
+  "requirement_duplicates_removed": 12,
+  "source_inventory_files_checksummed": 628,
+  "source_items": 171,
+  "source_label_count": 6,
+  "source_user_comments": 4,
+  "system_notes": 1449,
+  "timelogs": 40,
+  "total_time_estimate_seconds": 389400,
+  "total_time_spent_seconds": 381600,
+  "types": {
+    "issue": 42,
+    "requirement": 12,
+    "test_case": 117
+  },
+  "unmapped_source_urls": {}
+}

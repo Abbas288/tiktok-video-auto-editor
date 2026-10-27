@@ -1,0 +1,134 @@
+[
+  {
+    "discussion_id": "dc8826020acfd312fcbbbcdcbd01abd1a7018961",
+    "note": {
+      "author": {
+        "avatar_url": "https://secure.gravatar.com/avatar/d0d871296940442738e0cc7c58b64903a9745d6b0016cb7d7f2db25d9fc74e4e?s=80&d=identicon",
+        "id": 1432,
+        "locked": false,
+        "name": "Abbas Faeq Hadi",
+        "public_email": "af223qz@student.lnu.se",
+        "state": "active",
+        "username": "af223qz",
+        "web_url": "https://gitlab.lnu.se/af223qz"
+      },
+      "body": "Lägger in tid i efterhand. Tidsåtgången på 5h kan verifieras via historiken: startade kl. 17:16 (uppdaterade description) och stängdes kl. 22:14 (via MR).",
+      "commands_changes": {},
+      "confidential": false,
+      "created_at": "2026-05-26T16:57:02.103+02:00",
+      "id": 870415,
+      "imported": false,
+      "imported_from": "none",
+      "internal": false,
+      "noteable_id": 159622,
+      "noteable_iid": 7,
+      "noteable_type": "Issue",
+      "project_id": 59528,
+      "resolvable": false,
+      "system": false,
+      "type": null,
+      "updated_at": "2026-05-26T16:57:02.103+02:00"
+    },
+    "source_iid": 7,
+    "source_kind": "issue"
+  },
+  {
+    "discussion_id": "43e6cc426918f3847963136312fde0b0f43d1495",
+    "note": {
+      "author": {
+        "avatar_url": "https://secure.gravatar.com/avatar/d0d871296940442738e0cc7c58b64903a9745d6b0016cb7d7f2db25d9fc74e4e?s=80&d=identicon",
+        "id": 1432,
+        "locked": false,
+        "name": "Abbas Faeq Hadi",
+        "public_email": "af223qz@student.lnu.se",
+        "state": "active",
+        "username": "af223qz",
+        "web_url": "https://gitlab.lnu.se/af223qz"
+      },
+      "body": "Estimatet är gammalt från tidigt i kursen, därav den stora avvikelsen mellan det och den faktiska tiden nerlagd.",
+      "commands_changes": {},
+      "confidential": false,
+      "created_at": "2026-05-28T13:52:01.020+02:00",
+      "id": 872014,
+      "imported": false,
+      "imported_from": "none",
+      "internal": false,
+      "noteable_id": 159624,
+      "noteable_iid": 9,
+      "noteable_type": "Issue",
+      "project_id": 59528,
+      "resolvable": false,
+      "system": false,
+      "type": null,
+      "updated_at": "2026-05-28T13:52:01.020+02:00"
+    },
+    "source_iid": 9,
+    "source_kind": "issue"
+  },
+  {
+    "discussion_id": "0f392cf9e3b3ac307399f9c470064aa1fe49c0cd",
+    "note": {
+      "author": {
+        "avatar_url": "https://secure.gravatar.com/avatar/d0d871296940442738e0cc7c58b64903a9745d6b0016cb7d7f2db25d9fc74e4e?s=80&d=identicon",
+        "id": 1432,
+        "locked": false,
+        "name": "Abbas Faeq Hadi",
+        "public_email": "af223qz@student.lnu.se",
+        "state": "active",
+        "username": "af223qz",
+        "web_url": "https://gitlab.lnu.se/af223qz"
+      },
+      "body": "Rättar föregående inlägg – 1 h rast är nu borträknad.",
+      "commands_changes": {},
+      "confidential": false,
+      "created_at": "2026-05-29T03:39:37.034+02:00",
+      "id": 872772,
+      "imported": false,
+      "imported_from": "none",
+      "internal": false,
+      "noteable_id": 163213,
+      "noteable_iid": 106,
+      "noteable_type": "Issue",
+      "project_id": 59528,
+      "resolvable": false,
+      "system": false,
+      "type": null,
+      "updated_at": "2026-05-29T03:39:37.034+02:00"
+    },
+    "source_iid": 106,
+    "source_kind": "issue"
+  },
+  {
+    "discussion_id": "d9f5802ce9ba5f8e810b18db186afb45e13855f8",
+    "note": {
+      "author": {
+        "avatar_url": "https://secure.gravatar.com/avatar/d0d871296940442738e0cc7c58b64903a9745d6b0016cb7d7f2db25d9fc74e4e?s=80&d=identicon",
+        "id": 1432,
+        "locked": false,
+        "name": "Abbas Faeq Hadi",
+        "public_email": "af223qz@student.lnu.se",
+        "state": "active",
+        "username": "af223qz",
+        "web_url": "https://gitlab.lnu.se/af223qz"
+      },
+      "body": "Korrekturläsningen gjorde så att jag spenderade mer tid än planerat för detta issue.",
+      "commands_changes": {},
+      "confidential": false,
+      "created_at": "2026-06-04T20:50:05.953+02:00",
+      "id": 876301,
+      "imported": false,
+      "imported_from": "none",
+      "internal": false,
+      "noteable_id": 163563,
+      "noteable_iid": 172,
+      "noteable_type": "Issue",
+      "project_id": 59528,
+      "resolvable": false,
+      "system": false,
+      "type": null,
+      "updated_at": "2026-06-04T20:50:32.655+02:00"
+    },
+    "source_iid": 172,
+    "source_kind": "issue"
+  }
+]
